@@ -1,13 +1,13 @@
-###### Last updated: January 6 2023
+###### Last updated: January 14 2023
 
 m8face is built and published as a commercial WearOS watch face.  
-It is is maintained by rdnt and is intended for use as is.
+It is maintained by Papalyras Anastasios (rdnt) and is intended for use as is.
 
 ### Information Collection & Share
 
 No information is collected or shared.  
 Complication data in the watch face such as battery level status, step count, weather, calendar, heart rate and other fitness data is received from the relevant complication data providers.
-The watch face retains control only over how the data is rendered, there is no interest in accessing the actual values.
+The watch face retains control only over how the data is rendered, there is no interest in accessing or sharing the actual values.
 
 ### Changes to This Privacy Policy
 
