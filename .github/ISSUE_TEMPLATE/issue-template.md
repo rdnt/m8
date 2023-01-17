@@ -1,6 +1,6 @@
 ---
-name: Issue template
-about: Default issue template
+name: Submit issue
+about: Submit an issue with reproduction steps and device information
 title: ''
 labels: ''
 assignees: ''
