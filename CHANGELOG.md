@@ -1,4 +1,4 @@
-- v1.3.10 (2023/02/03)
- - Configuration editor performance improvements
- - Fix issue with configured color being reset upon editor launch
- - Fix color picker focus issues
+- v1.3.10-beta (2023/02/03)
+  - Configuration editor performance improvements
+  - Fix issue with configured color being reset upon editor launch
+  - Fix color picker focus issues
