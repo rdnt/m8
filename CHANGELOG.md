@@ -4,6 +4,7 @@ Last updated: 2023/02/10
   - Snap to middle of color selection when initializing watchface color picker
   - Fix spacing between complications
   - Add background to color scheme name to compensate for the battery complication being visible
+  - Improve configurator performance & limit re-compositions
 
 - v1.3.12-beta
   - Refactored configuration editor on watch
