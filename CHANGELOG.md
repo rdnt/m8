@@ -1,7 +1,7 @@
 Last updated: 2023/02/10
 
 - v2.0.0-rc
-  - Snap to middle of color selection when initializing watchface color picker
+  - Snap to middle of color selection when initializing configurator
   - Fix spacing between complications
   - Add background to color scheme name to compensate for the battery complication being visible
   - Improve configurator performance & limit re-compositions
