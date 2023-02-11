@@ -1,4 +1,8 @@
-Last updated: 2023/02/10
+Last updated: 2023/02/11
+
+- v2.0.2
+  - Fix date font rendering accuracy
+  - Refine complication placement & scale, as well as configurator complication buttons
 
 - v2.0.0-rc
   - Snap to middle of color selection when initializing configurator
