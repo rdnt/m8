@@ -5,10 +5,10 @@ Last updated: 2023/03/02
   - Ambient style setting (outline, bold outline, filled)
   - Custom complications rendering
   - Allow top and bottom complications to be configurable
-  - Fix elements scaling issues
   - Fix complication colors not being applied properly
   - Performance optimizations on watchface editor and renderer 
   - Custom prefix style for battery and heart-rate complications
+  - Fix elements scaling issues
 
 - v2.0.2
   - Fix date font rendering accuracy
