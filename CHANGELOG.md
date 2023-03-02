@@ -8,6 +8,7 @@ Last updated: 2023/03/02
   - Fix elements scaling issues
   - Fix complication colors not being applied properly
   - Performance optimizations on watchface editor and renderer 
+  - Custom prefix style for battery and heart-rate complications
 
 - v2.0.2
   - Fix date font rendering accuracy
