@@ -7,7 +7,7 @@ Last updated: 2023/03/02
   - Allow top and bottom complications to be configurable
   - Fix elements scaling issues
   - Fix complication colors not being applied properly
-  - Renderer performance optimizations
+  - Performance optimizations on watchface editor and renderer 
 
 - v2.0.2
   - Fix date font rendering accuracy
