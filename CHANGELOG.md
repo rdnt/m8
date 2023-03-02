@@ -1,4 +1,13 @@
-Last updated: 2023/02/11
+Last updated: 2023/03/02
+
+- v2.6.4-rc
+  - Configurable military time style (with auto detection in case it is not configured)
+  - Ambient style setting (outline, bold outline, filled)
+  - Custom complications rendering
+  - Allow top and bottom complications to be configurable
+  - Fix elements scaling issues
+  - Fix complication colors not being applied properly
+  - Renderer performance optimizations
 
 - v2.0.2
   - Fix date font rendering accuracy
