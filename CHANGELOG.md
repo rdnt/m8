@@ -1,6 +1,6 @@
 Last updated: 2023/03/02
 
-- v2.6.4-rc
+- v2.6.4
   - Configurable military time style (with auto detection in case it is not configured)
   - Ambient style setting (outline, bold outline, filled)
   - Custom complications rendering
