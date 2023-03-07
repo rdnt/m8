@@ -1,5 +1,9 @@
 Last updated: 2023/03/02
 
+- v2.6.6-rc
+  - Fix 12-hour and 24-hour represention when in standard time mode
+  - Do not listen for locale update events after watch-face data initialization
+
 - v2.6.4
   - Configurable military time style (with auto detection in case it is not configured)
   - Ambient style setting (outline, bold outline, filled)
