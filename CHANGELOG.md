@@ -1,6 +1,6 @@
-Last updated: 2023/03/02
+Last updated: 2023/03/09
 
-- v2.6.6-rc
+- v2.6.6
   - Fix 12-hour and 24-hour represention when in standard time mode
   - Do not listen for locale update events after watch-face data initialization
 
