@@ -1,5 +1,8 @@
 Last updated: 2023/03/09
 
+- v2.7.0-beta
+  - Seconds indicator with dashed/dotted styles
+
 - v2.6.6
   - Fix 12-hour and 24-hour represention when in standard time mode
   - Do not listen for locale update events after watch-face data initialization
