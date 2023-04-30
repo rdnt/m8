@@ -1,5 +1,3 @@
-# M8
-
 This repository is used as an issue tracker for M8, a WearOS watch-face. 
 
 Please submit any issue or suggestion in the [issues page](https://github.com/rdnt/m8/issues).  
