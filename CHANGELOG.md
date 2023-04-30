@@ -1,5 +1,14 @@
 Last updated: 2023/04/02
 
+- v2.9.6-beta1
+  - Transitions
+  - Refine fonts
+  - Bug fixes
+
+- v2.8.0-beta1
+  - Big Ambient setting
+  - Refine ambient font rendering
+
 - v2.7.0-beta
   - Seconds indicator with dashed/dotted styles
 
