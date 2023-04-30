@@ -1,6 +1,6 @@
-###### Last updated: January 14 2023
+###### Last updated: May 01 2023
 
-m8face is built and published as a commercial WearOS watch face.  
+M8 is built and published as a commercial WearOS watch face.  
 It is maintained by Papalyras Anastasios (rdnt) and is intended for use as is.
 
 ### Information Collection & Share
