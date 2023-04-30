@@ -2,8 +2,9 @@ Last updated: 2023/04/02
 
 - v2.9.6-beta1
   - Transitions
+  - Fix dynamic preview generation
+  - Improve configurator
   - Refine fonts
-  - Bug fixes
 
 - v2.8.0-beta1
   - Big Ambient setting
