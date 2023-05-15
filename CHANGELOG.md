@@ -1,4 +1,4 @@
-Last updated: 2023/04/02
+Last updated: 2023/05/15
 
 - v2.9.7-beta
   - Improve animations
