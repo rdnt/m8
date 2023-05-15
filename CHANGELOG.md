@@ -1,6 +1,11 @@
 Last updated: 2023/05/15
 
-- v2.9.8-beta
+- v2.9.8 (in review)
+  - Analog seconds indicator with dashed/dotted styles
+  - Big Ambient setting
+  - Ambient mode transitions
+
+- v2.9.8-beta (in review)
   - Improve animations
   - Obey Animator duration scale
   - Fix animator replaying on rare occasions
