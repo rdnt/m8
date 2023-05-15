@@ -1,8 +1,9 @@
 Last updated: 2023/05/15
 
-- v2.9.7-beta
+- v2.9.8-beta
   - Improve animations
   - Obey Animator duration scale
+  - Fix animator replaying on rare occasions
 
 - v2.9.6-beta
   - Transitions
