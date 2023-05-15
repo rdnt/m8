@@ -1,5 +1,8 @@
 Last updated: 2023/04/02
 
+- v2.9.7-beta
+  - Improve animations, obey Animator scale from devtools
+
 - v2.9.6-beta
   - Transitions
   - Fix dynamic preview generation
