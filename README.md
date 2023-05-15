@@ -3,7 +3,7 @@ This repository is used as an issue tracker for M8, a WearOS watch-face.
 Please submit any issue or suggestion in the [issues page](https://github.com/rdnt/m8/issues).  
 If the issue is a bug, include your device model and steps required to reproduce, if any.
 
-Want to try out new features? [Become a tester!](https://play.google.com/apps/testing/dev.rdnt.m8face)
+Want to try out new features? [Become a tester!](https://play.google.com/apps/testing/dev.rdnt.m8face)  
 Want to help the project grow? Share it on social networks and with your friends! 🥰
 
 [Get M8 from the Play Store!](https://play.google.com/store/apps/details?id=dev.rdnt.m8face)
