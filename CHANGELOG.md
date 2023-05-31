@@ -1,5 +1,8 @@
 Last updated: 2023/05/15
 
+- v2.9.9
+  - Fix regression regarding 12-hour time
+
 - v2.9.8
   - Analog seconds indicator with dashed/dotted styles
   - Big Ambient setting
