@@ -10,11 +10,10 @@ assignees: ''
 **Describe the issue**
 A clear and concise description of what the issue is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
+**Steps to reproduce**
 1. ...
 2. ...
 
 **Device info:**
- - WearOS version: e.g. 11
+ - WearOS version: e.g. 3.5 (Android 11)
  - Device model: e.g. Pixel Watch
