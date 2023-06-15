@@ -7,10 +7,10 @@ assignees: ''
 
 ---
 
-**Describe the issue**
+**Issue description:**
 A clear and concise description of what the issue is.
 
-**Steps to reproduce**
+**Steps to reproduce:**
 1. ...
 2. ...
 
