@@ -1,4 +1,11 @@
-Last updated: 2023/05/15
+Last updated: 2023/06/21
+
+- v2.11.2
+  - Four new color schemes (Retro, Flamingo, Cotton Candy, Onyx)
+  - Refine existing color schemes
+  - Fix 24-hour time setting not being applied correctly under specific circumstances
+  - Fix transition from ambient mode
+  - Fix configurator over-scroll
 
 - v2.9.9
   - Fix regression regarding 12-hour time
