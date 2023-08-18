@@ -97,7 +97,6 @@ import dev.rdnt.m8face.utils.HORIZONTAL_COMPLICATION_RIGHT_BOUND
 import dev.rdnt.m8face.utils.LEFT_COMPLICATION_ID
 import dev.rdnt.m8face.utils.RIGHT_COMPLICATION_ID
 import dev.rdnt.m8face.utils.TOP_COMPLICATION_ID
-import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_HEIGHT
 import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_OFFSET
 import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_TOP_BOUND
 import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_WIDTH
@@ -936,7 +935,6 @@ fun ComplicationPicker(
         modifier = Modifier
           .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
           .fillMaxHeight()
-//          .alpha(0f),
       ) {}
       Box(
         Modifier
@@ -966,7 +964,6 @@ fun ComplicationPicker(
         modifier = Modifier
           .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
           .fillMaxHeight()
-//          .alpha(0f),
       ) {}
       Box(
         Modifier
@@ -1045,7 +1042,6 @@ fun ColorName(name: String) {
     modifier = Modifier
       .fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally
-//    contentAlignment = Alignment.Center
   ) {
     Box(Modifier.weight(29f))
 
@@ -1076,7 +1072,6 @@ fun Label(label: String) {
     modifier = Modifier
       .fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally
-//    contentAlignment = Alignment.Center
   ) {
 //    Box(Modifier
 //      .padding(0.dp, 140.dp, 0.dp, 0.dp)

@@ -54,17 +54,11 @@ import java.time.ZonedDateTime
 const val VERTICAL_COMPLICATION_TOP_BOUND = 0.328125f // 126px / 384
 const val VERTICAL_COMPLICATION_BOTTOM_BOUND = 1f - VERTICAL_COMPLICATION_TOP_BOUND
 
-//const val VERTICAL_COMPLICATION_TOP_BOUND = 0.2265625f // 87px / 384
-//const val VERTICAL_COMPLICATION_BOTTOM_BOUND = 1f - VERTICAL_COMPLICATION_TOP_BOUND
-
 // offset: 18px, width: 78px (canvas 384x384)
 const val VERTICAL_COMPLICATION_OFFSET = 24f / 384f
-//const val VERTICAL_COMPLICATION_OFFSET = 0.0390625f // 15f / 384f
-
 
 const val VERTICAL_COMPLICATION_WIDTH = 78f / 384f
-//const val VERTICAL_COMPLICATION_WIDTH = 0.21875f // 84f / 384f
-const val VERTICAL_COMPLICATION_HEIGHT = VERTICAL_COMPLICATION_BOTTOM_BOUND - VERTICAL_COMPLICATION_TOP_BOUND
+//const val VERTICAL_COMPLICATION_HEIGHT = VERTICAL_COMPLICATION_BOTTOM_BOUND - VERTICAL_COMPLICATION_TOP_BOUND
 
 // 0.03125
 private const val LEFT_COMPLICATION_LEFT_BOUND = VERTICAL_COMPLICATION_OFFSET
@@ -81,10 +75,7 @@ const val HORIZONTAL_COMPLICATION_RIGHT_BOUND = 1f - HORIZONTAL_COMPLICATION_LEF
 const val HORIZONTAL_COMPLICATION_OFFSET = 24f / 384f
 const val HORIZONTAL_COMPLICATION_HEIGHT = 48f / 384f
 
-//const val HORIZONTAL_COMPLICATION_OFFSET = 9f / 384f
-//const val HORIZONTAL_COMPLICATION_HEIGHT = 0.15625f // 60 / 384
-
-const val HORIZONTAL_COMPLICATION_WIDTH = HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND
+//const val HORIZONTAL_COMPLICATION_WIDTH = HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND
 
 private const val TOP_COMPLICATION_TOP_BOUND = HORIZONTAL_COMPLICATION_OFFSET
 private const val TOP_COMPLICATION_BOTTOM_BOUND = HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT
@@ -143,14 +134,6 @@ fun createComplicationSlotManager(
   context: Context,
   currentUserStyleRepository: CurrentUserStyleRepository,
 ): ComplicationSlotsManager {
-//  val defaultCanvasComplicationFactory =
-//    CanvasComplicationFactory { watchState, listener ->
-//      CanvasComplicationDrawable(
-//        ComplicationDrawable.getDrawable(context, drawableId)!!,
-//        watchState,
-//        listener
-//      )
-//    }
 
   val customLeftComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Left.id,
@@ -248,12 +231,7 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
     Log.d("RectangleCanvasComplication", "render($slotId, ${_data.type}) -- start: ${start}ms")
 
     val dataSource = _data.dataSource
-
     val isBattery = dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
-
-
-
-//    com.google.android.wearable.sysui/com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService
 
     // debug
     val dp = Paint()
@@ -319,22 +297,6 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
       text = "$title $text"
     }
 
-//        text = "1234"
-
-//    if (text.length <= 3) {
-//      tp.textSize = 24F/384F*canvas.width.toFloat()
-//      offset = 11F
-//    } else if (text.length <= 6) {
-//      tp.textSize = 16F/384F*canvas.width.toFloat()
-//      offset = +8F
-//    } else {
-//      tp.textSize = 12F/384F*canvas.width.toFloat()
-//      offset = +5F
-//      tp.isAntiAlias = true
-//    }
-
-
-
     tp.color = Color.parseColor("#8888bb")
 
     canvas.drawText(
@@ -357,13 +319,7 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
       )
     }
 
-
-
     if (icon != null && title == null) {
-
-
-
-//            val drawable = getDrawable(context, icon.type)!!
 
       val srcRect = iconRect
       val dstRect = RectF(
@@ -373,11 +329,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
         bounds.exactCenterY()+iconRect.height()/2f,
       )
 
-//            val iconbmp = BitmapFactory.decodeResource(context.getResources(), icon.resId)
-
       val dp = Paint()
       dp.color = Color.parseColor("#222222")
-//      canvas.drawRect(dstRect, dp)
 
       val iconPaint = Paint()
       iconPaint.isAntiAlias = false
@@ -395,9 +348,7 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
     boundsType: Int,
     zonedDateTime: ZonedDateTime,
     color: Int
-  ) {
-    // Rendering of highlights
-  }
+  ) {}
 
   private var _data: ComplicationData = NoDataComplicationData()
 
@@ -409,9 +360,4 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
   ) {
     _data = complicationData
   }
-}
-
-
-fun createRectangleComplicationFactory(context: Context) = CanvasComplicationFactory { _, _ ->
-  RectangleCanvasComplication(context)
 }

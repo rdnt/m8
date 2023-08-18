@@ -290,9 +290,7 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     boundsType: Int,
     zonedDateTime: ZonedDateTime,
     color: Int
-  ) {
-    // Rendering of highlights
-  }
+  ) {}
 
   private var data: ComplicationData = NoDataComplicationData()
 

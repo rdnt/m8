@@ -102,19 +102,6 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     false,
   )
 
-  // 3. Allows user to change the length of the minute hand.
-//    val watchHandLengthStyleSetting = UserStyleSetting.DoubleRangeUserStyleSetting(
-//        UserStyleSetting.Id(WATCH_HAND_LENGTH_STYLE_SETTING),
-//        context.resources,
-//        R.string.watchface_hand_length_setting,
-//        R.string.watchface_hand_length_setting_description,
-//        null,
-//        MINUTE_HAND_LENGTH_FRACTION_MINIMUM.toDouble(),
-//        MINUTE_HAND_LENGTH_FRACTION_MAXIMUM.toDouble(),
-//        listOf(WatchFaceLayer.COMPLICATIONS_OVERLAY),
-//        MINUTE_HAND_LENGTH_FRACTION_DEFAULT.toDouble()
-//    )
-
   // 4. Create style settings to hold all options.
   return UserStyleSchema(
     listOf(
@@ -123,9 +110,6 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
       secondsStyleSetting,
       militaryTimeSetting,
       bigAmbientSetting,
-//            secondaryColorStyleSetting,
-//            drawHourPipsStyleSetting,
-//            watchHandLengthStyleSetting
     )
   )
 }
