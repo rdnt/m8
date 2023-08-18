@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
+    <shape android:shape="oval">
+      <solid android:color="@color/aqua_primary_color" />
+      <size
+        android:width="@dimen/item_color_picker_height"
+        android:height="@dimen/item_color_picker_height" />
+    </shape>
+  </item>
+</layer-list>

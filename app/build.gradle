@@ -1,0 +1,130 @@
+/*
+ * Copyright (C) 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+  id 'com.android.application'
+  id 'org.jetbrains.kotlin.android'
+  id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+  namespace 'dev.rdnt.m8face'
+
+  compileSdk 33
+
+  defaultConfig {
+    applicationId "dev.rdnt.m8face"
+    minSdk 28
+    targetSdk 31
+    versionCode 54
+    versionName '2.11.2'
+  }
+
+  buildFeatures {
+    viewBinding true
+    compose true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion "$compose_compiler_version"
+  }
+
+  buildTypes {
+    debug {
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      versionNameSuffix '-debug'
+      applicationIdSuffix '.debug'
+    }
+    'release-preview' {
+          applicationIdSuffix '.preview'
+          minifyEnabled true
+          proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        versionNameSuffix '-preview'
+      }
+
+      release {
+      debuggable false
+      minifyEnabled true
+      shrinkResources true
+          proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      }
+  }
+
+  packagingOptions {
+    resources {
+      excludes += ['META-INF/atomicfu.kotlin_module']
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  }
+
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+}
+
+dependencies {
+  implementation libs.androidx.core.ktx
+
+  // Kotlin components
+  implementation libs.kotlinx.coroutines.core
+  implementation libs.kotlinx.coroutines.android
+
+  implementation libs.androidx.activity.ktx
+
+  // Lifecycle components
+  implementation libs.androidx.lifecycle.runtime.ktx
+  implementation libs.androidx.lifecycle.viewmodel.ktx
+
+  // Material components
+  implementation libs.android.material
+
+  // Wear libraries
+  implementation libs.androidx.wear
+
+  // Watch face specific libraries
+  implementation libs.wear.watchface.complications.data
+  implementation libs.wear.watchface.complications.data.source
+
+  implementation libs.wear.watchface
+  implementation libs.wear.watchface.client
+  implementation libs.wear.watchface.complications.rendering
+  implementation libs.wear.watchface.data
+  implementation libs.wear.watchface.editor
+  implementation libs.wear.watchface.style
+
+  /* Compose Dependencies */
+  // General Compose dependencies
+  // it also added dependencies of activity-ktx, activity-compose
+  implementation "androidx.activity:activity-compose:$activity_compose_version"
+  implementation "androidx.compose.ui:ui-tooling:$compose_version"
+  implementation "androidx.compose.foundation:foundation:$compose_version"
+  implementation "androidx.compose.material:material-icons-extended:$compose_version"
+  // compiler
+  implementation "androidx.compose.compiler:compiler:$compose_compiler_version"
+  // Compose for Wear OS Dependencies
+  implementation "androidx.wear.compose:compose-material:$wear_compose_version"
+  // Foundation is additive, so you can use the mobile version in your Wear OS app.
+  implementation "androidx.wear.compose:compose-foundation:$wear_compose_version"
+
+  implementation "com.google.accompanist:accompanist-pager:$compose_accompanist_version"
+
+  implementation "com.google.accompanist:accompanist-pager-indicators:$compose_accompanist_version"
+
+  implementation "com.google.android.horologist:horologist-compose-layout:$horologist_version"
+}

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     Copyright (C) 2020 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+  <string name="app_name" translatable="false">m8face</string>
+
+  <string name="analog_watch_face_name" translatable="false">m8face</string>
+
+  <!-- Name of watchface style category for selecting the color theme [CHAR LIMIT=20] -->
+  <string name="color_style_setting">Color</string>
+  <string name="ambient_style_setting">Ambient Style</string>
+  <string name="seconds_style_setting">Seconds Indicator</string>
+
+  <!-- Subtitle for the menu option to select the watch face color theme -->
+  <string name="color_style_setting_description">Color scheme</string>
+  <string name="ambient_style_setting_description">Ambient mode style</string>
+  <string name="seconds_style_setting_description">Seconds indicator style</string>
+
+  <!-- Name of watchface style [CHAR LIMIT=20] -->
+  <string name="ambient_style_name">Ambient</string>
+
+  <!-- Name of watchface style [CHAR LIMIT=20] -->
+  <string name="red_style_name">Red Style</string>
+
+  <!-- Name of watchface style [CHAR LIMIT=20] -->
+  <string name="green_style_name">Green Style</string>
+
+  <!-- Name of watchface style [CHAR LIMIT=20] -->
+  <string name="blue_style_name">Blue Style</string>
+
+  <!-- Name of watchface style [CHAR LIMIT=20] -->
+
+  <string name="mauve_style_name">Mauve</string>
+  <string name="plum_web_style_name">Plum Web</string>
+  <string name="orchid_style_name">Orchid</string>
+  <string name="salmon_style_name">Salmon</string>
+  <string name="tangerine_style_name">Tangerine</string>
+  <string name="apricot_style_name">Apricot</string>
+  <string name="jasmine_style_name">Jasmine</string>
+  <string name="key_lime_style_name">Key Lime</string>
+  <string name="mint_style_name">Mint</string>
+  <string name="aquamarine_style_name">Aquamarine</string>
+  <string name="turquoise_style_name">Turquoise</string>
+  <string name="aqua_style_name">Aqua</string>
+  <string name="sky_blue_style_name">Sky Blue</string>
+  <string name="capri_style_name">Capri</string>
+  <string name="cornflower_style_name">Cornflower</string>
+
+  <string name="last_dance_style_name">Last Dance</string>
+  <string name="bubblegum_style_name">Bubblegum</string>
+  <string name="dream_style_name">Dream</string>
+  <string name="bubbletea_style_name">Bubbletea</string>
+  <string name="forest_style_name">Forest</string>
+  <string name="champagne_style_name">Champagne</string>
+
+  <string name="retro_style_name">Retro</string>
+  <string name="flamingo_style_name">Flamingo</string>
+  <string name="cotton_candy_style_name">Cotton Candy</string>
+
+  <string name="nord_style_name">Nord</string>
+  <string name="frost_style_name">Frost</string>
+  <string name="steel_style_name">Steel</string>
+  <string name="snow_style_name">Snow</string>
+  <string name="onyx_style_name">Onyx</string>
+
+  <string name="outline_ambient_style_name">Outline</string>
+  <string name="bold_outline_ambient_style_name">Bold</string>
+  <string name="filled_ambient_style_name">Filled</string>
+
+  <string name="none_seconds_style_name">None</string>
+  <string name="dashes_seconds_style_name">Dashes</string>
+  <string name="dots_seconds_style_name">Dots</string>
+
+
+  <string name="left_complication_name">Left</string>
+  <string name="right_complication_name">Right</string>
+  <string name="top_complication_name">Top</string>
+  <string name="bottom_complication_name">Bottom</string>
+
+
+  <!--    <string name="light_coral_style_name">Light Coral</string>-->
+  <!--    <string name="bittersweet_style_name">Bittersweet</string>-->
+  <!--    <string name="tumbleweed_style_name">Tumbleweed</string>-->
+  <!--    <string name="atomic_tangerine_style_name">Atomic Tangerine</string>-->
+  <!--    <string name="buff_style_name">Buff</string>-->
+  <!--    <string name="orange_yellow_style_name">Orange Yellow</string>-->
+  <!--    <string name="key_lime_style_name">Key Lime</string>-->
+  <!--    <string name="laser_lemon_style_name">Laser Lemon</string>-->
+  <!--    <string name="yellow_green_style_name">Yellow Green</string>-->
+  <!--    <string name="french_lime_style_name">French Lime</string>-->
+  <!--    <string name="light_green_style_name">Light Green</string>-->
+  <!--    <string name="screamin_green_style_name">Screamin Green</string>-->
+  <!--    <string name="granny_smith_apple_style_name">Granny Smith Apple</string>-->
+  <!--    <string name="spring_green_style_name">Spring Green</string>-->
+  <!--    <string name="magic_mint_style_name">Magic Mint</string>-->
+  <!--    <string name="aquamarine_style_name">Aquamarine</string>-->
+  <!--    <string name="electric_blue_style_name">Electric Blue</string>-->
+  <!--    <string name="aqua_style_name">Aqua</string>-->
+  <!--    <string name="light_sky_blue_style_name">Light Sky Blue</string>-->
+  <!--    <string name="maya_blue_style_name">Maya Blue</string>-->
+  <!--    <string name="maximum_blue_purple_style_name">Maximum Blue Purple</string>-->
+  <!--    <string name="cornflower_blue_style_name">Cornflower Blue</string>-->
+  <!--    <string name="lavender_floral_style_name">Lavender Floral</string>-->
+  <!--    <string name="slate_blue_style_name">Slate Blue</string>-->
+  <!--    <string name="lilac_style_name">Lilac</string>-->
+  <!--    <string name="purple_style_name">Purple</string>-->
+  <!--    <string name="orchid_style_name">Orchid</string>-->
+  <!--    <string name="rose_pink_style_name">Rose Pink</string>-->
+  <!--    <string name="charm_pink_style_name">Charm Pink</string>-->
+  <!--    <string name="french_pink_style_name">French Pink</string>-->
+
+
+  <!-- An option within the analog watch face to draw pips to mark each hour [CHAR LIMIT=20] -->
+  <string name="watchface_pips_setting">Hour Pips</string>
+  <string name="military_time_setting">Military Time</string>
+  <string name="big_ambient_setting">Big Ambient</string>
+
+  <!-- Subtitle for the menu option to configure if we should draw pips to mark each hour
+   on the watch face -->
+  <string name="watchface_pips_setting_description">Whether to draw or not</string>
+  <string name="military_time_setting_description">Whether to use military instead of standard time</string>
+  <string name="big_ambient_setting_description">Use big time on ambient mode</string>
+
+  <!-- A menu option to select a widget that lets us configure the length of the watch hands
+  [CHAR LIMIT=20] -->
+  <string name="watchface_hand_length_setting">Minute Hand length</string>
+
+  <!-- Sub title for the menu option to select a widget that lets us configure the length of the
+  watch hands -->
+  <string name="watchface_hand_length_setting_description">Scale of watch hand</string>
+
+  <!-- A menu option to select a widget that lets us configure the Complications (a watch
+  making term) [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting">Complications</string>
+
+  <!-- Sub title for the menu option to select a widget that lets us configure the Complications
+  (a watch making term) [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting_description">Number and position</string>
+
+  <!-- Menu option within the complications configuration widget that lets us select both
+  the left and the right complication for rendering. [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting_both">Both</string>
+
+  <!-- Menu option within the complications configuration widget that lets us select no
+  complications for rendering. [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting_none">None</string>
+
+  <!-- Menu option within the complications configuration widget that lets us select only the left
+  complication for rendering. [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting_left">Left</string>
+
+  <!-- Menu option within the complications configuration widget that lets us select only the
+  right complication for rendering. [CHAR LIMIT=20] -->
+  <string name="watchface_complications_setting_right">Right</string>
+
+  <!-- Values for WatchFaceConfigActivity -->
+  <!-- Title for config activity for watch face (settings). -->
+  <string name="title_activity_watch_face_config">Configuration</string>
+  <!-- Use of "\n" is to conserve horizontal space in config menu. -->
+  <string name="activity_config_color_style_picker_label">Color\nStyle</string>
+  <string name="activity_config_ticks_enabled_label">Ticks\nEnabled</string>
+  <string name="activity_config_slider_text_label">Minute Hand Size</string>
+  <!-- Content Descriptions -->
+  <string name="activity_config_preview_of_watch_face_content_description">Preview of Watch Face.</string>
+  <string name="activity_config_more_options_icon_content_description">Icon to indicate there are more options if you scroll down.</string>
+  <string name="activity_config_change_color_style_button_content_description">Button to change the color style of the watch face.</string>
+  <string name="activity_config_ticks_enabled_switch_content_description">Displays or hides the outer marks for the watch face.</string>
+  <string name="activity_config_minute_hand_slider_text_label_content_description">Label for hand length slider below.</string>
+  <string name="activity_config_minute_hand_length_slider_content_description">Slider for adjusting the minute hand length.</string>
+  <string name="activity_config_screenshot_content_description">Screenshot of Watch Face</string>
+  <string name="activity_config_complication_button_right_content_description">Button to edit the right complication data</string>
+  <string name="activity_config_complication_button_left_content_description">Button to edit the left complication data</string>
+</resources>

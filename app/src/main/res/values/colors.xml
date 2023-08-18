@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2020 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <!-- Main Style Colors -->
+    <color name="color_primary">#707070</color>
+    <color name="color_secondary">#CCCCCC</color>
+
+    <color name="color_subtle">#8b8bb8</color>
+
+    <!-- Button Style Colors -->
+    <color name="color_primary_button">#000000</color>
+
+    <!-- Theme colors -->
+    <color name="last_dance_primary_color">#33EEFF</color>
+    <color name="last_dance_secondary_color">#AA99FF</color>
+    <color name="last_dance_tertiary_color">#8888bb</color>
+
+    <color name="mauve_primary_color">#B994FE</color>
+    <color name="mauve_secondary_color">#DF9DFF</color>
+    <color name="mauve_tertiary_color">#C8B7FE</color>
+
+    <color name="orchid_primary_color">#F793FF</color>
+    <color name="orchid_secondary_color">#CE78BE</color>
+    <color name="orchid_tertiary_color">#BA96C4</color>
+
+  <color name="plum_web_primary_color">#F0C7CF</color>
+  <color name="plum_web_secondary_color">#D1A3AB</color>
+  <color name="plum_web_tertiary_color">#C3749C</color>
+
+    <color name="salmon_primary_color">#FFC1B4</color>
+    <color name="salmon_secondary_color">#F38C79</color>
+    <color name="salmon_tertiary_color">#E29C9E</color>
+
+    <color name="tangerine_primary_color">#FFA050</color>
+    <color name="tangerine_secondary_color">#FFCD69</color>
+    <color name="tangerine_tertiary_color">#FEBF89</color>
+
+    <color name="apricot_primary_color">#F1A478</color>
+    <color name="apricot_secondary_color">#D2B8A0</color>
+    <color name="apricot_tertiary_color">#EF9485</color>
+
+    <color name="jasmine_primary_color">#F8DE7E</color>
+    <color name="jasmine_secondary_color">#FEEEB8</color>
+    <color name="jasmine_tertiary_color">#FFC369</color>
+
+    <color name="key_lime_primary_color">#C4FF7E</color>
+    <color name="key_lime_secondary_color">#EEEE90</color>
+    <color name="key_lime_tertiary_color">#ACDBA0</color>
+
+    <color name="mint_primary_color">#6FF591</color>
+    <color name="mint_secondary_color">#ADFFC3</color>
+    <color name="mint_tertiary_color">#7CB896</color>
+
+    <color name="aquamarine_primary_color">#7CF9D6</color>
+    <color name="aquamarine_secondary_color">#7FCCB6</color>
+    <color name="aquamarine_tertiary_color">#74A7B2</color>
+
+    <color name="turquoise_primary_color">#89ECDA</color>
+    <color name="turquoise_secondary_color">#43E8D8</color>
+    <color name="turquoise_tertiary_color">#3BD6C6</color>
+
+    <color name="aqua_primary_color">#B0EBEC</color>
+    <color name="aqua_secondary_color">#65C9E5</color>
+    <color name="aqua_tertiary_color">#7FC6D2</color>
+
+    <color name="sky_blue_primary_color">#5ADEFF</color>
+    <color name="sky_blue_secondary_color">#B1DEFA</color>
+    <color name="sky_blue_tertiary_color">#84C8F8</color>
+
+    <color name="capri_primary_color">#81DAEC</color>
+    <color name="capri_secondary_color">#77B5FE</color>
+    <color name="capri_tertiary_color">#4F9BD9</color>
+
+    <color name="cornflower_primary_color">#9EA9ED</color>
+    <color name="cornflower_secondary_color">#CCCCFF</color>
+    <color name="cornflower_tertiary_color">#83AAF1</color>
+
+    <color name="bubblegum_primary_color">#4CE3FE</color>
+    <color name="bubblegum_secondary_color">#F86EE7</color>
+    <color name="bubblegum_tertiary_color">#859FAD</color>
+
+    <color name="dream_primary_color">#EC536D</color>
+    <color name="dream_secondary_color">#81FFFF</color>
+    <color name="dream_tertiary_color">#DDD5AF</color>
+
+    <color name="bubbletea_primary_color">#EAB6CC</color>
+    <color name="bubbletea_secondary_color">#FAE6E8</color>
+    <color name="bubbletea_tertiary_color">#8F85AD</color>
+
+    <color name="forest_primary_color">#79A79D</color>
+    <color name="forest_secondary_color">#B0D8D0</color>
+    <color name="forest_tertiary_color">#AD8F85</color>
+
+    <color name="champagne_primary_color">#E3CCA4</color>
+    <color name="champagne_secondary_color">#FBDFBB</color>
+    <color name="champagne_tertiary_color">#AD9485</color>
+
+    <color name="retro_primary_color">#C5FFC0</color>
+    <color name="retro_secondary_color">#2988A3</color>
+    <color name="retro_tertiary_color">#95BAC5</color>
+
+    <color name="flamingo_primary_color">#FF928F</color>
+    <color name="flamingo_secondary_color">#9DE0D2</color>
+    <color name="flamingo_tertiary_color">#A4A08D</color>
+
+    <color name="cotton_candy_primary_color">#90D9F4</color>
+    <color name="cotton_candy_secondary_color">#EA99BE</color>
+    <color name="cotton_candy_tertiary_color">#BAB4D3</color>
+
+    <color name="nord_primary_color">#8FBCBB</color>
+    <color name="nord_secondary_color">#5E81AC</color>
+    <color name="nord_tertiary_color">#7BA1C7</color>
+
+    <color name="frost_primary_color">#AFE1FF</color>
+    <color name="frost_secondary_color">#E0FFFD</color>
+    <color name="frost_tertiary_color">#859CAD</color>
+
+    <color name="steel_primary_color">#9CAFC9</color>
+    <color name="steel_secondary_color">#D9E5F2</color>
+    <color name="steel_tertiary_color">#7095C2</color>
+
+    <color name="snow_primary_color">#FFFFFF</color>
+    <color name="snow_secondary_color">#DDDDDD</color>
+    <color name="snow_tertiary_color">#BBBBBB</color>
+
+    <color name="onyx_primary_color">#B7B6C3</color>
+    <color name="onyx_secondary_color">#9998A5</color>
+    <color name="onyx_tertiary_color">#747481</color>
+
+</resources>
