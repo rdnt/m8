@@ -3,7 +3,7 @@
 This is the source code repository and issue tracker for 
 [M8](https://play.google.com/store/apps/details?id=dev.rdnt.m8face), a WearOS watch-face.
 
-![](https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png =250x250)
+![image](https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png)
 
 M8 was initially conceived as a Samsung Watch Face Studio project, but it was later ported to
 Kotlin and the new AndroidX/Jetpack APIs, so that its customization UI can be on par or close to
