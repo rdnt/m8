@@ -80,12 +80,12 @@ class WatchFaceConfigStateHolder(
           editorSession.complicationsPreviewData,
         ) { userStyle, complicationsPreviewData ->
           yield()
-            EditWatchFaceUiState.Success(
-              createWatchFacePreview(
-                userStyle,
-                complicationsPreviewData,
-              )
+          EditWatchFaceUiState.Success(
+            createWatchFacePreview(
+              userStyle,
+              complicationsPreviewData,
             )
+          )
         }
       )
     }

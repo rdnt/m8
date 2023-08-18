@@ -188,7 +188,9 @@ fun ScrollableColumn(
               position.value = maxValue - 1
             } else {
               position.value = value
-              val selected = (value / threshold).toInt().coerceAtMost(items-1)
+              val selected = (value / threshold)
+                .toInt()
+                .coerceAtMost(items - 1)
               if (selected != selectedItem.value) {
                 selectedItem.value = selected
                 view.performHapticFeedback(KEYBOARD_TAP)
@@ -215,7 +217,9 @@ fun ScrollableColumn(
             position.value = maxValue - 1
           } else {
             position.value = value
-            val selected = (value / threshold).toInt().coerceAtMost(items-1)
+            val selected = (value / threshold)
+              .toInt()
+              .coerceAtMost(items - 1)
             if (selected != selectedItem.value) {
               selectedItem.value = selected
               view.performHapticFeedback(KEYBOARD_TAP)
@@ -357,7 +361,10 @@ fun ConfigScaffold(
   militaryTimeEnabled: Boolean,
   bigAmbientEnabled: Boolean,
 ) {
-  Log.d("Editor", "ConfigScaffold($colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)")
+  Log.d(
+    "Editor",
+    "ConfigScaffold($colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
+  )
 
   val pagerState = rememberPagerState()
 
@@ -479,8 +486,7 @@ fun ConfigScaffold(
           .clip(BottomHalfRectShape)
           .scale(1f)
       )
-    }
-    else {
+    } else {
       Preview(bitmap)
     }
 
@@ -493,7 +499,7 @@ fun ConfigScaffold(
         focusRequester0.requestFocus()
       } else if (pagerState.currentPage == 1) {
         focusRequester1.requestFocus()
-      }else if (pagerState.currentPage == 2) {
+      } else if (pagerState.currentPage == 2) {
         focusRequester2.requestFocus()
       }
     }
@@ -548,12 +554,17 @@ fun Overlay(
       extend = 4f
     }
 
-    val ringColor = ColorUtils.blendARGB(android.graphics.Color.TRANSPARENT, android.graphics.Color.BLACK, opacity * 0.75f)
+    val ringColor = ColorUtils.blendARGB(
+      android.graphics.Color.TRANSPARENT,
+      android.graphics.Color.BLACK,
+      opacity * 0.75f
+    )
 
-    Box(Modifier
-      .zIndex(2f)
-      .fillMaxSize()
-      .border(10.dp, Color(ringColor), CircleShape)
+    Box(
+      Modifier
+        .zIndex(2f)
+        .fillMaxSize()
+        .border(10.dp, Color(ringColor), CircleShape)
     )
 
     Column(
@@ -573,7 +584,7 @@ fun Overlay(
 
       Row(
         Modifier
-          .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2+extend)
+          .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2 + extend)
           .fillMaxWidth()
       ) {
         Box(
@@ -586,7 +597,7 @@ fun Overlay(
 
         Box(
           Modifier
-            .weight(1f - VERTICAL_COMPLICATION_OFFSET * 2 - VERTICAL_COMPLICATION_WIDTH * 2+extend)
+            .weight(1f - VERTICAL_COMPLICATION_OFFSET * 2 - VERTICAL_COMPLICATION_WIDTH * 2 + extend)
             .fillMaxHeight()
             .alpha(opacity * 0.75f)
             .background(Black)

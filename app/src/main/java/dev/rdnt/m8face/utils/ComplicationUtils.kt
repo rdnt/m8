@@ -62,9 +62,11 @@ const val VERTICAL_COMPLICATION_WIDTH = 78f / 384f
 
 // 0.03125
 private const val LEFT_COMPLICATION_LEFT_BOUND = VERTICAL_COMPLICATION_OFFSET
-private const val LEFT_COMPLICATION_RIGHT_BOUND = VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH
+private const val LEFT_COMPLICATION_RIGHT_BOUND =
+  VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH
 
-private const val RIGHT_COMPLICATION_LEFT_BOUND = 1f - VERTICAL_COMPLICATION_OFFSET - VERTICAL_COMPLICATION_WIDTH
+private const val RIGHT_COMPLICATION_LEFT_BOUND =
+  1f - VERTICAL_COMPLICATION_OFFSET - VERTICAL_COMPLICATION_WIDTH
 private const val RIGHT_COMPLICATION_RIGHT_BOUND = 1f - VERTICAL_COMPLICATION_OFFSET
 
 // Both left and right complications use the same top and bottom bounds.
@@ -78,9 +80,11 @@ const val HORIZONTAL_COMPLICATION_HEIGHT = 48f / 384f
 //const val HORIZONTAL_COMPLICATION_WIDTH = HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND
 
 private const val TOP_COMPLICATION_TOP_BOUND = HORIZONTAL_COMPLICATION_OFFSET
-private const val TOP_COMPLICATION_BOTTOM_BOUND = HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT
+private const val TOP_COMPLICATION_BOTTOM_BOUND =
+  HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT
 
-private const val BOTTOM_COMPLICATION_TOP_BOUND = 1f - HORIZONTAL_COMPLICATION_OFFSET - HORIZONTAL_COMPLICATION_HEIGHT
+private const val BOTTOM_COMPLICATION_TOP_BOUND =
+  1f - HORIZONTAL_COMPLICATION_OFFSET - HORIZONTAL_COMPLICATION_HEIGHT
 private const val BOTTOM_COMPLICATION_BOTTOM_BOUND = 1f - HORIZONTAL_COMPLICATION_OFFSET
 
 // Unique IDs for each complication. The settings activity that supports allowing users
@@ -142,8 +146,8 @@ fun createComplicationSlotManager(
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
 //      SystemDataSources.DATA_SOURCE_DAY_OF_WEEK,
 //      ComplicationType.SHORT_TEXT
-            SystemDataSources.NO_DATA_SOURCE,
-            ComplicationType.SHORT_TEXT
+      SystemDataSources.NO_DATA_SOURCE,
+      ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -153,7 +157,8 @@ fun createComplicationSlotManager(
         VERTICAL_COMPLICATION_BOTTOM_BOUND
       )
     )
-  ).setNameResourceId(R.string.left_complication_name).setScreenReaderNameResourceId(R.string.left_complication_name).build()
+  ).setNameResourceId(R.string.left_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).build()
 
   val customRightComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Right.id,
@@ -162,8 +167,8 @@ fun createComplicationSlotManager(
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
 //      SystemDataSources.DATA_SOURCE_DAY_OF_WEEK,
 //      ComplicationType.SHORT_TEXT
-            SystemDataSources.NO_DATA_SOURCE,
-            ComplicationType.SHORT_TEXT
+      SystemDataSources.NO_DATA_SOURCE,
+      ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -173,7 +178,8 @@ fun createComplicationSlotManager(
         VERTICAL_COMPLICATION_BOTTOM_BOUND
       )
     )
-  ).setNameResourceId(R.string.right_complication_name).setScreenReaderNameResourceId(R.string.right_complication_name).build()
+  ).setNameResourceId(R.string.right_complication_name)
+    .setScreenReaderNameResourceId(R.string.right_complication_name).build()
 
   val customTopComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Top.id,
@@ -193,7 +199,8 @@ fun createComplicationSlotManager(
         TOP_COMPLICATION_BOTTOM_BOUND
       )
     )
-  ).setNameResourceId(R.string.top_complication_name).setScreenReaderNameResourceId(R.string.top_complication_name).build()
+  ).setNameResourceId(R.string.top_complication_name)
+    .setScreenReaderNameResourceId(R.string.top_complication_name).build()
 
   val customBottomComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Bottom.id,
@@ -211,15 +218,21 @@ fun createComplicationSlotManager(
         BOTTOM_COMPLICATION_BOTTOM_BOUND
       )
     )
-  ).setNameResourceId(R.string.bottom_complication_name).setScreenReaderNameResourceId(R.string.bottom_complication_name).build()
+  ).setNameResourceId(R.string.bottom_complication_name)
+    .setScreenReaderNameResourceId(R.string.bottom_complication_name).build()
 
   return ComplicationSlotsManager(
-    listOf(customLeftComplication, customRightComplication, customTopComplication, customBottomComplication),
+    listOf(
+      customLeftComplication,
+      customRightComplication,
+      customTopComplication,
+      customBottomComplication
+    ),
     currentUserStyleRepository
   )
 }
 
-class RectangleCanvasComplication(private val context: Context): CanvasComplication {
+class RectangleCanvasComplication(private val context: Context) : CanvasComplication {
   override fun render(
     canvas: Canvas,
     bounds: Rect,
@@ -231,7 +244,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
     Log.d("RectangleCanvasComplication", "render($slotId, ${_data.type}) -- start: ${start}ms")
 
     val dataSource = _data.dataSource
-    val isBattery = dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
+    val isBattery =
+      dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
 
     // debug
     val dp = Paint()
@@ -260,6 +274,7 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
         }
 
       }
+
       else -> {
         Log.d("TIME", "start: ${start}ms, elapsed: ${System.currentTimeMillis() - start}ms")
         return
@@ -276,12 +291,13 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
 
     val tp = Paint()
     tp.isAntiAlias = true
-    tp.textSize = 24F/384F*canvas.width
+    tp.textSize = 24F / 384F * canvas.width
     tp.typeface = context.resources.getFont(R.font.m8stealth57)
     tp.textAlign = Paint.Align.CENTER
     tp.color = Color.parseColor("#8888bb")
 
-    var offsetX = iconRect.width()/2f + 6f // half icon width to the right plus 3f to the right for some spacing
+    var offsetX =
+      iconRect.width() / 2f + 6f // half icon width to the right plus 3f to the right for some spacing
     val offsetY = 10.5f
 
     var prefixLen = 0
@@ -290,7 +306,7 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
       text = text.padStart(3, ' ')
     }
 
-    val width = 15f * text.length + 3f*(text.length-1)
+    val width = 15f * text.length + 3f * (text.length - 1)
 
     if (title != null) {
       offsetX = 0f
@@ -301,8 +317,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
 
     canvas.drawText(
       text.uppercase(),
-      bounds.exactCenterX()+offsetX/384F*canvas.width.toFloat(),
-      bounds.exactCenterY()+offsetY/384F*canvas.height.toFloat(),
+      bounds.exactCenterX() + offsetX / 384F * canvas.width.toFloat(),
+      bounds.exactCenterY() + offsetY / 384F * canvas.height.toFloat(),
       tp
     )
 
@@ -313,8 +329,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
 
       canvas.drawText(
         prefix,
-        bounds.exactCenterX()+offsetX/384F*canvas.width.toFloat(),
-        bounds.exactCenterY()+offsetY/384F*canvas.height.toFloat(),
+        bounds.exactCenterX() + offsetX / 384F * canvas.width.toFloat(),
+        bounds.exactCenterY() + offsetY / 384F * canvas.height.toFloat(),
         tp
       )
     }
@@ -323,10 +339,10 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
 
       val srcRect = iconRect
       val dstRect = RectF(
-        bounds.exactCenterX() - iconRect.width()/2f - width/2 - 6f,
-        bounds.exactCenterY()-iconRect.height()/2f,
-        bounds.exactCenterX() + iconRect.width()/2f - width/2 - 6f,
-        bounds.exactCenterY()+iconRect.height()/2f,
+        bounds.exactCenterX() - iconRect.width() / 2f - width / 2 - 6f,
+        bounds.exactCenterY() - iconRect.height() / 2f,
+        bounds.exactCenterX() + iconRect.width() / 2f - width / 2 - 6f,
+        bounds.exactCenterY() + iconRect.height() / 2f,
       )
 
       val dp = Paint()
@@ -334,7 +350,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
 
       val iconPaint = Paint()
       iconPaint.isAntiAlias = false
-      iconPaint.colorFilter = PorterDuffColorFilter(Color.parseColor("#8888bb"), PorterDuff.Mode.SRC_IN)
+      iconPaint.colorFilter =
+        PorterDuffColorFilter(Color.parseColor("#8888bb"), PorterDuff.Mode.SRC_IN)
       canvas.drawBitmap(icon, srcRect, dstRect, iconPaint)
 
     }
@@ -348,7 +365,8 @@ class RectangleCanvasComplication(private val context: Context): CanvasComplicat
     boundsType: Int,
     zonedDateTime: ZonedDateTime,
     color: Int
-  ) {}
+  ) {
+  }
 
   private var _data: ComplicationData = NoDataComplicationData()
 

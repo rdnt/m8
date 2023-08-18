@@ -62,7 +62,10 @@ enum class AmbientStyle(
       }
     }
 
-    fun ambientStyleToListOption(context: Context, style: AmbientStyle): ListUserStyleSetting.ListOption {
+    fun ambientStyleToListOption(
+      context: Context,
+      style: AmbientStyle
+    ): ListUserStyleSetting.ListOption {
       return ListUserStyleSetting.ListOption(
         UserStyleSetting.Option.Id(style.id),
         context.resources,

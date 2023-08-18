@@ -14,7 +14,7 @@ import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
 
-class VerticalComplication(private val context: Context): CanvasComplication {
+class VerticalComplication(private val context: Context) : CanvasComplication {
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {
       field = tertiaryColor
@@ -34,7 +34,7 @@ class VerticalComplication(private val context: Context): CanvasComplication {
       titlePaint.color = color
 
       iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-      imagePaint.alpha = (opacity*255).toInt()
+      imagePaint.alpha = (opacity * 255).toInt()
 
       prefixPaint.color = color
       prefixPaint.alpha = 100
@@ -45,7 +45,7 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     typeface = context.resources.getFont(R.font.m8stealth57)
     textAlign = Paint.Align.LEFT
     color = tertiaryColor
-    }
+  }
 
   private val titlePaint = Paint().apply {
     isAntiAlias = true
@@ -81,12 +81,19 @@ class VerticalComplication(private val context: Context): CanvasComplication {
       ComplicationType.SHORT_TEXT -> {
         renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
       }
+
       ComplicationType.MONOCHROMATIC_IMAGE -> {
-        renderMonochromaticImageComplication(canvas, bounds, data as MonochromaticImageComplicationData)
+        renderMonochromaticImageComplication(
+          canvas,
+          bounds,
+          data as MonochromaticImageComplicationData
+        )
       }
+
       ComplicationType.SMALL_IMAGE -> {
         renderSmallImageComplication(canvas, bounds, data as SmallImageComplicationData)
       }
+
       else -> return
     }
   }
@@ -106,8 +113,9 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     val isBattery =
       data.dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
 
-    val isHeartRate = data.dataSource?.className == "com.weartools.heartratecomp.HeartRateComplicationDataSourceService" ||
-      data.dataSource?.className == "com.fitbit.complications.heartrate.HeartRateComplicationDataSourceService"
+    val isHeartRate =
+      data.dataSource?.className == "com.weartools.heartratecomp.HeartRateComplicationDataSourceService" ||
+        data.dataSource?.className == "com.fitbit.complications.heartrate.HeartRateComplicationDataSourceService"
 
     val threeDigit = isBattery || isHeartRate
 
@@ -117,8 +125,12 @@ class VerticalComplication(private val context: Context): CanvasComplication {
 
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
-      icon = drawable.toBitmap((32f/78f*bounds.width()).toInt(), (32f/78f*bounds.width()).toInt())
-      iconBounds = Rect(0, 0, (32f/78f*bounds.width()).toInt(), (32f/78f*bounds.width()).toInt())
+      icon = drawable.toBitmap(
+        (32f / 78f * bounds.width()).toInt(),
+        (32f / 78f * bounds.width()).toInt()
+      )
+      iconBounds =
+        Rect(0, 0, (32f / 78f * bounds.width()).toInt(), (32f / 78f * bounds.width()).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {
@@ -131,7 +143,7 @@ class VerticalComplication(private val context: Context): CanvasComplication {
 
     var prefixLen = 0
 
-    if (threeDigit)  {
+    if (threeDigit) {
       prefixLen = 3 - text.length
       text = text.padStart(3, ' ')
     }
@@ -141,11 +153,11 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     }
 
     if (text.length <= 3) {
-      textPaint.textSize = 24F/78F*bounds.width()
+      textPaint.textSize = 24F / 78F * bounds.width()
     } else if (text.length <= 6) {
-      textPaint.textSize = 16F/78F*bounds.width()
+      textPaint.textSize = 16F / 78F * bounds.width()
     } else {
-      textPaint.textSize = 12F/78F*bounds.width()
+      textPaint.textSize = 12F / 78F * bounds.width()
     }
 
     val textBounds = Rect()
@@ -160,11 +172,11 @@ class VerticalComplication(private val context: Context): CanvasComplication {
 
     if (title != null) {
       if (title.length <= 3) {
-        titlePaint.textSize = 24F/78F*bounds.width()
+        titlePaint.textSize = 24F / 78F * bounds.width()
       } else if (title.length <= 6) {
-        titlePaint.textSize = 16F/78F*bounds.width()
+        titlePaint.textSize = 16F / 78F * bounds.width()
       } else {
-        titlePaint.textSize = 12F/78F*bounds.width()
+        titlePaint.textSize = 12F / 78F * bounds.width()
       }
 
       titlePaint.getTextBounds(title, 0, title.length, titleBounds)
@@ -175,41 +187,41 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     var textOffsetY = 0f
 
     if (icon != null) {
-      val height = iconBounds.height()+textBounds.height()
+      val height = iconBounds.height() + textBounds.height()
 
       iconOffsetY = (height - iconBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      iconOffsetY += 9f/132f*bounds.height()
+      iconOffsetY += 9f / 132f * bounds.height()
       if (isBattery) {
         iconOffsetY = iconOffsetY.toInt().toFloat()
       }
 
-      textOffsetY += 9f/132f*bounds.height()
+      textOffsetY += 9f / 132f * bounds.height()
     } else if (title != null) {
-      val height = titleBounds.height()+textBounds.height()
+      val height = titleBounds.height() + textBounds.height()
 
       titleOffsetY = (height - titleBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      titleOffsetY += 9f/132f*bounds.height()
-      textOffsetY += 9f/132f*bounds.height()
+      titleOffsetY += 9f / 132f * bounds.height()
+      textOffsetY += 9f / 132f * bounds.height()
     }
 
     if (icon != null) {
       val dstRect = RectF(
-        bounds.exactCenterX()-iconBounds.width()/2,
-        bounds.exactCenterY()-iconBounds.height()/2 - iconOffsetY,
-        bounds.exactCenterX()+iconBounds.width()/2,
-        bounds.exactCenterY()+iconBounds.height()/2 - iconOffsetY,
+        bounds.exactCenterX() - iconBounds.width() / 2,
+        bounds.exactCenterY() - iconBounds.height() / 2 - iconOffsetY,
+        bounds.exactCenterX() + iconBounds.width() / 2,
+        bounds.exactCenterY() + iconBounds.height() / 2 - iconOffsetY,
       )
 
       canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     } else if (title != null) {
       canvas.drawText(
         title,
-        bounds.exactCenterX() - titleBounds.width()/2 ,
-        bounds.exactCenterY() + titleBounds.height()/2 - titleOffsetY,
+        bounds.exactCenterX() - titleBounds.width() / 2,
+        bounds.exactCenterY() + titleBounds.height() / 2 - titleOffsetY,
         titlePaint
       )
     }
@@ -220,16 +232,16 @@ class VerticalComplication(private val context: Context): CanvasComplication {
 
       canvas.drawText(
         prefix,
-        bounds.exactCenterX() - textBounds.width()/2,
-        bounds.exactCenterY() + textBounds.height()/2 + textOffsetY,
+        bounds.exactCenterX() - textBounds.width() / 2,
+        bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
         prefixPaint
       )
     }
 
     canvas.drawText(
       text,
-      bounds.exactCenterX() - textBounds.width()/2 ,
-      bounds.exactCenterY() + textBounds.height()/2 + textOffsetY,
+      bounds.exactCenterX() - textBounds.width() / 2,
+      bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
       textPaint
     )
   }
@@ -290,7 +302,8 @@ class VerticalComplication(private val context: Context): CanvasComplication {
     boundsType: Int,
     zonedDateTime: ZonedDateTime,
     color: Int
-  ) {}
+  ) {
+  }
 
   private var data: ComplicationData = NoDataComplicationData()
 

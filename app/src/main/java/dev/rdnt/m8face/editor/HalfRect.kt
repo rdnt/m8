@@ -10,9 +10,13 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
 val TopHalfRectShape: Shape = object : Shape {
-  override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+  override fun createOutline(
+    size: Size,
+    layoutDirection: LayoutDirection,
+    density: Density
+  ): Outline {
     val r1 = size.toRect()
-    val r2 = Rect(r1.topLeft, Offset(r1.bottomRight.x, r1.bottomRight.y/2f))
+    val r2 = Rect(r1.topLeft, Offset(r1.bottomRight.x, r1.bottomRight.y / 2f))
     return Outline.Rectangle(r2)
   }
 
@@ -20,9 +24,13 @@ val TopHalfRectShape: Shape = object : Shape {
 }
 
 val BottomHalfRectShape: Shape = object : Shape {
-  override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+  override fun createOutline(
+    size: Size,
+    layoutDirection: LayoutDirection,
+    density: Density
+  ): Outline {
     val r1 = size.toRect()
-    val r2 = Rect(Offset(r1.topLeft.x, r1.bottomRight.y/2f), r1.bottomRight)
+    val r2 = Rect(Offset(r1.topLeft.x, r1.bottomRight.y / 2f), r1.bottomRight)
     return Outline.Rectangle(r2)
   }
 

@@ -352,7 +352,10 @@ enum class ColorStyle(
       }
     }
 
-    fun colorStyleToListOption(context: Context, style: ColorStyle): ListUserStyleSetting.ListOption {
+    fun colorStyleToListOption(
+      context: Context,
+      style: ColorStyle
+    ): ListUserStyleSetting.ListOption {
       return ListUserStyleSetting.ListOption(
         UserStyleSetting.Option.Id(style.id),
         context.resources,

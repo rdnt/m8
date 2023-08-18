@@ -80,6 +80,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       ComplicationType.SHORT_TEXT -> {
         renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
       }
+
       else -> return
     }
   }
@@ -96,8 +97,9 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       return
     }
 
-    val isHeartRate = data.dataSource?.className == "com.weartools.heartratecomp.HeartRateComplicationDataSourceService" ||
-      data.dataSource?.className == "com.fitbit.complications.heartrate.HeartRateComplicationDataSourceService"
+    val isHeartRate =
+      data.dataSource?.className == "com.weartools.heartratecomp.HeartRateComplicationDataSourceService" ||
+        data.dataSource?.className == "com.fitbit.complications.heartrate.HeartRateComplicationDataSourceService"
 
     val isBattery =
       data.dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
@@ -110,8 +112,12 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
 
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
-      icon = drawable.toBitmap((32f/48f*bounds.height()).toInt(), (32f/48f*bounds.height()).toInt())
-      iconBounds = Rect(0, 0, (32f/48f*bounds.height()).toInt(), (32f/48f*bounds.height()).toInt())
+      icon = drawable.toBitmap(
+        (32f / 48f * bounds.height()).toInt(),
+        (32f / 48f * bounds.height()).toInt()
+      )
+      iconBounds =
+        Rect(0, 0, (32f / 48f * bounds.height()).toInt(), (32f / 48f * bounds.height()).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {

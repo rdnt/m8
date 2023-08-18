@@ -62,7 +62,10 @@ enum class SecondsStyle(
       }
     }
 
-    fun secondsStyleToListOption(context: Context, style: SecondsStyle): ListUserStyleSetting.ListOption {
+    fun secondsStyleToListOption(
+      context: Context,
+      style: SecondsStyle
+    ): ListUserStyleSetting.ListOption {
       return ListUserStyleSetting.ListOption(
         UserStyleSetting.Option.Id(style.id),
         context.resources,

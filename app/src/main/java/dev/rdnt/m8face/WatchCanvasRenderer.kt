@@ -88,7 +88,7 @@ class WatchCanvasRenderer(
     CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
   private val coroutineScope: CoroutineScope =
-    CoroutineScope( Dispatchers.Main.immediate)
+    CoroutineScope(Dispatchers.Main.immediate)
 
   // Represents all data needed to render the watch face. All value defaults are constants. Only
   // three values are changeable by the user (color scheme, ticks being rendered, and length of
@@ -129,7 +129,7 @@ class WatchCanvasRenderer(
   private val hourPaint = Paint().apply {
     isAntiAlias = true // make sure text is not anti-aliased even with this on
     typeface = context.resources.getFont(R.font.m8stealth57)
-    textSize = 112f/14f*14f // TODO: 98f/112f
+    textSize = 112f / 14f * 14f // TODO: 98f/112f
     color = watchFaceColors.primaryColor
   }
 
@@ -154,9 +154,9 @@ class WatchCanvasRenderer(
       }
     } else if (watchFaceData.ambientStyle.id == AmbientStyle.FILLED.id) {
       typeface = context.resources.getFont(R.font.m8stealth57)
-      textSize = 112F/14f*16f
+      textSize = 112F / 14f * 16f
       if (big) {
-        textSize = 112F/14f*18f
+        textSize = 112F / 14f * 18f
       }
     }
 
@@ -166,7 +166,7 @@ class WatchCanvasRenderer(
   private val minutePaint = Paint().apply {
     isAntiAlias = true // make sure text is not anti-aliased even with this on
     typeface = context.resources.getFont(R.font.m8stealth57)
-    textSize = 112f/14f*14f // TODO: 98f/112F
+    textSize = 112f / 14f * 14f // TODO: 98f/112F
     color = watchFaceColors.secondaryColor
   }
 
@@ -190,9 +190,9 @@ class WatchCanvasRenderer(
       }
     } else if (watchFaceData.ambientStyle.id == AmbientStyle.FILLED.id) {
       typeface = context.resources.getFont(R.font.m8stealth57)
-      textSize = 112F/14f*16f
+      textSize = 112F / 14f * 16f
       if (big) {
-        textSize = 112F/14f*18f
+        textSize = 112F / 14f * 18f
       }
     }
 
@@ -231,7 +231,12 @@ class WatchCanvasRenderer(
           android.R.interpolator.linear_out_slow_in
         )
       play(
-        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE,  drawProperties.timeScale, 1.0f).apply {
+        ObjectAnimator.ofFloat(
+          drawProperties,
+          DrawProperties.TIME_SCALE,
+          drawProperties.timeScale,
+          1.0f
+        ).apply {
           duration = ambientTransitionMs
           interpolator = linearOutSlow
           setAutoCancel(false)
@@ -260,7 +265,7 @@ class WatchCanvasRenderer(
 
       play(
         ObjectAnimator.ofPropertyValuesHolder(drawProperties, propertyValuesHolder).apply {
-          duration = ambientTransitionMs*5/9
+          duration = ambientTransitionMs * 5 / 9
           interpolator = linearOutSlow
           setAutoCancel(false)
         },
@@ -420,15 +425,15 @@ class WatchCanvasRenderer(
         }
       } else if (watchFaceData.ambientStyle.id == AmbientStyle.FILLED.id) {
         ambientHourPaint.typeface = context.resources.getFont(R.font.m8stealth57)
-        ambientHourPaint.textSize = 112F/14f*16f
+        ambientHourPaint.textSize = 112F / 14f * 16f
         if (watchFaceData.bigAmbient) {
-          ambientHourPaint.textSize = 112F/14f*18f
+          ambientHourPaint.textSize = 112F / 14f * 18f
         }
 
         ambientMinutePaint.typeface = context.resources.getFont(R.font.m8stealth57)
-        ambientMinutePaint.textSize = 112F/14f*16f
+        ambientMinutePaint.textSize = 112F / 14f * 16f
         if (watchFaceData.bigAmbient) {
-          ambientMinutePaint.textSize = 112F/14f*18f
+          ambientMinutePaint.textSize = 112F / 14f * 18f
         }
 
       }
@@ -443,8 +448,12 @@ class WatchCanvasRenderer(
       for ((_, complication) in complicationSlotsManager.complicationSlots) {
 
         when (complication.renderer) {
-          is VerticalComplication -> (complication.renderer as VerticalComplication).tertiaryColor = watchFaceColors.tertiaryColor
-          is HorizontalComplication -> (complication.renderer as HorizontalComplication).tertiaryColor = watchFaceColors.tertiaryColor
+          is VerticalComplication -> (complication.renderer as VerticalComplication).tertiaryColor =
+            watchFaceColors.tertiaryColor
+
+          is HorizontalComplication -> (complication.renderer as HorizontalComplication).tertiaryColor =
+            watchFaceColors.tertiaryColor
+
           else -> {}
         }
       }
@@ -513,6 +522,7 @@ class WatchCanvasRenderer(
               minuteOffsetY = 120f
             }
           }
+
           AmbientStyle.BOLD_OUTLINE.id -> {
             if (watchFaceData.bigAmbient) {
               hourOffsetX = -99f
@@ -526,6 +536,7 @@ class WatchCanvasRenderer(
               minuteOffsetY = 120f
             }
           }
+
           AmbientStyle.FILLED.id -> {
             if (watchFaceData.bigAmbient) {
               hourOffsetX = -99f
@@ -542,28 +553,46 @@ class WatchCanvasRenderer(
         }
 
         drawTime(canvas, bounds, hour, ambientHourPaint, hourOffsetX, hourOffsetY, 0f)
-        drawTime(canvas, bounds, zonedDateTime.minute, ambientMinutePaint, minuteOffsetX, minuteOffsetY, 0f)
+        drawTime(
+          canvas,
+          bounds,
+          zonedDateTime.minute,
+          ambientMinutePaint,
+          minuteOffsetX,
+          minuteOffsetY,
+          0f
+        )
       } else {
         when (watchFaceData.secondsStyle.id) {
           SecondsStyle.NONE.id -> {
 
           }
+
           SecondsStyle.DASHES.id -> {
             drawDashes(canvas, bounds, zonedDateTime)
           }
+
           SecondsStyle.DOTS.id -> {
             drawDots(canvas, bounds, zonedDateTime)
           }
         }
 
         val scaleOffset = if (this.watchFaceData.bigAmbient) {
-          18f/14f-1f
+          18f / 14f - 1f
         } else {
-          16f/14f-1f
+          16f / 14f - 1f
         }
 
-          drawTime(canvas, bounds, hour, hourPaint,-77f, -7f, scaleOffset) // Rect(0, 0, 152, 14))
-          drawTime(canvas, bounds, zonedDateTime.minute, minutePaint, -77f, 105f, scaleOffset)//Rect(0, 0, 152, -210))
+        drawTime(canvas, bounds, hour, hourPaint, -77f, -7f, scaleOffset) // Rect(0, 0, 152, 14))
+        drawTime(
+          canvas,
+          bounds,
+          zonedDateTime.minute,
+          minutePaint,
+          -77f,
+          105f,
+          scaleOffset
+        )//Rect(0, 0, 152, -210))
       }
 
     }
@@ -590,8 +619,12 @@ class WatchCanvasRenderer(
     for ((_, complication) in complicationSlotsManager.complicationSlots) {
       if (complication.enabled) {
         when (complication.renderer) {
-          is VerticalComplication -> (complication.renderer as VerticalComplication).opacity = opacity
-          is HorizontalComplication -> (complication.renderer as HorizontalComplication).opacity = opacity
+          is VerticalComplication -> (complication.renderer as VerticalComplication).opacity =
+            opacity
+
+          is HorizontalComplication -> (complication.renderer as HorizontalComplication).opacity =
+            opacity
+
           else -> {}
         }
 
@@ -615,9 +648,9 @@ class WatchCanvasRenderer(
 
     var scale = 1f
 
-      p.isAntiAlias = true
+    p.isAntiAlias = true
 
-    scale += (1f-this.easeInOutCirc(drawProperties.timeScale)) * scaleOffset
+    scale += (1f - this.easeInOutCirc(drawProperties.timeScale)) * scaleOffset
 
     canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
       canvas.drawText(
@@ -645,17 +678,18 @@ class WatchCanvasRenderer(
     val secondHandSize = 12f * this.easeInOutCirc(this.drawProperties.timeScale)
 
     val secondHandPaint = Paint(this.secondHandPaint)
-      secondHandPaint.alpha = (this.easeInOutCirc(this.drawProperties.timeScale)*secondHandPaint.alpha).toInt()
+    secondHandPaint.alpha =
+      (this.easeInOutCirc(this.drawProperties.timeScale) * secondHandPaint.alpha).toInt()
 
-    val transitionOffset: Float = this.easeInOutCirc(1- this.drawProperties.timeScale) * 16f
+    val transitionOffset: Float = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 16f
 
     canvas.withRotation(secondsRotation, bounds.exactCenterX(), bounds.exactCenterY()) {
       canvas.drawRect(
         RectF(
-          (bounds.width()/2f-1.25f/384F * bounds.width()),
-          transitionOffset/ 384F * bounds.width(),
-          (bounds.width()/2f+1.25f/384F * bounds.width()),
-          (secondHandSize+transitionOffset*2)/ 384F * bounds.width(),
+          (bounds.width() / 2f - 1.25f / 384F * bounds.width()),
+          transitionOffset / 384F * bounds.width(),
+          (bounds.width() / 2f + 1.25f / 384F * bounds.width()),
+          (secondHandSize + transitionOffset * 2) / 384F * bounds.width(),
         ),
         secondHandPaint,
       )
@@ -696,8 +730,8 @@ class WatchCanvasRenderer(
         if (secondsRotation > 354f) { // last second animation
           val ratio = (secondsRotation - 354f) / 6f
 
-          size = minSize + (maxSize-minSize) * ratio
-          alpha = minAlpha + (maxAlpha-minAlpha) * ratio
+          size = minSize + (maxSize - minSize) * ratio
+          alpha = minAlpha + (maxAlpha - minAlpha) * ratio
         } else {
           val ratio = (354f - secondsRotation) / 354f
 
@@ -706,8 +740,8 @@ class WatchCanvasRenderer(
             color = ColorUtils.blendARGB(color, Color.WHITE, ratio2)
           }
 
-          size = minSize + (maxSize-minSize) * ratio
-          alpha = minAlpha + (maxAlpha-minAlpha) * ratio
+          size = minSize + (maxSize - minSize) * ratio
+          alpha = minAlpha + (maxAlpha - minAlpha) * ratio
         }
       } else {
         if (secondsRotation > 354f) { // last second animation
@@ -730,14 +764,12 @@ class WatchCanvasRenderer(
           if (diff < -6f) { // elapsed second, draw fully
             size = maxSize
             alpha = maxAlpha
-          }
-          else if (diff >= -6f && diff < 0) {
-            color = ColorUtils.blendARGB(color, Color.WHITE, (6f+diff)/6f)
+          } else if (diff >= -6f && diff < 0) {
+            color = ColorUtils.blendARGB(color, Color.WHITE, (6f + diff) / 6f)
             alpha = maxAlpha
             size = maxSize
-          }
-          else if (diff >= 0 && diff < 6f) { // fade in next second indicator
-            alpha = minAlpha + (maxAlpha-minAlpha) * (6f - diff) / 6f
+          } else if (diff >= 0 && diff < 6f) { // fade in next second indicator
+            alpha = minAlpha + (maxAlpha - minAlpha) * (6f - diff) / 6f
             size = maxSize - 2f + (6f - diff) / 3f
           } else {
             size = minSize
@@ -746,8 +778,8 @@ class WatchCanvasRenderer(
         }
       }
 
-        size *= this.easeInOutCirc(this.drawProperties.timeScale)
-        alpha *= this.easeInOutCirc(this.drawProperties.timeScale)
+      size *= this.easeInOutCirc(this.drawProperties.timeScale)
+      alpha *= this.easeInOutCirc(this.drawProperties.timeScale)
 
       outerElementPaint.color = color
       outerElementPaint.alpha = alpha.toInt()
@@ -755,16 +787,16 @@ class WatchCanvasRenderer(
       canvas.withRotation(i, bounds.exactCenterX(), bounds.exactCenterY()) {
         canvas.drawRect(
           RectF(
-            bounds.exactCenterX()-weight/384F * bounds.width(),
-            transitionOffset/384F * bounds.width(),
-            bounds.exactCenterX()+weight/384F * bounds.width(),
-            (size+transitionOffset*2)/384F * bounds.width(),
+            bounds.exactCenterX() - weight / 384F * bounds.width(),
+            transitionOffset / 384F * bounds.width(),
+            bounds.exactCenterX() + weight / 384F * bounds.width(),
+            (size + transitionOffset * 2) / 384F * bounds.width(),
           ),
           outerElementPaint
         )
       }
 
-      i+= 6f
+      i += 6f
     }
   }
 
@@ -784,20 +816,21 @@ class WatchCanvasRenderer(
     val div = secondsRotation.div(6f).toInt()
     val mod = secondsRotation.mod(6f)
 
-    val rotation = div*6f + this.easeInOutCirc(mod / 6f) * 6f
+    val rotation = div * 6f + this.easeInOutCirc(mod / 6f) * 6f
 
     var centerY = 8f * this.easeInOutCirc(this.drawProperties.timeScale)
-      val secondHandSize =  3.5f * this.easeInOutCirc(this.drawProperties.timeScale)
-    val transitionOffset = this.easeInOutCirc(1- this.drawProperties.timeScale) * 24f
+    val secondHandSize = 3.5f * this.easeInOutCirc(this.drawProperties.timeScale)
+    val transitionOffset = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 24f
 
     val secondHandPaint = Paint(this.secondHandPaint)
-      secondHandPaint.alpha = (this.easeInOutCirc(this.drawProperties.timeScale)*secondHandPaint.alpha).toInt()
+    secondHandPaint.alpha =
+      (this.easeInOutCirc(this.drawProperties.timeScale) * secondHandPaint.alpha).toInt()
 
     canvas.withRotation(rotation, bounds.exactCenterX(), bounds.exactCenterY()) {
       canvas.drawCircle(
         bounds.centerX().toFloat(),
-        (centerY+transitionOffset),
-        secondHandSize/ 384F * bounds.width(),
+        (centerY + transitionOffset),
+        secondHandSize / 384F * bounds.width(),
         secondHandPaint
       )
     }
@@ -833,8 +866,8 @@ class WatchCanvasRenderer(
         if (secondsRotation > 354f) { // last second animation
           val ratio = (secondsRotation - 354f) / 6f
 
-          size = minSize + (maxSize-minSize) * ratio
-          alpha = minAlpha + (maxAlpha-minAlpha) * ratio
+          size = minSize + (maxSize - minSize) * ratio
+          alpha = minAlpha + (maxAlpha - minAlpha) * ratio
         } else {
           val ratio = (354f - secondsRotation) / 354f
 
@@ -843,8 +876,8 @@ class WatchCanvasRenderer(
             color = ColorUtils.blendARGB(color, Color.WHITE, ratio2)
           }
 
-          size = minSize + (maxSize-minSize) * ratio
-          alpha = minAlpha + (maxAlpha-minAlpha) * ratio
+          size = minSize + (maxSize - minSize) * ratio
+          alpha = minAlpha + (maxAlpha - minAlpha) * ratio
         }
       } else {
         if (secondsRotation > 354f) { // last second animation
@@ -867,15 +900,13 @@ class WatchCanvasRenderer(
           if (diff < -6f) { // elapsed second, draw fully
             size = maxSize
             alpha = maxAlpha
-          }
-          else if (diff >= -6f && diff < 0) {
-            color = ColorUtils.blendARGB(color, Color.WHITE, (6f+diff)/6f)
+          } else if (diff >= -6f && diff < 0) {
+            color = ColorUtils.blendARGB(color, Color.WHITE, (6f + diff) / 6f)
             alpha = maxAlpha
             size = maxSize
-          }
-          else if (diff >= 0 && diff < 6f) { // fade in next second indicator
-            alpha = minAlpha + (maxAlpha-minAlpha) * (6f - diff) / 6f
-            size = minSize + (maxSize-minSize) * (6f - diff) / 6f
+          } else if (diff >= 0 && diff < 6f) { // fade in next second indicator
+            alpha = minAlpha + (maxAlpha - minAlpha) * (6f - diff) / 6f
+            size = minSize + (maxSize - minSize) * (6f - diff) / 6f
           } else {
             size = minSize
             alpha = minAlpha
@@ -883,9 +914,9 @@ class WatchCanvasRenderer(
         }
       }
 
-      centerY = 8f *  this.easeInOutCirc(this.drawProperties.timeScale)
-        size = 0.5f * this.easeInOutCirc(this.drawProperties.timeScale) * size + 0.5f * size
-        alpha *= this.easeInOutCirc(this.drawProperties.timeScale)
+      centerY = 8f * this.easeInOutCirc(this.drawProperties.timeScale)
+      size = 0.5f * this.easeInOutCirc(this.drawProperties.timeScale) * size + 0.5f * size
+      alpha *= this.easeInOutCirc(this.drawProperties.timeScale)
 
       outerElementPaint.color = color
       outerElementPaint.alpha = alpha.toInt()
@@ -893,13 +924,13 @@ class WatchCanvasRenderer(
       canvas.withRotation(i, bounds.exactCenterX(), bounds.exactCenterY()) {
         canvas.drawCircle(
           bounds.centerX().toFloat(),
-          centerY+transitionOffset,
-          size/ 384F * bounds.width(),
+          centerY + transitionOffset,
+          size / 384F * bounds.width(),
           outerElementPaint
         )
       }
 
-      i+= 6f
+      i += 6f
     }
   }
 
