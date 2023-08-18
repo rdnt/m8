@@ -4,7 +4,7 @@
   This is the source code repository and issue tracker for 
   [M8](https://play.google.com/store/apps/details?id=dev.rdnt.m8face), a WearOS watch-face.
   
-  ![](https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png | width=100)
+  <img src="https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png" data-canonical-src="https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png" width="200" height="400" />
 </p>
 
 
