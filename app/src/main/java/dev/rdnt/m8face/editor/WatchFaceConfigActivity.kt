@@ -535,18 +535,16 @@ fun Overlay(
   }
 
   if (offset > 2.0f && offset <= 4.0f) {
-    var opacity = 1.0f
-    if (offset > 3.0f) {
-      opacity = 1f
+    val opacity = if (offset > 3.0f) {
+      1f
     } else {
-      opacity = offset - 2f
+      offset - 2f
     }
 
-    var opacity2 = 1.0f
-    if (offset <= 3.0f) {
-      opacity2 = 0f
+    val opacity2 = if (offset <= 3.0f) {
+      0f
     } else {
-      opacity2 = (offset - 3.0f)
+      (offset - 3.0f)
     }
 
     var extend = 0f
