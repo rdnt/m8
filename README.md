@@ -23,4 +23,6 @@ Want to help the project grow? Share it on social networks and with your friends
 
 [Get M8 from the Play Store!](https://play.google.com/store/apps/details?id=dev.rdnt.m8face)
 
-![image](https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png)
+<!-- ![cover](https://user-images.githubusercontent.com/17600197/213029406-018a5c66-726a-4bb5-92b0-723fb922da9f.png) -->
+
+![cover](https://github.com/rdnt/m8/assets/17600197/1322fa27-0ef5-499f-987f-763bfb601670)
