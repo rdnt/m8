@@ -10,10 +10,7 @@ Kotlin and the new AndroidX/Jetpack APIs, so that its customization UI and capab
 par or close to the native Pixel Watch faces experience, in terms of look & feel as well as
 performance.
 
-M8's source code is released as open source under the MIT license and you are free to hack it,
-use it as a base for your own watch face, study its code, submit feature requests or implement
-features directly as Pull Requests (please reach out in case what you want to implement conflicts
-with the existing implementation or future plans).
+M8's source code is released as open source under the MIT license.
 
 Please submit any issue or suggestion in the
 [issues page](https://github.com/rdnt/m8/issues).  
