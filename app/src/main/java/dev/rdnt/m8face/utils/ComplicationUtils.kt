@@ -252,7 +252,7 @@ class RectangleCanvasComplication(private val context: Context) : CanvasComplica
     dp.color = Color.parseColor("#444444")
 //    canvas.drawRect(bounds, dp)
 
-    var text = ""
+    var text: String
     var title: String? = null
     var icon: Bitmap? = null
     var iconRect = Rect(0, 0, 32, 32)
@@ -345,15 +345,11 @@ class RectangleCanvasComplication(private val context: Context) : CanvasComplica
         bounds.exactCenterY() + iconRect.height() / 2f,
       )
 
-      val dp = Paint()
-      dp.color = Color.parseColor("#222222")
-
       val iconPaint = Paint()
       iconPaint.isAntiAlias = false
       iconPaint.colorFilter =
         PorterDuffColorFilter(Color.parseColor("#8888bb"), PorterDuff.Mode.SRC_IN)
       canvas.drawBitmap(icon, srcRect, dstRect, iconPaint)
-
     }
 
     Log.d("TIME", "start: ${start}ms, elapsed: ${System.currentTimeMillis() - start}ms")

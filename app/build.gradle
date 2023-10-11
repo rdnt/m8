@@ -21,15 +21,14 @@ plugins {
 
 android {
   namespace 'dev.rdnt.m8face'
-
-  compileSdk 33
+  compileSdk 34
 
   defaultConfig {
     applicationId "dev.rdnt.m8face"
     minSdk 28
-    targetSdk 31
-    versionCode 54
-    versionName '2.11.2'
+    targetSdk 33
+    versionCode 55
+    versionName '2.12.0'
   }
 
   buildFeatures {
@@ -48,18 +47,18 @@ android {
       applicationIdSuffix '.debug'
     }
     'release-preview' {
-          applicationIdSuffix '.preview'
-          minifyEnabled true
-          proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        versionNameSuffix '-preview'
-      }
+      applicationIdSuffix '.preview'
+      minifyEnabled true
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      versionNameSuffix '-preview'
+    }
 
-      release {
+    release {
       debuggable false
       minifyEnabled true
       shrinkResources true
-          proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-      }
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
   }
 
   packagingOptions {
