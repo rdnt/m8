@@ -1,4 +1,7 @@
-Last updated: 2023/06/21
+Last updated: 2023/10/12
+
+- v2.12.0-beta
+  - Initial WearOS 4 support
 
 - v2.11.2
   - Four new color schemes (Retro, Flamingo, Cotton Candy, Onyx)
