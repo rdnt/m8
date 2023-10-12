@@ -11,6 +11,7 @@ androidx-wear-watchface = "1.1.1"
 compiler = "1.5.3"
 compose = "1.3.1"
 compose-material = "1.2.0"
+horologist-compose-layout = "0.5.7"
 ktlint = "0.46.1"
 org-jetbrains-kotlin = "1.9.10"
 org-jetbrains-kotlinx = "1.6.4"
@@ -21,6 +22,11 @@ accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pa
 android-lint-gradle = "com.android.tools.lint:lint-gradle:30.3.1"
 android-material = "com.google.android.material:material:1.7.0"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+
+androidx-compose-material-iconsExtended = { module = "androidx.compose.material:material-icons-extended" }
+
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compiler" }
 androidx-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "compose-material" }
@@ -30,6 +36,7 @@ androidx-databinding-viewbinding = "androidx.databinding:viewbinding:7.3.1"
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 androidx-wear = "androidx.wear:wear:1.2.0"
+horologist-compose-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist-compose-layout" }
 jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.8"
 kotlin-annotation-processing-gradle = { module = "org.jetbrains.kotlin:kotlin-annotation-processing-gradle", version.ref = "org-jetbrains-kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
