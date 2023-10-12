@@ -79,51 +79,28 @@ android {
 
 dependencies {
   implementation libs.androidx.core.ktx
-
-  // Kotlin components
   implementation libs.kotlinx.coroutines.core
   implementation libs.kotlinx.coroutines.android
-
   implementation libs.androidx.activity.ktx
-
-  // Lifecycle components
   implementation libs.androidx.lifecycle.runtime.ktx
   implementation libs.androidx.lifecycle.viewmodel.ktx
-
-  // Material components
   implementation libs.android.material
-
-  // Wear libraries
   implementation libs.androidx.wear
-
-  // Watch face specific libraries
   implementation libs.wear.watchface.complications.data
   implementation libs.wear.watchface.complications.data.source
-
   implementation libs.wear.watchface
   implementation libs.wear.watchface.client
   implementation libs.wear.watchface.complications.rendering
   implementation libs.wear.watchface.data
   implementation libs.wear.watchface.editor
   implementation libs.wear.watchface.style
-
-  /* Compose Dependencies */
-  // General Compose dependencies
-  // it also added dependencies of activity-ktx, activity-compose
-  implementation "androidx.activity:activity-compose:$activity_compose_version"
-  implementation "androidx.compose.ui:ui-tooling:$compose_version"
-  implementation "androidx.compose.foundation:foundation:$compose_version"
-  implementation "androidx.compose.material:material-icons-extended:$compose_version"
-  // compiler
-  implementation "androidx.compose.compiler:compiler:$compose_compiler_version"
-  // Compose for Wear OS Dependencies
-  implementation "androidx.wear.compose:compose-material:$wear_compose_version"
-  // Foundation is additive, so you can use the mobile version in your Wear OS app.
-  implementation "androidx.wear.compose:compose-foundation:$wear_compose_version"
-
-  implementation "com.google.accompanist:accompanist-pager:$compose_accompanist_version"
-
-  implementation "com.google.accompanist:accompanist-pager-indicators:$compose_accompanist_version"
-
-  implementation "com.google.android.horologist:horologist-compose-layout:$horologist_version"
+  implementation libs.androidx.activity.compose
+  implementation libs.androidx.compose.foundation
+  implementation libs.androidx.compose.ui.tooling.preview
+  implementation libs.androidx.compose.material.iconsExtended
+  implementation libs.androidx.compiler
+  implementation libs.androidx.compose.material
+  implementation libs.accompanist.pager
+  implementation libs.accompanist.pager.indicators
+  implementation libs.horologist.compose.layout
 }
