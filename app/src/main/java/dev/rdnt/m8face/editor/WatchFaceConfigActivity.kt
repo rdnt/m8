@@ -17,7 +17,6 @@
 @file:OptIn(
   ExperimentalSnapperApi::class,
   ExperimentalHorologistComposeLayoutApi::class,
-  ExperimentalPagerApi::class
 )
 
 package dev.rdnt.m8face.editor
@@ -75,11 +74,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.*
 import androidx.wear.compose.material.ButtonDefaults.outlinedButtonBorder
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerDefaults
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import com.google.android.horologist.compose.navscaffold.ExperimentalHorologistComposeLayoutApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithSnap
 import com.google.android.horologist.compose.rotaryinput.toRotaryScrollAdapter
@@ -348,6 +346,7 @@ fun WatchfaceConfigApp(
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConfigScaffold(
   stateHolder: WatchFaceConfigStateHolder,
@@ -366,14 +365,14 @@ fun ConfigScaffold(
     "ConfigScaffold($colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
   )
 
-  val pagerState = rememberPagerState()
+  val pagerState = rememberPagerState { 5 }
 
   Scaffold(
     positionIndicator = {
       val pageIndicatorState: PageIndicatorState = remember {
         object : PageIndicatorState {
           override val pageOffset: Float
-            get() = pagerState.currentPageOffset
+            get() = pagerState.currentPageOffsetFraction
           override val selectedPage: Int
             get() = pagerState.currentPage
           override val pageCount: Int
@@ -400,7 +399,6 @@ fun ConfigScaffold(
 
 
     HorizontalPager(
-      count = 5,
       flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
       state = pagerState,
       modifier = Modifier
@@ -506,11 +504,12 @@ fun ConfigScaffold(
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Overlay(
   pagerState: PagerState,
 ) {
-  val offset = pagerState.currentPage + pagerState.currentPageOffset
+  val offset = pagerState.currentPage + pagerState.currentPageOffsetFraction
 
   if (offset < 3.0f) {
     var opacity = 1.0f
@@ -627,74 +626,79 @@ fun Options(
   militaryTime: Boolean,
   bigAmbient: Boolean,
 ) {
-  Column(
-    modifier = Modifier.fillMaxSize(),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
+  Box(
+    Modifier
+      .fillMaxSize()
   ) {
-    ToggleChip(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(12.dp, 0.dp)
-        .height((40.dp)),
-      checked = militaryTime,
-      colors = ToggleChipDefaults.toggleChipColors(
-        checkedStartBackgroundColor = Transparent,
-        checkedEndBackgroundColor = Transparent,
-        uncheckedStartBackgroundColor = Transparent,
-        uncheckedEndBackgroundColor = Transparent,
-      ),
-      onCheckedChange = {
-        stateHolder.setMilitaryTime(it)
-      },
-      toggleControl = {
-        Switch(
-          modifier = Modifier.padding(0.dp),
-          checked = militaryTime,
-        )
-      },
-      label = {
-        Text(
-          text = "Military Time",
-          fontSize = 14.sp,
-          fontWeight = Medium,
-          fontFamily = Default,
-          color = White
-        )
-      },
-    )
+    Column(
+      modifier = Modifier.fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+    ) {
+      ToggleChip(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(12.dp, 0.dp)
+          .height((40.dp)),
+        checked = militaryTime,
+        colors = ToggleChipDefaults.toggleChipColors(
+          checkedStartBackgroundColor = Transparent,
+          checkedEndBackgroundColor = Transparent,
+          uncheckedStartBackgroundColor = Transparent,
+          uncheckedEndBackgroundColor = Transparent,
+        ),
+        onCheckedChange = {
+          stateHolder.setMilitaryTime(it)
+        },
+        toggleControl = {
+          Switch(
+            modifier = Modifier.padding(0.dp),
+            checked = militaryTime,
+          )
+        },
+        label = {
+          Text(
+            text = "Military Time",
+            fontSize = 14.sp,
+            fontWeight = Medium,
+            fontFamily = Default,
+            color = White
+          )
+        },
+      )
 
-    ToggleChip(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(12.dp, 0.dp)
-        .height((40.dp)),
-      checked = bigAmbient,
-      colors = ToggleChipDefaults.toggleChipColors(
-        checkedStartBackgroundColor = Transparent,
-        checkedEndBackgroundColor = Transparent,
-        uncheckedStartBackgroundColor = Transparent,
-        uncheckedEndBackgroundColor = Transparent,
-      ),
-      onCheckedChange = {
-        stateHolder.setBigAmbient(it)
-      },
-      toggleControl = {
-        Switch(
-          modifier = Modifier.padding(0.dp),
-          checked = bigAmbient,
-        )
-      },
-      label = {
-        Text(
-          text = "Big Ambient",
-          fontSize = 14.sp,
-          fontWeight = Medium,
-          fontFamily = Default,
-          color = White
-        )
-      },
-    )
+      ToggleChip(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(12.dp, 0.dp)
+          .height((40.dp)),
+        checked = bigAmbient,
+        colors = ToggleChipDefaults.toggleChipColors(
+          checkedStartBackgroundColor = Transparent,
+          checkedEndBackgroundColor = Transparent,
+          uncheckedStartBackgroundColor = Transparent,
+          uncheckedEndBackgroundColor = Transparent,
+        ),
+        onCheckedChange = {
+          stateHolder.setBigAmbient(it)
+        },
+        toggleControl = {
+          Switch(
+            modifier = Modifier.padding(0.dp),
+            checked = bigAmbient,
+          )
+        },
+        label = {
+          Text(
+            text = "Big Ambient",
+            fontSize = 14.sp,
+            fontWeight = Medium,
+            fontFamily = Default,
+            color = White
+          )
+        },
+      )
+    }
   }
 }
 
@@ -758,21 +762,28 @@ fun ColorStyleSelect(
 
   val colorIdsSize = remember { colorStyles.size }
 
-  ScrollableColumn(
-    focusRequester,
-    colorIdsSize,
-    100f,
-    colorIndex,
-  ) { itemIndex ->
-    val current =
-      colorStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.colorStyleId }
-    if (current != itemIndex) {
-      Log.d("Editor", "setColorStyle(${colorStyles[itemIndex].id})")
-      stateHolder.setColorStyle(colorStyles[itemIndex].id)
+  Box(
+    Modifier
+      .fillMaxSize()
+  ) {
+    ScrollableColumn(
+      focusRequester,
+      colorIdsSize,
+      100f,
+      colorIndex,
+    ) { itemIndex ->
+      val current =
+        colorStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.colorStyleId }
+      if (current != itemIndex) {
+        Log.d("Editor", "setColorStyle(${colorStyles[itemIndex].id})")
+        stateHolder.setColorStyle(colorStyles[itemIndex].id)
+      }
     }
+
+    ColorName(stringResource(colorStyles[colorIndex].nameResourceId))
   }
 
-  ColorName(stringResource(colorStyles[colorIndex].nameResourceId))
+
 }
 
 @Composable
@@ -784,22 +795,26 @@ fun AmbientStyleSelect(
 ) {
   Log.d("Editor", "AmbientStyleSelect($stateHolder, $ambientStyles, $styleIndex)")
 
-  ScrollableColumn(
-    focusRequester,
-    ambientStyles.size,
-    100f,
-    styleIndex,
-  ) { itemIndex ->
-    val current =
-      ambientStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.ambientStyleId }
-    if (current != itemIndex) {
-      Log.d("Editor", "setColorStyle(${ambientStyles[itemIndex].id})")
-      stateHolder.setAmbientStyle(ambientStyles[itemIndex].id)
+  Box(
+    Modifier
+      .fillMaxSize()
+  ) {
+    ScrollableColumn(
+      focusRequester,
+      ambientStyles.size,
+      100f,
+      styleIndex,
+    ) { itemIndex ->
+      val current =
+        ambientStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.ambientStyleId }
+      if (current != itemIndex) {
+        Log.d("Editor", "setColorStyle(${ambientStyles[itemIndex].id})")
+        stateHolder.setAmbientStyle(ambientStyles[itemIndex].id)
+      }
     }
+
+    ColorName(stringResource(ambientStyles[styleIndex].nameResourceId))
   }
-
-  ColorName(stringResource(ambientStyles[styleIndex].nameResourceId))
-
 }
 
 
@@ -812,21 +827,26 @@ fun SecondsStyleSelect(
 ) {
   Log.d("Editor", "SecondsStyleSelect($stateHolder, $secondsStyles, $styleIndex)")
 
-  ScrollableColumn(
-    focusRequester,
-    secondsStyles.size,
-    100f,
-    styleIndex,
-  ) { itemIndex ->
-    val current =
-      secondsStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.secondsStyleId }
-    if (current != itemIndex) {
-      Log.d("Editor", "setSecondsStyle(${secondsStyles[itemIndex].id})")
-      stateHolder.setSecondsStyle(secondsStyles[itemIndex].id)
+  Box(
+    Modifier
+      .fillMaxSize()
+  ) {
+    ScrollableColumn(
+      focusRequester,
+      secondsStyles.size,
+      100f,
+      styleIndex,
+    ) { itemIndex ->
+      val current =
+        secondsStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.secondsStyleId }
+      if (current != itemIndex) {
+        Log.d("Editor", "setSecondsStyle(${secondsStyles[itemIndex].id})")
+        stateHolder.setSecondsStyle(secondsStyles[itemIndex].id)
+      }
     }
-  }
 
-  ColorName(stringResource(secondsStyles[styleIndex].nameResourceId))
+    ColorName(stringResource(secondsStyles[styleIndex].nameResourceId))
+  }
 }
 
 @Composable
@@ -918,128 +938,133 @@ fun ComplicationPicker(
 ) {
   Log.d("Editor", "ComplicationPicker()")
 
-  Column(
+  Box (
     Modifier
       .fillMaxSize()
   ) {
-    Row(
-      modifier = Modifier
-        .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-    ) {}
-    Row(
-      modifier = Modifier
-        .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
+    Column(
+      Modifier
+        .fillMaxSize()
     ) {
-      Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
-      )
-      OutlinedButton(
-        onClick = { stateHolder.setComplication(TOP_COMPLICATION_ID) },
-        border = outlinedButtonBorder(
-          Color(0xFF5c6063),
-          borderWidth = 2.dp
-        ),
+      Row(
         modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
+          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
       ) {}
-      Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
-      )
-    }
-    Box(
-      modifier = Modifier
-        .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2, true)
-    )
-    Row(
-      modifier = Modifier
-        .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
-    ) {
-      Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
-      )
-      OutlinedButton(
-        onClick = { stateHolder.setComplication(BOTTOM_COMPLICATION_ID) },
-        border = outlinedButtonBorder(
-          Color(0xFF5c6063),
-          borderWidth = 2.dp
-        ),
+      Row(
         modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
-      ) {}
+          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
+      ) {
+        Box(
+          Modifier
+            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        )
+        OutlinedButton(
+          onClick = { stateHolder.setComplication(TOP_COMPLICATION_ID) },
+          border = outlinedButtonBorder(
+            Color(0xFF5c6063),
+            borderWidth = 2.dp
+          ),
+          modifier = Modifier
+            .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        ) {}
+        Box(
+          Modifier
+            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        )
+      }
       Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-          .fillMaxHeight()
-      )
-    }
-    Row(
-      modifier = Modifier
-        .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-    ) {}
-  }
-
-  Column(
-    Modifier
-      .fillMaxSize()
-  ) {
-    Box(
-      modifier = Modifier
-        .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-    )
-
-    Row(
-      modifier = Modifier
-        .weight(1f - VERTICAL_COMPLICATION_TOP_BOUND * 2, true)
-    ) {
-      Box(
-        Modifier
-          .weight(VERTICAL_COMPLICATION_OFFSET, true)
-          .fillMaxHeight()
-      )
-      OutlinedButton(
-        onClick = { stateHolder.setComplication(LEFT_COMPLICATION_ID) },
-        border = outlinedButtonBorder(
-          Color(0xFF5c6063),
-          borderWidth = 2.dp
-        ),
         modifier = Modifier
-          .weight(VERTICAL_COMPLICATION_WIDTH, true)
-          .fillMaxHeight(),
-      ) {}
-      Box(
-        Modifier
-          .weight(1f - VERTICAL_COMPLICATION_WIDTH * 2 - VERTICAL_COMPLICATION_OFFSET * 2, true)
-          .fillMaxHeight()
+          .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2, true)
       )
-      OutlinedButton(
-        onClick = { stateHolder.setComplication(RIGHT_COMPLICATION_ID) },
-        border = outlinedButtonBorder(
-          Color(0xFF5c6063),
-          borderWidth = 2.dp
-        ),
+      Row(
         modifier = Modifier
-          .weight(VERTICAL_COMPLICATION_WIDTH, true)
-          .fillMaxHeight(),
+          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
+      ) {
+        Box(
+          Modifier
+            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        )
+        OutlinedButton(
+          onClick = { stateHolder.setComplication(BOTTOM_COMPLICATION_ID) },
+          border = outlinedButtonBorder(
+            Color(0xFF5c6063),
+            borderWidth = 2.dp
+          ),
+          modifier = Modifier
+            .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        ) {}
+        Box(
+          Modifier
+            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+            .fillMaxHeight()
+        )
+      }
+      Row(
+        modifier = Modifier
+          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
       ) {}
-      Box(
-        Modifier
-          .weight(VERTICAL_COMPLICATION_OFFSET, true)
-          .fillMaxHeight()
-      )
     }
 
-    Box(
-      modifier = Modifier
-        .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-    )
+    Column(
+      Modifier
+        .fillMaxSize()
+    ) {
+      Box(
+        modifier = Modifier
+          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
+      )
+
+      Row(
+        modifier = Modifier
+          .weight(1f - VERTICAL_COMPLICATION_TOP_BOUND * 2, true)
+      ) {
+        Box(
+          Modifier
+            .weight(VERTICAL_COMPLICATION_OFFSET, true)
+            .fillMaxHeight()
+        )
+        OutlinedButton(
+          onClick = { stateHolder.setComplication(LEFT_COMPLICATION_ID) },
+          border = outlinedButtonBorder(
+            Color(0xFF5c6063),
+            borderWidth = 2.dp
+          ),
+          modifier = Modifier
+            .weight(VERTICAL_COMPLICATION_WIDTH, true)
+            .fillMaxHeight(),
+        ) {}
+        Box(
+          Modifier
+            .weight(1f - VERTICAL_COMPLICATION_WIDTH * 2 - VERTICAL_COMPLICATION_OFFSET * 2, true)
+            .fillMaxHeight()
+        )
+        OutlinedButton(
+          onClick = { stateHolder.setComplication(RIGHT_COMPLICATION_ID) },
+          border = outlinedButtonBorder(
+            Color(0xFF5c6063),
+            borderWidth = 2.dp
+          ),
+          modifier = Modifier
+            .weight(VERTICAL_COMPLICATION_WIDTH, true)
+            .fillMaxHeight(),
+        ) {}
+        Box(
+          Modifier
+            .weight(VERTICAL_COMPLICATION_OFFSET, true)
+            .fillMaxHeight()
+        )
+      }
+
+      Box(
+        modifier = Modifier
+          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
+      )
+    }
   }
 }
 
