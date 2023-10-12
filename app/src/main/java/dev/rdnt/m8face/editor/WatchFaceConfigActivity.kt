@@ -17,6 +17,8 @@
 @file:OptIn(
   ExperimentalSnapperApi::class,
   ExperimentalHorologistComposeLayoutApi::class,
+  ExperimentalHorologistApi::class,
+  ExperimentalFoundationApi::class,
 )
 
 package dev.rdnt.m8face.editor
@@ -74,10 +76,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.*
 import androidx.wear.compose.material.ButtonDefaults.outlinedButtonBorder
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
+import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.navscaffold.ExperimentalHorologistComposeLayoutApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithSnap
 import com.google.android.horologist.compose.rotaryinput.toRotaryScrollAdapter
@@ -346,7 +354,6 @@ fun WatchfaceConfigApp(
   }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConfigScaffold(
   stateHolder: WatchFaceConfigStateHolder,
@@ -504,7 +511,6 @@ fun ConfigScaffold(
   }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Overlay(
   pagerState: PagerState,
@@ -909,7 +915,7 @@ fun ColorPicker(
       .fillMaxSize()
       .focusable()
       .focusRequester(focusRequester)
-      .rotaryWithSnap(focusRequester, adapter),
+      .rotaryWithSnap(adapter, focusRequester),
     state = state,
     autoCentering = AutoCenteringParams(itemIndex = 0, itemOffset = 0),
     scalingParams = ScalingLazyColumnDefaults.scalingParams(
