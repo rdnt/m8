@@ -16,7 +16,6 @@
 
 @file:OptIn(
   ExperimentalSnapperApi::class,
-  ExperimentalHorologistComposeLayoutApi::class,
   ExperimentalHorologistApi::class,
   ExperimentalFoundationApi::class,
 )
@@ -86,7 +85,6 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.compose.navscaffold.ExperimentalHorologistComposeLayoutApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithSnap
 import com.google.android.horologist.compose.rotaryinput.toRotaryScrollAdapter
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
