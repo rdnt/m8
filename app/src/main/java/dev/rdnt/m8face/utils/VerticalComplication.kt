@@ -113,11 +113,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     val isBattery =
       data.dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
 
-    val isHeartRate =
-      data.dataSource?.className == "com.weartools.heartratecomp.HeartRateComplicationDataSourceService" ||
-        data.dataSource?.className == "com.fitbit.complications.heartrate.HeartRateComplicationDataSourceService"
-
-    val threeDigit = isBattery || isHeartRate
+    val threeDigit = isBattery
 
     var title: String? = null
     var icon: Bitmap? = null
