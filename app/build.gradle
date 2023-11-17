@@ -27,8 +27,8 @@ android {
     applicationId "dev.rdnt.m8face"
     minSdk 28
     targetSdk 33
-    versionCode 55
-    versionName '2.12.0'
+    versionCode 56
+    versionName '2.12.1'
   }
 
   buildFeatures {
