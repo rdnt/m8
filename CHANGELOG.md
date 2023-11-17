@@ -1,4 +1,4 @@
-Last updated: 2023/10/12
+Last updated: 2023-11-17
 
 - v2.12.1-beta
   - Remove heartrate complication prefix style
