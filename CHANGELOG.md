@@ -1,5 +1,8 @@
 Last updated: 2023/10/12
 
+- v2.12.1-beta
+  - Remove heartrate complication prefix style
+
 - v2.12.0-beta
   - Initial WearOS 4 support
 
