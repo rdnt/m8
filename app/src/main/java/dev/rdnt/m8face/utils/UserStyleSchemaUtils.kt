@@ -19,6 +19,8 @@ import android.content.Context
 import android.text.format.DateFormat
 import androidx.wear.watchface.style.UserStyleSchema
 import androidx.wear.watchface.style.UserStyleSetting
+import androidx.wear.watchface.style.UserStyleSetting.ComplicationSlotsUserStyleSetting
+import androidx.wear.watchface.style.UserStyleSetting.ComplicationSlotsUserStyleSetting.ComplicationSlotsOption
 import androidx.wear.watchface.style.WatchFaceLayer
 import dev.rdnt.m8face.R
 import dev.rdnt.m8face.data.watchface.AmbientStyle
@@ -26,7 +28,6 @@ import dev.rdnt.m8face.data.watchface.AmbientStyle.Companion.ambientStyleToListO
 import dev.rdnt.m8face.data.watchface.ColorStyle
 import dev.rdnt.m8face.data.watchface.ColorStyle.Companion.colorStyleToListOption
 import dev.rdnt.m8face.data.watchface.LayoutStyle
-import dev.rdnt.m8face.data.watchface.LayoutStyle.Companion.layoutStyleToListOption
 import dev.rdnt.m8face.data.watchface.SecondsStyle
 import dev.rdnt.m8face.data.watchface.SecondsStyle.Companion.secondsStyleToListOption
 
@@ -49,15 +50,49 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
   // 1. Allows user to change the color styles of the watch face (if any are available).
 
   val layoutStyleSetting =
-    UserStyleSetting.ListUserStyleSetting(
-      UserStyleSetting.Id(LAYOUT_STYLE_SETTING),
-      context.resources,
-      R.string.layout_style_setting,
-      R.string.layout_style_setting,
-      null,
-      LayoutStyle.toOptionList(context),
-      listOf(WatchFaceLayer.BASE),
-      defaultOption = layoutStyleToListOption(context, LayoutStyle.DEFAULT)
+    ComplicationSlotsUserStyleSetting(
+      id = UserStyleSetting.Id(LAYOUT_STYLE_SETTING),
+      resources = context.resources,
+      displayNameResourceId = R.string.layout_style_setting,
+      descriptionResourceId = R.string.layout_style_setting_description,
+      icon = null,
+      complicationConfig = listOf(
+        ComplicationSlotsOption(
+          id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
+          resources = context.resources,
+          displayNameResourceId = R.string.watchface_complications_setting_both,
+          icon = null,
+          // NB this list is empty because each [ComplicationSlotOverlay] is applied on
+          // top of the initial config.
+          complicationSlotOverlays = listOf()
+        ),
+        ComplicationSlotsOption(
+          id = UserStyleSetting.Option.Id(LayoutStyle.TEST.id),
+          resources = context.resources,
+          displayNameResourceId = R.string.watchface_complications_setting_none,
+          icon = null,
+          complicationSlotOverlays = listOf(
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              LEFT_COMPLICATION_ID,
+              enabled = false
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              RIGHT_COMPLICATION_ID,
+              enabled = false
+            )
+          )
+        ),
+      ),
+      listOf(WatchFaceLayer.COMPLICATIONS),
+      defaultOption = ComplicationSlotsOption(
+        id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
+        resources = context.resources,
+        displayNameResourceId = R.string.watchface_complications_setting_both,
+        icon = null,
+        // NB this list is empty because each [ComplicationSlotOverlay] is applied on
+        // top of the initial config.
+        complicationSlotOverlays = listOf()
+      ),
     )
 
   val colorStyleSetting =

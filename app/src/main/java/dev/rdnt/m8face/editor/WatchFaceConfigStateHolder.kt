@@ -22,6 +22,7 @@ import androidx.wear.watchface.DrawMode
 import androidx.wear.watchface.RenderParameters
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.editor.EditorSession
+import androidx.wear.watchface.style.ExperimentalHierarchicalStyle
 import androidx.wear.watchface.style.UserStyle
 import androidx.wear.watchface.style.UserStyleSchema
 import androidx.wear.watchface.style.UserStyleSetting
@@ -60,7 +61,7 @@ class WatchFaceConfigStateHolder(
   private lateinit var editorSession: EditorSession
 
   // Keys from Watch Face Data Structure
-  private lateinit var layoutStyleKey: UserStyleSetting.ListUserStyleSetting
+  private lateinit var layoutStyleKey: UserStyleSetting.ComplicationSlotsUserStyleSetting
   private lateinit var colorStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var ambientStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var secondsStyleKey: UserStyleSetting.ListUserStyleSetting
@@ -101,7 +102,7 @@ class WatchFaceConfigStateHolder(
     for (setting in userStyleSchema.userStyleSettings) {
       when (setting.id.toString()) {
         LAYOUT_STYLE_SETTING -> {
-          layoutStyleKey = setting as UserStyleSetting.ListUserStyleSetting
+          layoutStyleKey = setting as UserStyleSetting.ComplicationSlotsUserStyleSetting
         }
 
         COLOR_STYLE_SETTING -> {
@@ -151,7 +152,7 @@ class WatchFaceConfigStateHolder(
     )
 
     val layoutStyle =
-      userStyle[layoutStyleKey] as UserStyleSetting.ListUserStyleSetting.ListOption
+      userStyle[layoutStyleKey] as UserStyleSetting.ComplicationSlotsUserStyleSetting.ComplicationSlotsOption
 
     val colorStyle =
       userStyle[colorStyleKey] as UserStyleSetting.ListUserStyleSetting.ListOption
@@ -219,17 +220,18 @@ class WatchFaceConfigStateHolder(
 
   fun setLayoutStyle(layoutStyleId: String) {
     val userStyleSettingList = editorSession.userStyleSchema.userStyleSettings
+    // TODO @rdnt editorSession.userStyleSchema.rootUserStyleSettings
 
     // Loops over all UserStyleSettings (basically the keys in the map) to find the setting for
     // the color style (which contains all the possible options for that style setting).
     for (userStyleSetting in userStyleSettingList) {
       if (userStyleSetting.id == UserStyleSetting.Id(LAYOUT_STYLE_SETTING)) {
-        val colorUserStyleSetting =
-          userStyleSetting as UserStyleSetting.ListUserStyleSetting
+        val layoutUserStyleSetting =
+          userStyleSetting as UserStyleSetting.ComplicationSlotsUserStyleSetting
 
         // Loops over the UserStyleSetting.Option colors (all possible values for the key)
         // to find the matching option, and if it exists, sets it as the color style.
-        for (layoutOptions in colorUserStyleSetting.options) {
+        for (layoutOptions in layoutUserStyleSetting.options) {
           if (layoutOptions.id.toString() == layoutStyleId) {
             setUserStyleOption(layoutStyleKey, layoutOptions)
           }

@@ -50,28 +50,5 @@ enum class LayoutStyle(
         else -> DEFAULT
       }
     }
-
-    fun toOptionList(context: Context): List<ListUserStyleSetting.ListOption> {
-      val colorStyleIdAndResourceIdsList = enumValues<LayoutStyle>()
-
-      return colorStyleIdAndResourceIdsList.map { style ->
-        layoutStyleToListOption(context, style)
-      }
-    }
-
-    fun layoutStyleToListOption(
-      context: Context,
-      style: LayoutStyle
-    ): ListUserStyleSetting.ListOption {
-      return ListUserStyleSetting.ListOption(
-        UserStyleSetting.Option.Id(style.id),
-        context.resources,
-        style.nameResourceId,
-        Icon.createWithResource(
-          context,
-          style.iconResourceId
-        )
-      )
-    }
   }
 }

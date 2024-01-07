@@ -322,7 +322,7 @@ class WatchCanvasRenderer(
       when (options.key.id.toString()) {
         LAYOUT_STYLE_SETTING -> {
           val listOption = options.value as
-            UserStyleSetting.ListUserStyleSetting.ListOption
+            UserStyleSetting.ComplicationSlotsUserStyleSetting.ComplicationSlotsOption
 
           newWatchFaceData = newWatchFaceData.copy(
             layoutStyle = LayoutStyle.getLayoutStyleConfig(
