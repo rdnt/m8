@@ -25,12 +25,15 @@ import dev.rdnt.m8face.data.watchface.AmbientStyle
 import dev.rdnt.m8face.data.watchface.AmbientStyle.Companion.ambientStyleToListOption
 import dev.rdnt.m8face.data.watchface.ColorStyle
 import dev.rdnt.m8face.data.watchface.ColorStyle.Companion.colorStyleToListOption
+import dev.rdnt.m8face.data.watchface.LayoutStyle
+import dev.rdnt.m8face.data.watchface.LayoutStyle.Companion.layoutStyleToListOption
 import dev.rdnt.m8face.data.watchface.SecondsStyle
 import dev.rdnt.m8face.data.watchface.SecondsStyle.Companion.secondsStyleToListOption
 
 // Keys to matched content in the user style settings. We listen for changes to these
 // values in the renderer and if new, we will update the database and update the watch face
 // being rendered.
+const val LAYOUT_STYLE_SETTING = "layout_style_setting"
 const val COLOR_STYLE_SETTING = "color_style_setting"
 const val AMBIENT_STYLE_SETTING = "ambient_style_setting"
 const val SECONDS_STYLE_SETTING = "seconds_style_setting"
@@ -44,6 +47,18 @@ const val BIG_AMBIENT_SETTING = "big_ambient_setting"
  */
 fun createUserStyleSchema(context: Context): UserStyleSchema {
   // 1. Allows user to change the color styles of the watch face (if any are available).
+
+  val layoutStyleSetting =
+    UserStyleSetting.ListUserStyleSetting(
+      UserStyleSetting.Id(LAYOUT_STYLE_SETTING),
+      context.resources,
+      R.string.layout_style_setting,
+      R.string.layout_style_setting,
+      null,
+      LayoutStyle.toOptionList(context),
+      listOf(WatchFaceLayer.BASE),
+      defaultOption = layoutStyleToListOption(context, LayoutStyle.DEFAULT)
+    )
 
   val colorStyleSetting =
     UserStyleSetting.ListUserStyleSetting(
@@ -105,6 +120,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
   // 4. Create style settings to hold all options.
   return UserStyleSchema(
     listOf(
+      layoutStyleSetting,
       colorStyleSetting,
       ambientStyleSetting,
       secondsStyleSetting,

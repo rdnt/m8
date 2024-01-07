@@ -40,6 +40,7 @@ import androidx.wear.watchface.style.UserStyleSetting
 import androidx.wear.watchface.style.WatchFaceLayer
 import dev.rdnt.m8face.data.watchface.AmbientStyle
 import dev.rdnt.m8face.data.watchface.ColorStyle
+import dev.rdnt.m8face.data.watchface.LayoutStyle
 import dev.rdnt.m8face.data.watchface.SecondsStyle
 import dev.rdnt.m8face.data.watchface.WatchFaceColorPalette.Companion.convertToWatchFaceColorPalette
 import dev.rdnt.m8face.data.watchface.WatchFaceData
@@ -47,6 +48,7 @@ import dev.rdnt.m8face.utils.AMBIENT_STYLE_SETTING
 import dev.rdnt.m8face.utils.BIG_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.COLOR_STYLE_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
+import dev.rdnt.m8face.utils.LAYOUT_STYLE_SETTING
 import dev.rdnt.m8face.utils.MILITARY_TIME_SETTING
 import dev.rdnt.m8face.utils.SECONDS_STYLE_SETTING
 import dev.rdnt.m8face.utils.VerticalComplication
@@ -318,6 +320,17 @@ class WatchCanvasRenderer(
     // Loops through user style and applies new values to watchFaceData.
     for (options in userStyle) {
       when (options.key.id.toString()) {
+        LAYOUT_STYLE_SETTING -> {
+          val listOption = options.value as
+            UserStyleSetting.ListUserStyleSetting.ListOption
+
+          newWatchFaceData = newWatchFaceData.copy(
+            layoutStyle = LayoutStyle.getLayoutStyleConfig(
+              listOption.id.toString()
+            ),
+          )
+        }
+
         COLOR_STYLE_SETTING -> {
           val listOption = options.value as
             UserStyleSetting.ListUserStyleSetting.ListOption

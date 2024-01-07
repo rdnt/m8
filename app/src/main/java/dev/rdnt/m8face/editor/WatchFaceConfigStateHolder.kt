@@ -60,6 +60,7 @@ class WatchFaceConfigStateHolder(
   private lateinit var editorSession: EditorSession
 
   // Keys from Watch Face Data Structure
+  private lateinit var layoutStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var colorStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var ambientStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var secondsStyleKey: UserStyleSetting.ListUserStyleSetting
@@ -99,6 +100,10 @@ class WatchFaceConfigStateHolder(
     // Loops through user styles and retrieves user editable styles.
     for (setting in userStyleSchema.userStyleSettings) {
       when (setting.id.toString()) {
+        LAYOUT_STYLE_SETTING -> {
+          layoutStyleKey = setting as UserStyleSetting.ListUserStyleSetting
+        }
+
         COLOR_STYLE_SETTING -> {
           colorStyleKey = setting as UserStyleSetting.ListUserStyleSetting
         }
@@ -145,6 +150,9 @@ class WatchFaceConfigStateHolder(
       complicationsPreviewData
     )
 
+    val layoutStyle =
+      userStyle[layoutStyleKey] as UserStyleSetting.ListUserStyleSetting.ListOption
+
     val colorStyle =
       userStyle[colorStyleKey] as UserStyleSetting.ListUserStyleSetting.ListOption
 
@@ -161,6 +169,7 @@ class WatchFaceConfigStateHolder(
       userStyle[bigAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
     return UserStylesAndPreview(
+      layoutStyleId = layoutStyle.id.toString(),
       colorStyleId = colorStyle.id.toString(),
       ambientStyleId = ambientStyle.id.toString(),
       secondsStyleId = secondsStyle.id.toString(),
@@ -206,6 +215,27 @@ class WatchFaceConfigStateHolder(
         launchInProgress = false
       }
     )
+  }
+
+  fun setLayoutStyle(layoutStyleId: String) {
+    val userStyleSettingList = editorSession.userStyleSchema.userStyleSettings
+
+    // Loops over all UserStyleSettings (basically the keys in the map) to find the setting for
+    // the color style (which contains all the possible options for that style setting).
+    for (userStyleSetting in userStyleSettingList) {
+      if (userStyleSetting.id == UserStyleSetting.Id(LAYOUT_STYLE_SETTING)) {
+        val colorUserStyleSetting =
+          userStyleSetting as UserStyleSetting.ListUserStyleSetting
+
+        // Loops over the UserStyleSetting.Option colors (all possible values for the key)
+        // to find the matching option, and if it exists, sets it as the color style.
+        for (layoutOptions in colorUserStyleSetting.options) {
+          if (layoutOptions.id.toString() == layoutStyleId) {
+            setUserStyleOption(layoutStyleKey, layoutOptions)
+          }
+        }
+      }
+    }
   }
 
   fun setColorStyle(colorStyleId: String) {
@@ -311,6 +341,7 @@ class WatchFaceConfigStateHolder(
   }
 
   data class UserStylesAndPreview(
+    val layoutStyleId: String,
     val colorStyleId: String,
     val ambientStyleId: String,
     val secondsStyleId: String,

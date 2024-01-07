@@ -49,8 +49,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
@@ -91,6 +89,7 @@ import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.rdnt.m8face.R
 import dev.rdnt.m8face.data.watchface.AmbientStyle
 import dev.rdnt.m8face.data.watchface.ColorStyle
+import dev.rdnt.m8face.data.watchface.LayoutStyle
 import dev.rdnt.m8face.data.watchface.SecondsStyle
 import dev.rdnt.m8face.theme.WearAppTheme
 import dev.rdnt.m8face.utils.BOTTOM_COMPLICATION_ID
@@ -251,6 +250,10 @@ class WatchFaceConfigActivity : ComponentActivity() {
       )
     }
 
+  private val layoutStyles by lazy {
+    enumValues<LayoutStyle>()
+  }
+
   private val colorStyles by lazy {
     enumValues<ColorStyle>()
   }
@@ -268,6 +271,7 @@ class WatchFaceConfigActivity : ComponentActivity() {
 
     lifecycleScope.launch {
       stateHolder
+      layoutStyles
       colorStyles
       ambientStyles
       secondsStyles
@@ -276,6 +280,7 @@ class WatchFaceConfigActivity : ComponentActivity() {
     setContent {
       WatchfaceConfigApp(
         stateHolder,
+        layoutStyles,
         colorStyles,
         ambientStyles,
         secondsStyles,
@@ -288,6 +293,7 @@ class WatchFaceConfigActivity : ComponentActivity() {
 @Composable
 fun WatchfaceConfigApp(
   stateHolder: WatchFaceConfigStateHolder,
+  layoutStyles: Array<LayoutStyle>,
   colorStyles: Array<ColorStyle>,
   ambientStyles: Array<AmbientStyle>,
   secondsStyles: Array<SecondsStyle>,
@@ -306,6 +312,8 @@ fun WatchfaceConfigApp(
       when (val state = uiState) {
         is WatchFaceConfigStateHolder.EditWatchFaceUiState.Success -> {
           val bitmap = state.userStylesAndPreview.previewImage.asImageBitmap()
+          val layoutIndex =
+            layoutStyles.indexOfFirst { it.id == state.userStylesAndPreview.layoutStyleId }
           val colorIndex =
             colorStyles.indexOfFirst { it.id == state.userStylesAndPreview.colorStyleId }
           val ambientStyleIndex =
@@ -323,10 +331,12 @@ fun WatchfaceConfigApp(
           ) {
             ConfigScaffold(
               stateHolder,
+              layoutStyles,
               colorStyles,
               ambientStyles,
               secondsStyles,
               bitmap,
+              layoutIndex,
               colorIndex,
               ambientStyleIndex,
               secondsStyleIndex,
@@ -355,10 +365,12 @@ fun WatchfaceConfigApp(
 @Composable
 fun ConfigScaffold(
   stateHolder: WatchFaceConfigStateHolder,
+  layoutStyles: Array<LayoutStyle>,
   colorStyles: Array<ColorStyle>,
   ambientStyles: Array<AmbientStyle>,
   secondsStyles: Array<SecondsStyle>,
   bitmap: ImageBitmap,
+  layoutIndex: Int,
   colorIndex: Int,
   ambientStyleIndex: Int,
   secondsStyleIndex: Int,
@@ -367,10 +379,12 @@ fun ConfigScaffold(
 ) {
   Log.d(
     "Editor",
-    "ConfigScaffold($colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
+    "ConfigScaffold($layoutIndex, $colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
   )
 
-  val pagerState = rememberPagerState { 5 }
+  val pagerState = rememberPagerState (
+    pageCount = { 6 }
+  )
 
   Scaffold(
     positionIndicator = {
@@ -401,24 +415,26 @@ fun ConfigScaffold(
     val focusRequester0 = remember { FocusRequester() }
     val focusRequester1 = remember { FocusRequester() }
     val focusRequester2 = remember { FocusRequester() }
+    val focusRequester3 = remember { FocusRequester() }
 
 
     HorizontalPager(
       flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
       state = pagerState,
       modifier = Modifier
-        .onPreRotaryScrollEvent { pagerState.currentPage != 0 && pagerState.currentPage != 1 && pagerState.currentPage != 2 }
+        .onPreRotaryScrollEvent { pagerState.currentPage != 0 && pagerState.currentPage != 1 && pagerState.currentPage != 2 && pagerState.currentPage != 3 }
         .zIndex(3f), // don't ask
       key = {
         it
       }
     ) { page ->
       when (page) {
-        0 -> ColorStyleSelect(focusRequester0, stateHolder, colorStyles, colorIndex)
-        1 -> SecondsStyleSelect(focusRequester1, stateHolder, secondsStyles, secondsStyleIndex)
-        2 -> AmbientStyleSelect(focusRequester2, stateHolder, ambientStyles, ambientStyleIndex)
-        3 -> ComplicationPicker(stateHolder)
-        4 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled)
+        0 -> LayoutStyleSelect(focusRequester0, stateHolder, layoutStyles, layoutIndex)
+        1 -> ColorStyleSelect(focusRequester1, stateHolder, colorStyles, colorIndex)
+        2 -> SecondsStyleSelect(focusRequester2, stateHolder, secondsStyles, secondsStyleIndex)
+        3 -> AmbientStyleSelect(focusRequester3, stateHolder, ambientStyles, ambientStyleIndex)
+        4 -> ComplicationPicker(stateHolder)
+        5 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled)
       }
     }
 
@@ -504,6 +520,8 @@ fun ConfigScaffold(
         focusRequester1.requestFocus()
       } else if (pagerState.currentPage == 2) {
         focusRequester2.requestFocus()
+      }else if (pagerState.currentPage == 3) {
+        focusRequester3.requestFocus()
       }
     }
   }
@@ -785,6 +803,41 @@ fun ColorStyleSelect(
     }
 
     ColorName(stringResource(colorStyles[colorIndex].nameResourceId))
+  }
+
+
+}
+
+@Composable
+fun LayoutStyleSelect(
+  focusRequester: FocusRequester,
+  stateHolder: WatchFaceConfigStateHolder,
+  layoutStyles: Array<LayoutStyle>,
+  layoutIndex: Int,
+) {
+  Log.d("Editor", "LayoutStyleSelect($layoutIndex)")
+
+  val layoutIdsSize = remember { layoutStyles.size }
+
+  Box(
+    Modifier
+      .fillMaxSize()
+  ) {
+    ScrollableColumn(
+      focusRequester,
+      layoutIdsSize,
+      100f,
+      layoutIndex,
+    ) { itemIndex ->
+      val current =
+        layoutStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.colorStyleId }
+      if (current != itemIndex) {
+        Log.d("Editor", "setLayoutStyle(${layoutStyles[itemIndex].id})")
+        stateHolder.setLayoutStyle(layoutStyles[itemIndex].id)
+      }
+    }
+
+    ColorName(stringResource(layoutStyles[layoutIndex].nameResourceId))
   }
 
 

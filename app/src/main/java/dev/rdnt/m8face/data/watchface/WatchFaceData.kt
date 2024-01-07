@@ -19,6 +19,7 @@ package dev.rdnt.m8face.data.watchface
  * Represents all data needed to render an analog watch face.
  */
 data class WatchFaceData(
+  val layoutStyle: LayoutStyle = LayoutStyle.DEFAULT,
   val colorStyle: ColorStyle = ColorStyle.LAST_DANCE,
   val ambientStyle: AmbientStyle = AmbientStyle.OUTLINE,
   val secondsStyle: SecondsStyle = SecondsStyle.NONE,

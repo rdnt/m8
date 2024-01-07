@@ -19,11 +19,13 @@
   <string name="analog_watch_face_name" translatable="false">m8face</string>
 
   <!-- Name of watchface style category for selecting the color theme [CHAR LIMIT=20] -->
+  <string name="layout_style_setting">Layout Style</string>
   <string name="color_style_setting">Color</string>
   <string name="ambient_style_setting">Ambient Style</string>
   <string name="seconds_style_setting">Seconds Indicator</string>
 
   <!-- Subtitle for the menu option to select the watch face color theme -->
+  <string name="layout_style_setting_description">Layout Style</string>
   <string name="color_style_setting_description">Color scheme</string>
   <string name="ambient_style_setting_description">Ambient mode style</string>
   <string name="seconds_style_setting_description">Seconds indicator style</string>
@@ -88,6 +90,9 @@
   <string name="right_complication_name">Right</string>
   <string name="top_complication_name">Top</string>
   <string name="bottom_complication_name">Bottom</string>
+
+
+  <string name="default_layout_style_name">Default</string>
 
 
   <!--    <string name="light_coral_style_name">Light Coral</string>-->
