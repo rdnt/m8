@@ -97,6 +97,36 @@ internal const val LEFT_ICON_COMPLICATION_ID = 108
 internal const val RIGHT_ICON_COMPLICATION_ID = 109
 internal const val RIGHT_TEXT_COMPLICATION_ID = 110
 
+private const val TOP_LEFT_COMPLICATION_LEFT_BOUND = 27f / 384f
+private const val TOP_LEFT_COMPLICATION_TOP_BOUND = 87f / 384f
+private const val TOP_LEFT_COMPLICATION_RIGHT_BOUND = 27f / 384f + 78f / 384f
+private const val TOP_LEFT_COMPLICATION_BOTTOM_BOUND = 87f / 384f + 102f / 384f
+
+private const val BOTTOM_LEFT_COMPLICATION_LEFT_BOUND = 27f / 384f
+private const val BOTTOM_LEFT_COMPLICATION_TOP_BOUND = 195f / 384f
+private const val BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND = 27f / 384f + 78f / 384f
+private const val BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND = 195f / 384f + 102f / 384f
+
+private const val TOP_RIGHT_COMPLICATION_LEFT_BOUND = 279f / 384f
+private const val TOP_RIGHT_COMPLICATION_TOP_BOUND = 87f / 384f
+private const val TOP_RIGHT_COMPLICATION_RIGHT_BOUND = 279f / 384f + 78f / 384f
+private const val TOP_RIGHT_COMPLICATION_BOTTOM_BOUND = 87f / 384f + 102f / 384f
+
+private const val BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND = 279f / 384f
+private const val BOTTOM_RIGHT_COMPLICATION_TOP_BOUND = 195f / 384f
+private const val BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND = 279f / 384f + 78f / 384f
+private const val BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND = 195f / 384f + 102f / 384f
+
+private const val LEFT_ICON_COMPLICATION_LEFT_BOUND = 33f / 384f
+private const val LEFT_ICON_COMPLICATION_TOP_BOUND = 126f / 384f
+private const val LEFT_ICON_COMPLICATION_RIGHT_BOUND = 33f / 384f + 54f / 384f
+private const val LEFT_ICON_COMPLICATION_BOTTOM_BOUND = 126f / 384f + 132f / 384f
+
+private const val RIGHT_ICON_COMPLICATION_LEFT_BOUND = 297f / 384f
+private const val RIGHT_ICON_COMPLICATION_TOP_BOUND = 126f / 384f
+private const val RIGHT_ICON_COMPLICATION_RIGHT_BOUND = 297f / 384f + 54f / 384f
+private const val RIGHT_ICON_COMPLICATION_BOTTOM_BOUND = 126f / 384f + 132f / 384f
+
 /**
  * Represents the unique id associated with a complication and the complication types it supports.
  */
@@ -188,6 +218,8 @@ fun createComplicationSlotManager(
   currentUserStyleRepository: CurrentUserStyleRepository,
 ): ComplicationSlotsManager {
 
+  // TODO @rdnt setNameResourceId setScreenReaderNameResourceId use proper name for all
+
   val customLeftComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Left.id,
     canvasComplicationFactory = createVerticalComplicationFactory(context),
@@ -270,10 +302,10 @@ fun createComplicationSlotManager(
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        TOP_LEFT_COMPLICATION_LEFT_BOUND,
+        TOP_LEFT_COMPLICATION_TOP_BOUND,
+        TOP_LEFT_COMPLICATION_RIGHT_BOUND,
+        TOP_LEFT_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.top_left_complication_name)
@@ -288,10 +320,10 @@ fun createComplicationSlotManager(
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
+        BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
+        BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
+        BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.bottom_left_complication_name)
@@ -306,10 +338,10 @@ fun createComplicationSlotManager(
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        TOP_RIGHT_COMPLICATION_LEFT_BOUND,
+        TOP_RIGHT_COMPLICATION_TOP_BOUND,
+        TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
+        TOP_RIGHT_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.top_right_complication_name)
@@ -324,10 +356,10 @@ fun createComplicationSlotManager(
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.bottom_right_complication_name)
@@ -335,17 +367,17 @@ fun createComplicationSlotManager(
 
   val customLeftIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.LeftIcon.id,
-    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    canvasComplicationFactory = createIconComplicationFactory(context),
     supportedTypes = ComplicationConfig.LeftIcon.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
       SystemDataSources.NO_DATA_SOURCE, ComplicationType.MONOCHROMATIC_IMAGE
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        LEFT_ICON_COMPLICATION_LEFT_BOUND,
+        LEFT_ICON_COMPLICATION_TOP_BOUND,
+        LEFT_ICON_COMPLICATION_RIGHT_BOUND,
+        LEFT_ICON_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.left_icon_complication_name)
@@ -353,17 +385,17 @@ fun createComplicationSlotManager(
 
   val customRightIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.RightIcon.id,
-    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    canvasComplicationFactory = createIconComplicationFactory(context),
     supportedTypes = ComplicationConfig.RightIcon.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
       SystemDataSources.NO_DATA_SOURCE, ComplicationType.MONOCHROMATIC_IMAGE
     ),
     bounds = ComplicationSlotBounds(
       RectF(
-        LEFT_COMPLICATION_LEFT_BOUND,
-        VERTICAL_COMPLICATION_TOP_BOUND,
-        LEFT_COMPLICATION_RIGHT_BOUND,
-        VERTICAL_COMPLICATION_BOTTOM_BOUND
+        RIGHT_ICON_COMPLICATION_LEFT_BOUND,
+        RIGHT_ICON_COMPLICATION_TOP_BOUND,
+        RIGHT_ICON_COMPLICATION_RIGHT_BOUND,
+        RIGHT_ICON_COMPLICATION_BOTTOM_BOUND
       )
     )
   ).setNameResourceId(R.string.right_icon_complication_name)
@@ -371,7 +403,7 @@ fun createComplicationSlotManager(
 
   val customRightTextComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.RightText.id,
-    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    canvasComplicationFactory = createHorizontalComplicationFactory(context),
     supportedTypes = ComplicationConfig.RightText.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
       SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT

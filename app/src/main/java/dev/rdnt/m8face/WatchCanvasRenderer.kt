@@ -48,6 +48,7 @@ import dev.rdnt.m8face.utils.AMBIENT_STYLE_SETTING
 import dev.rdnt.m8face.utils.BIG_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.COLOR_STYLE_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
+import dev.rdnt.m8face.utils.IconComplication
 import dev.rdnt.m8face.utils.LAYOUT_STYLE_SETTING
 import dev.rdnt.m8face.utils.MILITARY_TIME_SETTING
 import dev.rdnt.m8face.utils.SECONDS_STYLE_SETTING
@@ -467,6 +468,9 @@ class WatchCanvasRenderer(
           is HorizontalComplication -> (complication.renderer as HorizontalComplication).tertiaryColor =
             watchFaceColors.tertiaryColor
 
+          is IconComplication -> (complication.renderer as IconComplication).tertiaryColor =
+            watchFaceColors.tertiaryColor
+
           else -> {}
         }
       }
@@ -636,6 +640,9 @@ class WatchCanvasRenderer(
             opacity
 
           is HorizontalComplication -> (complication.renderer as HorizontalComplication).opacity =
+            opacity
+
+          is IconComplication -> (complication.renderer as IconComplication).opacity =
             opacity
 
           else -> {}
