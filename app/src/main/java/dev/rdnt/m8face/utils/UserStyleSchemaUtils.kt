@@ -60,26 +60,96 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
         ComplicationSlotsOption(
           id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
           resources = context.resources,
-          displayNameResourceId = R.string.watchface_complications_setting_both,
-          icon = null,
-          // NB this list is empty because each [ComplicationSlotOverlay] is applied on
-          // top of the initial config.
-          complicationSlotOverlays = listOf()
-        ),
-        ComplicationSlotsOption(
-          id = UserStyleSetting.Option.Id(LayoutStyle.TEST.id),
-          resources = context.resources,
-          displayNameResourceId = R.string.watchface_complications_setting_none,
+          displayNameResourceId = R.string.default_layout_style_name,
           icon = null,
           complicationSlotOverlays = listOf(
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               LEFT_COMPLICATION_ID,
-              enabled = false
+              enabled = true
             ),
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               RIGHT_COMPLICATION_ID,
-              enabled = false
-            )
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              TOP_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              BOTTOM_COMPLICATION_ID,
+              enabled = true
+            ),
+          )
+        ),
+
+        ComplicationSlotsOption(
+          id = UserStyleSetting.Option.Id(LayoutStyle.FOCUS.id),
+          resources = context.resources,
+          displayNameResourceId = R.string.focus_layout_style_name,
+          icon = null,
+          complicationSlotOverlays = listOf(
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              LEFT_ICON_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              RIGHT_ICON_COMPLICATION_ID,
+              enabled = true
+            ),
+          )
+        ),
+
+        ComplicationSlotsOption(
+          id = UserStyleSetting.Option.Id(LayoutStyle.SPORT.id),
+          resources = context.resources,
+          displayNameResourceId = R.string.sport_layout_style_name,
+          icon = null,
+          complicationSlotOverlays = listOf(
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              TOP_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              BOTTOM_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              RIGHT_TEXT_COMPLICATION_ID,
+              enabled = true
+            ),
+          )
+        ),
+
+        ComplicationSlotsOption(
+          id = UserStyleSetting.Option.Id(LayoutStyle.COMPLICATIONS.id),
+          resources = context.resources,
+          displayNameResourceId = R.string.complications_layout_style_name,
+          icon = null,
+          complicationSlotOverlays = listOf(
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              TOP_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              BOTTOM_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              TOP_LEFT_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              BOTTOM_LEFT_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              TOP_RIGHT_COMPLICATION_ID,
+              enabled = true
+            ),
+            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+              BOTTOM_RIGHT_COMPLICATION_ID,
+              enabled = true
+            ),
           )
         ),
       ),
@@ -87,11 +157,26 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
       defaultOption = ComplicationSlotsOption(
         id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
         resources = context.resources,
-        displayNameResourceId = R.string.watchface_complications_setting_both,
+        displayNameResourceId = R.string.default_layout_style_name,
         icon = null,
-        // NB this list is empty because each [ComplicationSlotOverlay] is applied on
-        // top of the initial config.
-        complicationSlotOverlays = listOf()
+        complicationSlotOverlays = listOf(
+          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+            LEFT_COMPLICATION_ID,
+            enabled = true
+          ),
+          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+            RIGHT_COMPLICATION_ID,
+            enabled = true
+          ),
+          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+            TOP_COMPLICATION_ID,
+            enabled = true
+          ),
+          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+            BOTTOM_COMPLICATION_ID,
+            enabled = true
+          ),
+        )
       ),
     )
 

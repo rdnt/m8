@@ -25,11 +25,9 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.Log
-import androidx.annotation.Keep
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.wear.watchface.CanvasComplication
-import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.ComplicationSlot
 import androidx.wear.watchface.ComplicationSlotsManager
 import androidx.wear.watchface.RenderParameters
@@ -38,10 +36,8 @@ import androidx.wear.watchface.complications.DefaultComplicationDataSourcePolicy
 import androidx.wear.watchface.complications.SystemDataSources
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
-import androidx.wear.watchface.complications.data.MonochromaticImageComplicationData
 import androidx.wear.watchface.complications.data.NoDataComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
-import androidx.wear.watchface.complications.data.SmallImageComplicationData
 import androidx.wear.watchface.style.CurrentUserStyleRepository
 import dev.rdnt.m8face.R
 import java.time.Instant
@@ -93,41 +89,94 @@ internal const val LEFT_COMPLICATION_ID = 100
 internal const val RIGHT_COMPLICATION_ID = 101
 internal const val TOP_COMPLICATION_ID = 102
 internal const val BOTTOM_COMPLICATION_ID = 103
+internal const val TOP_LEFT_COMPLICATION_ID = 104
+internal const val BOTTOM_LEFT_COMPLICATION_ID = 105
+internal const val TOP_RIGHT_COMPLICATION_ID = 106
+internal const val BOTTOM_RIGHT_COMPLICATION_ID = 107
+internal const val LEFT_ICON_COMPLICATION_ID = 108
+internal const val RIGHT_ICON_COMPLICATION_ID = 109
+internal const val RIGHT_TEXT_COMPLICATION_ID = 110
 
 /**
  * Represents the unique id associated with a complication and the complication types it supports.
  */
 sealed class ComplicationConfig(val id: Int, val supportedTypes: List<ComplicationType>) {
   object Left : ComplicationConfig(
-    LEFT_COMPLICATION_ID,
-    listOf(
+    LEFT_COMPLICATION_ID, listOf(
       ComplicationType.SHORT_TEXT,
-//      ComplicationType.RANGED_VALUE,
       ComplicationType.MONOCHROMATIC_IMAGE,
       ComplicationType.SMALL_IMAGE
     )
   )
 
   object Right : ComplicationConfig(
-    RIGHT_COMPLICATION_ID,
-    listOf(
+    RIGHT_COMPLICATION_ID, listOf(
       ComplicationType.SHORT_TEXT,
-//      ComplicationType.RANGED_VALUE,
       ComplicationType.MONOCHROMATIC_IMAGE,
       ComplicationType.SMALL_IMAGE
     )
   )
 
   object Top : ComplicationConfig(
-    TOP_COMPLICATION_ID,
-    listOf(
+    TOP_COMPLICATION_ID, listOf(
       ComplicationType.SHORT_TEXT,
     )
   )
 
   object Bottom : ComplicationConfig(
-    BOTTOM_COMPLICATION_ID,
-    listOf(
+    BOTTOM_COMPLICATION_ID, listOf(
+      ComplicationType.SHORT_TEXT,
+    )
+  )
+
+  object TopLeft : ComplicationConfig(
+    TOP_LEFT_COMPLICATION_ID, listOf(
+      ComplicationType.SHORT_TEXT,
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object BottomLeft : ComplicationConfig(
+    BOTTOM_LEFT_COMPLICATION_ID, listOf(
+      ComplicationType.SHORT_TEXT,
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object TopRight : ComplicationConfig(
+    TOP_RIGHT_COMPLICATION_ID, listOf(
+      ComplicationType.SHORT_TEXT,
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object BottomRight : ComplicationConfig(
+    BOTTOM_RIGHT_COMPLICATION_ID, listOf(
+      ComplicationType.SHORT_TEXT,
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object LeftIcon : ComplicationConfig(
+    LEFT_ICON_COMPLICATION_ID, listOf(
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object RightIcon : ComplicationConfig(
+    RIGHT_ICON_COMPLICATION_ID, listOf(
+      ComplicationType.MONOCHROMATIC_IMAGE,
+      ComplicationType.SMALL_IMAGE
+    )
+  )
+
+  object RightText : ComplicationConfig(
+    RIGHT_TEXT_COMPLICATION_ID, listOf(
       ComplicationType.SHORT_TEXT,
     )
   )
@@ -144,10 +193,7 @@ fun createComplicationSlotManager(
     canvasComplicationFactory = createVerticalComplicationFactory(context),
     supportedTypes = ComplicationConfig.Left.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
-//      SystemDataSources.DATA_SOURCE_DAY_OF_WEEK,
-//      ComplicationType.SHORT_TEXT
-      SystemDataSources.NO_DATA_SOURCE,
-      ComplicationType.SHORT_TEXT
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -158,17 +204,14 @@ fun createComplicationSlotManager(
       )
     )
   ).setNameResourceId(R.string.left_complication_name)
-    .setScreenReaderNameResourceId(R.string.left_complication_name).build()
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
 
   val customRightComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Right.id,
     canvasComplicationFactory = createVerticalComplicationFactory(context),
     supportedTypes = ComplicationConfig.Right.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
-//      SystemDataSources.DATA_SOURCE_DAY_OF_WEEK,
-//      ComplicationType.SHORT_TEXT
-      SystemDataSources.NO_DATA_SOURCE,
-      ComplicationType.SHORT_TEXT
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -179,17 +222,14 @@ fun createComplicationSlotManager(
       )
     )
   ).setNameResourceId(R.string.right_complication_name)
-    .setScreenReaderNameResourceId(R.string.right_complication_name).build()
+    .setScreenReaderNameResourceId(R.string.right_complication_name).setEnabled(false).build()
 
   val customTopComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Top.id,
     canvasComplicationFactory = createHorizontalComplicationFactory(context),
     supportedTypes = ComplicationConfig.Top.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
-      SystemDataSources.DATA_SOURCE_DATE,
-      ComplicationType.SHORT_TEXT
-//            SystemDataSources.NO_DATA_SOURCE,
-//            ComplicationType.SHORT_TEXT
+      SystemDataSources.DATA_SOURCE_DATE, ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -200,15 +240,14 @@ fun createComplicationSlotManager(
       )
     )
   ).setNameResourceId(R.string.top_complication_name)
-    .setScreenReaderNameResourceId(R.string.top_complication_name).build()
+    .setScreenReaderNameResourceId(R.string.top_complication_name).setEnabled(false).build()
 
   val customBottomComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = ComplicationConfig.Bottom.id,
     canvasComplicationFactory = createHorizontalComplicationFactory(context),
     supportedTypes = ComplicationConfig.Bottom.supportedTypes,
     defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
-      SystemDataSources.DATA_SOURCE_WATCH_BATTERY,
-      ComplicationType.SHORT_TEXT
+      SystemDataSources.DATA_SOURCE_WATCH_BATTERY, ComplicationType.SHORT_TEXT
     ),
     bounds = ComplicationSlotBounds(
       RectF(
@@ -219,159 +258,148 @@ fun createComplicationSlotManager(
       )
     )
   ).setNameResourceId(R.string.bottom_complication_name)
-    .setScreenReaderNameResourceId(R.string.bottom_complication_name).build()
+    .setScreenReaderNameResourceId(R.string.bottom_complication_name).setEnabled(false).build()
+
+
+  val customTopLeftComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.TopLeft.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.TopLeft.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.top_left_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customBottomLeftComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.BottomLeft.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.BottomLeft.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.bottom_left_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customTopRightComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.TopRight.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.TopRight.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.top_right_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customBottomRightComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.BottomRight.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.BottomRight.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.bottom_right_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customLeftIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.LeftIcon.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.LeftIcon.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.MONOCHROMATIC_IMAGE
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.left_icon_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customRightIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.RightIcon.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.RightIcon.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.MONOCHROMATIC_IMAGE
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.right_icon_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
+
+  val customRightTextComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
+    id = ComplicationConfig.RightText.id,
+    canvasComplicationFactory = createVerticalComplicationFactory(context),
+    supportedTypes = ComplicationConfig.RightText.supportedTypes,
+    defaultDataSourcePolicy = DefaultComplicationDataSourcePolicy(
+      SystemDataSources.NO_DATA_SOURCE, ComplicationType.SHORT_TEXT
+    ),
+    bounds = ComplicationSlotBounds(
+      RectF(
+        LEFT_COMPLICATION_LEFT_BOUND,
+        VERTICAL_COMPLICATION_TOP_BOUND,
+        LEFT_COMPLICATION_RIGHT_BOUND,
+        VERTICAL_COMPLICATION_BOTTOM_BOUND
+      )
+    )
+  ).setNameResourceId(R.string.right_text_complication_name)
+    .setScreenReaderNameResourceId(R.string.left_complication_name).setEnabled(false).build()
 
   return ComplicationSlotsManager(
     listOf(
       customLeftComplication,
       customRightComplication,
       customTopComplication,
-      customBottomComplication
-    ),
-    currentUserStyleRepository
+      customBottomComplication,
+      customTopLeftComplication,
+      customBottomLeftComplication,
+      customTopRightComplication,
+      customBottomRightComplication,
+      customLeftIconComplication,
+      customRightIconComplication,
+      customRightTextComplication
+    ), currentUserStyleRepository
   )
-}
-
-class RectangleCanvasComplication(private val context: Context) : CanvasComplication {
-  override fun render(
-    canvas: Canvas,
-    bounds: Rect,
-    zonedDateTime: ZonedDateTime,
-    renderParameters: RenderParameters,
-    slotId: Int
-  ) {
-    val start = System.currentTimeMillis()
-    Log.d("RectangleCanvasComplication", "render($slotId, ${_data.type}) -- start: ${start}ms")
-
-    val dataSource = _data.dataSource
-    val isBattery =
-      dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
-
-    // debug
-    val dp = Paint()
-    dp.color = Color.parseColor("#444444")
-//    canvas.drawRect(bounds, dp)
-
-    var text: String
-    var title: String? = null
-    var icon: Bitmap? = null
-    var iconRect = Rect(0, 0, 32, 32)
-
-    when (_data.type) {
-      ComplicationType.SHORT_TEXT -> {
-        val dat = _data as ShortTextComplicationData
-        text = dat.text.getTextAt(context.resources, Instant.now()).toString()
-
-        if (dat.monochromaticImage != null) {
-          val drawable = dat.monochromaticImage!!.image.loadDrawable(context)
-          if (drawable != null) {
-            icon = drawable.toBitmap(32, 32)
-          }
-        }
-
-        if (dat.title != null) {
-          title = dat.title!!.getTextAt(context.resources, Instant.now()).toString()
-        }
-
-      }
-
-      else -> {
-        Log.d("TIME", "start: ${start}ms, elapsed: ${System.currentTimeMillis() - start}ms")
-        return
-      }
-    }
-
-    if (isBattery) {
-      val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon)!!
-      icon = drawable.toBitmap(30, 15)
-      iconRect = Rect(-1, 0, 29, 15)
-    }
-
-//    text = "1234567"
-
-    val tp = Paint()
-    tp.isAntiAlias = true
-    tp.textSize = 24F / 384F * canvas.width
-    tp.typeface = context.resources.getFont(R.font.m8stealth57)
-    tp.textAlign = Paint.Align.CENTER
-    tp.color = Color.parseColor("#8888bb")
-
-    var offsetX =
-      iconRect.width() / 2f + 6f // half icon width to the right plus 3f to the right for some spacing
-    val offsetY = 10.5f
-
-    var prefixLen = 0
-    if (isBattery) {
-      prefixLen = 3 - text.length
-      text = text.padStart(3, ' ')
-    }
-
-    val width = 15f * text.length + 3f * (text.length - 1)
-
-    if (title != null) {
-      offsetX = 0f
-      text = "$title $text"
-    }
-
-    tp.color = Color.parseColor("#8888bb")
-
-    canvas.drawText(
-      text.uppercase(),
-      bounds.exactCenterX() + offsetX / 384F * canvas.width.toFloat(),
-      bounds.exactCenterY() + offsetY / 384F * canvas.height.toFloat(),
-      tp
-    )
-
-    if (isBattery) {
-      val prefix = "".padStart(prefixLen, '0') + " ".repeat(3 - prefixLen)
-
-      tp.color = Color.parseColor("#343434")
-
-      canvas.drawText(
-        prefix,
-        bounds.exactCenterX() + offsetX / 384F * canvas.width.toFloat(),
-        bounds.exactCenterY() + offsetY / 384F * canvas.height.toFloat(),
-        tp
-      )
-    }
-
-    if (icon != null && title == null) {
-
-      val srcRect = iconRect
-      val dstRect = RectF(
-        bounds.exactCenterX() - iconRect.width() / 2f - width / 2 - 6f,
-        bounds.exactCenterY() - iconRect.height() / 2f,
-        bounds.exactCenterX() + iconRect.width() / 2f - width / 2 - 6f,
-        bounds.exactCenterY() + iconRect.height() / 2f,
-      )
-
-      val iconPaint = Paint()
-      iconPaint.isAntiAlias = false
-      iconPaint.colorFilter =
-        PorterDuffColorFilter(Color.parseColor("#8888bb"), PorterDuff.Mode.SRC_IN)
-      canvas.drawBitmap(icon, srcRect, dstRect, iconPaint)
-    }
-
-    Log.d("TIME", "start: ${start}ms, elapsed: ${System.currentTimeMillis() - start}ms")
-  }
-
-  override fun drawHighlight(
-    canvas: Canvas,
-    bounds: Rect,
-    boundsType: Int,
-    zonedDateTime: ZonedDateTime,
-    color: Int
-  ) {
-  }
-
-  private var _data: ComplicationData = NoDataComplicationData()
-
-  override fun getData(): ComplicationData = _data
-
-  override fun loadData(
-    complicationData: ComplicationData,
-    loadDrawablesAsynchronous: Boolean
-  ) {
-    _data = complicationData
-  }
 }

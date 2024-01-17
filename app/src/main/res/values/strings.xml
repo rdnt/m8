@@ -90,9 +90,19 @@
   <string name="right_complication_name">Right</string>
   <string name="top_complication_name">Top</string>
   <string name="bottom_complication_name">Bottom</string>
-
+  <string name="top_left_complication_name">Top Left</string>
+  <string name="bottom_left_complication_name">Bottom Left</string>
+  <string name="top_right_complication_name">Top Right</string>
+  <string name="bottom_right_complication_name">Bottom Right</string>
+  <string name="left_icon_complication_name">Left</string>
+  <string name="right_icon_complication_name">Right</string>
+  <string name="right_text_complication_name">Right</string>
 
   <string name="default_layout_style_name">Default</string>
+  <string name="seconds_layout_style_name">Seconds</string>
+  <string name="focus_layout_style_name">Focus</string>
+  <string name="sport_layout_style_name">Sport</string>
+  <string name="complications_layout_style_name">Complications</string>
 
 
   <!--    <string name="light_coral_style_name">Light Coral</string>-->

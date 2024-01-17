@@ -36,17 +36,29 @@ enum class LayoutStyle(
     nameResourceId = R.string.default_layout_style_name,
     iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   ),
-  TEST( // TODO @rdnt remove
-    id = "test",
-    nameResourceId = R.string.default_layout_style_name,
-    iconResourceId = R.drawable.steel_style_icon,
+  FOCUS(
+    id = "focus",
+    nameResourceId = R.string.focus_layout_style_name,
+    iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
+  ),
+  SPORT(
+    id = "sport",
+    nameResourceId = R.string.sport_layout_style_name,
+    iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
+  ),
+  COMPLICATIONS(
+    id = "complications",
+    nameResourceId = R.string.complications_layout_style_name,
+    iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   );
 
   companion object {
     fun getLayoutStyleConfig(id: String): LayoutStyle {
       return when (id) {
         DEFAULT.id -> DEFAULT
-        TEST.id -> TEST
+        FOCUS.id -> FOCUS
+        SPORT.id -> SPORT
+        COMPLICATIONS.id -> COMPLICATIONS
         else -> DEFAULT
       }
     }
