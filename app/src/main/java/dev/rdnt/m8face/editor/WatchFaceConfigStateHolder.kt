@@ -22,7 +22,6 @@ import androidx.wear.watchface.DrawMode
 import androidx.wear.watchface.RenderParameters
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.editor.EditorSession
-import androidx.wear.watchface.style.ExperimentalHierarchicalStyle
 import androidx.wear.watchface.style.UserStyle
 import androidx.wear.watchface.style.UserStyleSchema
 import androidx.wear.watchface.style.UserStyleSetting
@@ -180,13 +179,13 @@ class WatchFaceConfigStateHolder(
     )
   }
 
-  fun setComplication(complicationLocation: Int) {
+  fun setComplication(complicationId: Int) {
     if (launchInProgress) {
       return
     }
     launchInProgress = true
 
-    val complicationSlotId = when (complicationLocation) {
+    val complicationSlotId = when (complicationId) {
       LEFT_COMPLICATION_ID -> {
         LEFT_COMPLICATION_ID
       }

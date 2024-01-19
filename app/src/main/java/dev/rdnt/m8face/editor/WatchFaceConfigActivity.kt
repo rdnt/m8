@@ -22,6 +22,8 @@
 
 package dev.rdnt.m8face.editor
 
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.HapticFeedbackConstants.KEYBOARD_TAP
@@ -1102,17 +1104,25 @@ fun ComplicationPicker(
 //    }
 
     ComplicationButton(
-      HORIZONTAL_COMPLICATION_LEFT_BOUND,
-      TOP_COMPLICATION_TOP_BOUND,
-      HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-      TOP_COMPLICATION_BOTTOM_BOUND,
+      stateHolder,
+      TOP_COMPLICATION_ID,
+      RectF(
+        HORIZONTAL_COMPLICATION_LEFT_BOUND,
+        TOP_COMPLICATION_TOP_BOUND,
+        HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+        TOP_COMPLICATION_BOTTOM_BOUND,
+      ),
     )
 
     ComplicationButton(
-      HORIZONTAL_COMPLICATION_LEFT_BOUND,
-      BOTTOM_COMPLICATION_TOP_BOUND,
-      HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-      BOTTOM_COMPLICATION_BOTTOM_BOUND,
+      stateHolder,
+      BOTTOM_COMPLICATION_ID,
+      RectF(
+        HORIZONTAL_COMPLICATION_LEFT_BOUND,
+        BOTTOM_COMPLICATION_TOP_BOUND,
+        HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+        BOTTOM_COMPLICATION_BOTTOM_BOUND,
+      ),
     )
 
 //    Column(
@@ -1172,31 +1182,48 @@ fun ComplicationPicker(
 //    }
 
     ComplicationButton(
-      TOP_LEFT_COMPLICATION_LEFT_BOUND,
-      TOP_LEFT_COMPLICATION_TOP_BOUND,
-      TOP_LEFT_COMPLICATION_RIGHT_BOUND,
-      TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
+      stateHolder,
+      TOP_LEFT_COMPLICATION_ID,
+      RectF(
+        TOP_LEFT_COMPLICATION_LEFT_BOUND,
+        TOP_LEFT_COMPLICATION_TOP_BOUND,
+        TOP_LEFT_COMPLICATION_RIGHT_BOUND,
+        TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
+      ),
+    )
+
+
+    ComplicationButton(
+      stateHolder,
+      BOTTOM_LEFT_COMPLICATION_ID,
+      RectF(
+        BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
+        BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
+        BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
+        BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
+      ),
     )
 
     ComplicationButton(
-      BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
-      BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
-      BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
-      BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
+      stateHolder,
+      TOP_RIGHT_COMPLICATION_ID,
+      RectF(
+        TOP_RIGHT_COMPLICATION_LEFT_BOUND,
+        TOP_RIGHT_COMPLICATION_TOP_BOUND,
+        TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
+        TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
+      ),
     )
 
     ComplicationButton(
-      TOP_RIGHT_COMPLICATION_LEFT_BOUND,
-      TOP_RIGHT_COMPLICATION_TOP_BOUND,
-      TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
-      TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
-    )
-
-    ComplicationButton(
-      BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
-      BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
-      BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
-      BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
+      stateHolder,
+      BOTTOM_RIGHT_COMPLICATION_ID,
+      RectF(
+        BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
+        BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
+      ),
     )
 
 //    Row(
@@ -1248,11 +1275,16 @@ fun ComplicationPicker(
 }
 
 @Composable
-fun ComplicationButton(left: Float, top: Float, right: Float, bottom: Float) {
-  var left = left - 0.012f
-  var  right = right + 0.012f
-  var top = top - 0.012f
-  var  bottom = bottom + 0.012f
+fun ComplicationButton(
+  stateHolder: WatchFaceConfigStateHolder,
+  id: Int,
+  bounds: RectF,
+//  left: Float, top: Float, right: Float, bottom: Float
+) {
+  var left = bounds.left - 0.012f
+  var  right = bounds.right + 0.012f
+  var top = bounds.top - 0.012f
+  var  bottom = bounds.bottom + 0.012f
 
   Log.d("Editor", "ComplicationButton(${left}, ${top}, ${right}, ${bottom})")
 
@@ -1266,7 +1298,7 @@ fun ComplicationButton(left: Float, top: Float, right: Float, bottom: Float) {
       Box(Modifier.weight(top, true))
 
       OutlinedButton(
-          onClick = {Log.d("@@@", "CLICK") },
+          onClick = { stateHolder.setComplication(id) },
           border = outlinedButtonBorder(
             Color(0xFF5c6063),
             borderWidth = 2.dp
