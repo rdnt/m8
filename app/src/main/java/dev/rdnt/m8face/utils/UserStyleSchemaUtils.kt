@@ -16,6 +16,7 @@
 package dev.rdnt.m8face.utils
 
 import android.content.Context
+import android.graphics.drawable.Icon
 import android.text.format.DateFormat
 import androidx.wear.watchface.style.UserStyleSchema
 import androidx.wear.watchface.style.UserStyleSetting
@@ -55,13 +56,13 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
       resources = context.resources,
       displayNameResourceId = R.string.layout_style_setting,
       descriptionResourceId = R.string.layout_style_setting_description,
-      icon = null,
+      icon = Icon.createWithResource(context, R.drawable.mauve_style_icon),
       complicationConfig = listOf(
         ComplicationSlotsOption(
           id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
           resources = context.resources,
           displayNameResourceId = R.string.default_layout_style_name,
-          icon = null,
+          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
           complicationSlotOverlays = listOf(
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               LEFT_COMPLICATION_ID,
@@ -86,7 +87,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           id = UserStyleSetting.Option.Id(LayoutStyle.FOCUS.id),
           resources = context.resources,
           displayNameResourceId = R.string.focus_layout_style_name,
-          icon = null,
+          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
           complicationSlotOverlays = listOf(
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               LEFT_ICON_COMPLICATION_ID,
@@ -103,7 +104,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           id = UserStyleSetting.Option.Id(LayoutStyle.SPORT.id),
           resources = context.resources,
           displayNameResourceId = R.string.sport_layout_style_name,
-          icon = null,
+          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
           complicationSlotOverlays = listOf(
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               TOP_COMPLICATION_ID,
@@ -124,7 +125,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           id = UserStyleSetting.Option.Id(LayoutStyle.COMPLICATIONS.id),
           resources = context.resources,
           displayNameResourceId = R.string.complications_layout_style_name,
-          icon = null,
+          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
           complicationSlotOverlays = listOf(
             ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
               TOP_COMPLICATION_ID,
@@ -158,7 +159,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
         id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
         resources = context.resources,
         displayNameResourceId = R.string.default_layout_style_name,
-        icon = null,
+        icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
         complicationSlotOverlays = listOf(
           ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
             LEFT_COMPLICATION_ID,

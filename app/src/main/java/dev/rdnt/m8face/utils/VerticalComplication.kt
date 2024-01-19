@@ -77,6 +77,10 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
   ) {
     if (bounds.isEmpty) return
 
+    canvas.drawRect(bounds, Paint().apply {
+      color = Color.parseColor("#11ffffff")
+    })
+
     when (data.type) {
       ComplicationType.SHORT_TEXT -> {
         renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
@@ -122,11 +126,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
       icon = drawable.toBitmap(
-        (32f / 78f * bounds.width()).toInt(),
-        (32f / 78f * bounds.width()).toInt()
+        (32f / 72f * bounds.width()).toInt(),
+        (32f / 72f * bounds.width()).toInt()
       )
       iconBounds =
-        Rect(0, 0, (32f / 78f * bounds.width()).toInt(), (32f / 78f * bounds.width()).toInt())
+        Rect(0, 0, (32f / 72f * bounds.width()).toInt(), (32f / 72f * bounds.width()).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {
@@ -149,11 +153,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     }
 
     if (text.length <= 3) {
-      textPaint.textSize = 24F / 78F * bounds.width()
+      textPaint.textSize = 24F / 72f * bounds.width()
     } else if (text.length <= 6) {
-      textPaint.textSize = 16F / 78F * bounds.width()
+      textPaint.textSize = 16F / 72f * bounds.width()
     } else {
-      textPaint.textSize = 12F / 78F * bounds.width()
+      textPaint.textSize = 12F / 72f * bounds.width()
     }
 
     val textBounds = Rect()
@@ -168,11 +172,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
 
     if (title != null) {
       if (title.length <= 3) {
-        titlePaint.textSize = 24F / 78F * bounds.width()
+        titlePaint.textSize = 24F / 72f * bounds.width()
       } else if (title.length <= 6) {
-        titlePaint.textSize = 16F / 78F * bounds.width()
+        titlePaint.textSize = 16F / 72f * bounds.width()
       } else {
-        titlePaint.textSize = 12F / 78F * bounds.width()
+        titlePaint.textSize = 12F / 72f * bounds.width()
       }
 
       titlePaint.getTextBounds(title, 0, title.length, titleBounds)
@@ -188,20 +192,20 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       iconOffsetY = (height - iconBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      iconOffsetY += 9f / 132f * bounds.height()
+      iconOffsetY += 6f / 132f * bounds.height()
       if (isBattery) {
         iconOffsetY = iconOffsetY.toInt().toFloat()
       }
 
-      textOffsetY += 9f / 132f * bounds.height()
+      textOffsetY += 6f / 132f * bounds.height()
     } else if (title != null) {
       val height = titleBounds.height() + textBounds.height()
 
       titleOffsetY = (height - titleBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      titleOffsetY += 9f / 132f * bounds.height()
-      textOffsetY += 9f / 132f * bounds.height()
+      titleOffsetY += 6f / 132f * bounds.height()
+      textOffsetY += 6f / 132f * bounds.height()
     }
 
     if (icon != null) {
@@ -252,7 +256,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
 
     val drawable = data.monochromaticImage.image.loadDrawable(context) ?: return
 
-    val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.8f).toInt()
+    val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.75f).toInt()
 
     icon = drawable.toBitmap(size, size)
     iconBounds = Rect(0, 0, size, size)

@@ -203,6 +203,34 @@ class WatchFaceConfigStateHolder(
         BOTTOM_COMPLICATION_ID
       }
 
+      TOP_LEFT_COMPLICATION_ID -> {
+        TOP_LEFT_COMPLICATION_ID
+      }
+
+      BOTTOM_LEFT_COMPLICATION_ID -> {
+        BOTTOM_LEFT_COMPLICATION_ID
+      }
+
+      TOP_RIGHT_COMPLICATION_ID -> {
+        TOP_RIGHT_COMPLICATION_ID
+      }
+
+      BOTTOM_RIGHT_COMPLICATION_ID -> {
+        BOTTOM_RIGHT_COMPLICATION_ID
+      }
+
+      LEFT_ICON_COMPLICATION_ID -> {
+        LEFT_ICON_COMPLICATION_ID
+      }
+
+      RIGHT_ICON_COMPLICATION_ID -> {
+        RIGHT_ICON_COMPLICATION_ID
+      }
+
+      RIGHT_TEXT_COMPLICATION_ID -> {
+        RIGHT_TEXT_COMPLICATION_ID
+      }
+
       else -> {
         launchInProgress = false
         return

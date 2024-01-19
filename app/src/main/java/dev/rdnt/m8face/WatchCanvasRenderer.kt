@@ -22,6 +22,7 @@ import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.graphics.*
 import android.util.FloatProperty
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
@@ -284,12 +285,22 @@ class WatchCanvasRenderer(
 
     coroutineScope.launch {
       watchState.isAmbient.collect { isAmbient ->
-        if (isAmbient!!) { // you call this readable? come on
-          ambientExitAnimator.cancel()
-          drawProperties.timeScale = 0f
+        if (!watchState.isHeadless) {
+          if (isAmbient!!) { // you call this readable? come on
+            ambientExitAnimator.cancel()
+            drawProperties.timeScale = 0f
+          } else {
+            ambientExitAnimator.setupStartValues()
+            ambientExitAnimator.start()
+          }
         } else {
-          ambientExitAnimator.setupStartValues()
-          ambientExitAnimator.start()
+          if (isAmbient!!) { // you call this readable? come on
+            ambientExitAnimator.setupStartValues()
+            drawProperties.timeScale = 0f
+          } else {
+            ambientExitAnimator.setupEndValues()
+            drawProperties.timeScale = 1f
+          }
         }
       }
     }

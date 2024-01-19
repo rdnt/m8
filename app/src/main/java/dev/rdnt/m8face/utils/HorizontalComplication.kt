@@ -76,6 +76,10 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
   ) {
     if (bounds.isEmpty) return
 
+    canvas.drawRect(bounds, Paint().apply {
+      color = Color.parseColor("#11ffffff")
+    })
+
     when (data.type) {
       ComplicationType.SHORT_TEXT -> {
         renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
