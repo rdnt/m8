@@ -29,15 +29,43 @@ import android.view.HapticFeedbackConstants.LONG_PRESS
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -71,17 +99,24 @@ import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.wear.compose.material.*
-import androidx.wear.compose.material.ButtonDefaults.outlinedButtonBorder
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
-import androidx.wear.compose.foundation.lazy.AutoCenteringParams
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerDefaults
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import androidx.wear.compose.material.ButtonDefaults.outlinedButtonBorder
+import androidx.wear.compose.material.HorizontalPageIndicator
+import androidx.wear.compose.material.OutlinedButton
+import androidx.wear.compose.material.PageIndicatorState
+import androidx.wear.compose.material.PositionIndicator
+import androidx.wear.compose.material.PositionIndicatorAlignment
+import androidx.wear.compose.material.PositionIndicatorState
+import androidx.wear.compose.material.PositionIndicatorVisibility
+import androidx.wear.compose.material.Scaffold
+import androidx.wear.compose.material.Switch
+import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.ToggleChip
+import androidx.wear.compose.material.ToggleChipDefaults
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithSnap
 import com.google.android.horologist.compose.rotaryinput.toRotaryScrollAdapter
@@ -92,17 +127,7 @@ import dev.rdnt.m8face.data.watchface.ColorStyle
 import dev.rdnt.m8face.data.watchface.LayoutStyle
 import dev.rdnt.m8face.data.watchface.SecondsStyle
 import dev.rdnt.m8face.theme.WearAppTheme
-import dev.rdnt.m8face.utils.BOTTOM_COMPLICATION_ID
-import dev.rdnt.m8face.utils.HORIZONTAL_COMPLICATION_HEIGHT
-import dev.rdnt.m8face.utils.HORIZONTAL_COMPLICATION_LEFT_BOUND
-import dev.rdnt.m8face.utils.HORIZONTAL_COMPLICATION_OFFSET
-import dev.rdnt.m8face.utils.HORIZONTAL_COMPLICATION_RIGHT_BOUND
-import dev.rdnt.m8face.utils.LEFT_COMPLICATION_ID
-import dev.rdnt.m8face.utils.RIGHT_COMPLICATION_ID
-import dev.rdnt.m8face.utils.TOP_COMPLICATION_ID
-import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_OFFSET
-import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_TOP_BOUND
-import dev.rdnt.m8face.utils.VERTICAL_COMPLICATION_WIDTH
+import dev.rdnt.m8face.utils.*
 import kotlinx.coroutines.launch
 
 @Preview()
@@ -151,9 +176,9 @@ fun ScrollableColumn(
   }
 
   Scaffold(
-    Modifier
-      .onPreRotaryScrollEvent { false }
-      .fillMaxSize(),
+      Modifier
+          .onPreRotaryScrollEvent { false }
+          .fillMaxSize(),
     positionIndicator = {
       PositionIndicator(
         state = state,
@@ -170,69 +195,69 @@ fun ScrollableColumn(
 
     Box(
       modifier = Modifier
-        .fillMaxSize()
-        .scrollable(
-          orientation = Orientation.Vertical,
-          state = rememberScrollableState { delta ->
-            val value = position.value - delta
+          .fillMaxSize()
+          .scrollable(
+              orientation = Orientation.Vertical,
+              state = rememberScrollableState { delta ->
+                  val value = position.value - delta
 
 
-            if (value < 0f) {
-              if (position.value != 0f) {
-                view.performHapticFeedback(LONG_PRESS)
+                  if (value < 0f) {
+                      if (position.value != 0f) {
+                          view.performHapticFeedback(LONG_PRESS)
+                      }
+
+                      position.value = 0f
+                  } else if (value > maxValue) {
+                      if (position.value != maxValue - 1) {
+                          view.performHapticFeedback(LONG_PRESS)
+                      }
+
+                      position.value = maxValue - 1
+                  } else {
+                      position.value = value
+                      val selected = (value / threshold)
+                          .toInt()
+                          .coerceAtMost(items - 1)
+                      if (selected != selectedItem.value) {
+                          selectedItem.value = selected
+                          view.performHapticFeedback(KEYBOARD_TAP)
+                      }
+                  }
+
+                  delta
+              }
+          )
+          .onRotaryScrollEvent {
+              val value = position.value + it.verticalScrollPixels
+
+              if (value < 0f) {
+                  if (position.value != 0f) {
+                      view.performHapticFeedback(LONG_PRESS)
+                  }
+
+                  position.value = 0f
+              } else if (value > maxValue) {
+                  if (position.value != maxValue - 1) {
+                      view.performHapticFeedback(LONG_PRESS)
+                  }
+
+                  position.value = maxValue - 1
+              } else {
+                  position.value = value
+                  val selected = (value / threshold)
+                      .toInt()
+                      .coerceAtMost(items - 1)
+                  if (selected != selectedItem.value) {
+                      selectedItem.value = selected
+                      view.performHapticFeedback(KEYBOARD_TAP)
+                  }
               }
 
-              position.value = 0f
-            } else if (value > maxValue) {
-              if (position.value != maxValue - 1) {
-                view.performHapticFeedback(LONG_PRESS)
-              }
-
-              position.value = maxValue - 1
-            } else {
-              position.value = value
-              val selected = (value / threshold)
-                .toInt()
-                .coerceAtMost(items - 1)
-              if (selected != selectedItem.value) {
-                selectedItem.value = selected
-                view.performHapticFeedback(KEYBOARD_TAP)
-              }
-            }
-
-            delta
+              true
           }
-        )
-        .onRotaryScrollEvent {
-          val value = position.value + it.verticalScrollPixels
-
-          if (value < 0f) {
-            if (position.value != 0f) {
-              view.performHapticFeedback(LONG_PRESS)
-            }
-
-            position.value = 0f
-          } else if (value > maxValue) {
-            if (position.value != maxValue - 1) {
-              view.performHapticFeedback(LONG_PRESS)
-            }
-
-            position.value = maxValue - 1
-          } else {
-            position.value = value
-            val selected = (value / threshold)
-              .toInt()
-              .coerceAtMost(items - 1)
-            if (selected != selectedItem.value) {
-              selectedItem.value = selected
-              view.performHapticFeedback(KEYBOARD_TAP)
-            }
-          }
-
-          true
-        }
-        .focusRequester(focusRequester)
-        .focusable(),
+          .focusRequester(focusRequester)
+          .focusable(),
     )
   }
 
@@ -324,10 +349,10 @@ fun WatchfaceConfigApp(
           val bigAmbientEnabled = state.userStylesAndPreview.bigAmbient
 
           Box(
-            Modifier
-              .fillMaxSize()
-              .zIndex(1f)
-              .background(Black)
+              Modifier
+                  .fillMaxSize()
+                  .zIndex(1f)
+                  .background(Black)
           ) {
             ConfigScaffold(
               stateHolder,
@@ -348,10 +373,10 @@ fun WatchfaceConfigApp(
 
         else -> {
           Box(
-            Modifier
-              .fillMaxSize()
-              .zIndex(2f)
-              .background(Black)
+              Modifier
+                  .fillMaxSize()
+                  .zIndex(2f)
+                  .background(Black)
           ) {
             SplashScreen(screenIsRound)
           }
@@ -382,7 +407,7 @@ fun ConfigScaffold(
     "ConfigScaffold($layoutIndex, $colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
   )
 
-  val pagerState = rememberPagerState (
+  val pagerState = rememberPagerState(
     pageCount = { 6 }
   )
 
@@ -401,15 +426,15 @@ fun ConfigScaffold(
 
       HorizontalPageIndicator(
         pageIndicatorState = pageIndicatorState,
-        Modifier
-          .padding(4.dp)
-          .zIndex(4f)
+          Modifier
+              .padding(4.dp)
+              .zIndex(4f)
       )
     },
     modifier = Modifier
-      .onPreRotaryScrollEvent { false }
-      .fillMaxSize()
-      .zIndex(1f)
+        .onPreRotaryScrollEvent { false }
+        .fillMaxSize()
+        .zIndex(1f)
   ) {
 
     val focusRequester0 = remember { FocusRequester() }
@@ -422,8 +447,8 @@ fun ConfigScaffold(
       flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
       state = pagerState,
       modifier = Modifier
-        .onPreRotaryScrollEvent { pagerState.currentPage != 0 && pagerState.currentPage != 1 && pagerState.currentPage != 2 && pagerState.currentPage != 3 }
-        .zIndex(3f), // don't ask
+          .onPreRotaryScrollEvent { pagerState.currentPage != 0 && pagerState.currentPage != 1 && pagerState.currentPage != 2 && pagerState.currentPage != 3 }
+          .zIndex(3f), // don't ask
       key = {
         it
       }
@@ -486,10 +511,10 @@ fun ConfigScaffold(
         ),
         contentScale = ContentScale.Crop,
         modifier = Modifier
-          .fillMaxSize()
-          .zIndex(1f)
-          .clip(TopHalfRectShape)
-          .scale(1f)
+            .fillMaxSize()
+            .zIndex(1f)
+            .clip(TopHalfRectShape)
+            .scale(1f)
       )
       Image(
         painterResource(id = id),
@@ -500,10 +525,10 @@ fun ConfigScaffold(
         ),
         contentScale = ContentScale.Crop,
         modifier = Modifier
-          .fillMaxSize()
-          .zIndex(1f)
-          .clip(BottomHalfRectShape)
-          .scale(1f)
+            .fillMaxSize()
+            .zIndex(1f)
+            .clip(BottomHalfRectShape)
+            .scale(1f)
       )
     } else {
       Preview(bitmap)
@@ -520,7 +545,7 @@ fun ConfigScaffold(
         focusRequester1.requestFocus()
       } else if (pagerState.currentPage == 2) {
         focusRequester2.requestFocus()
-      }else if (pagerState.currentPage == 3) {
+      } else if (pagerState.currentPage == 3) {
         focusRequester3.requestFocus()
       }
     }
@@ -540,18 +565,18 @@ fun Overlay(
     }
     Box(
       modifier = Modifier
-        .fillMaxSize()
-        .alpha(opacity * 0.75f)
-        .background(
-          brush = Brush.verticalGradient(
-            startY = 192f,
-            colors = listOf(
-              Color(0x00000000),
-              Color(0xFF000000),
-            )
+          .fillMaxSize()
+          .alpha(opacity * 0.75f)
+          .background(
+              brush = Brush.verticalGradient(
+                  startY = 192f,
+                  colors = listOf(
+                      Color(0x00000000),
+                      Color(0xFF000000),
+                  )
+              )
           )
-        )
-        .zIndex(2f),
+          .zIndex(2f),
     )
   }
 
@@ -580,63 +605,63 @@ fun Overlay(
     )
 
     Box(
-      Modifier
-        .zIndex(2f)
-        .fillMaxSize()
-        .border(10.dp, Color(ringColor), CircleShape)
+        Modifier
+            .zIndex(2f)
+            .fillMaxSize()
+            .border(10.dp, Color(ringColor), CircleShape)
     )
 
     Column(
-      Modifier
-        .fillMaxSize()
-        .padding(10.dp)
-        .clip(CircleShape)
-        .zIndex(2f)
+        Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+            .clip(CircleShape)
+            .zIndex(2f)
     ) {
       Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT)
-          .fillMaxWidth()
-          .alpha(opacity2 * 0.75f)
-          .background(Black)
+          Modifier
+              .weight(HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT)
+              .fillMaxWidth()
+              .alpha(opacity2 * 0.75f)
+              .background(Black)
       )
 
       Row(
-        Modifier
-          .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2 + extend)
-          .fillMaxWidth()
+          Modifier
+              .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2 + extend)
+              .fillMaxWidth()
       ) {
         Box(
-          Modifier
-            .weight(VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH)
-            .fillMaxHeight()
-            .alpha(opacity2 * 0.75f)
-            .background(Black)
+            Modifier
+                .weight(VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH)
+                .fillMaxHeight()
+                .alpha(opacity2 * 0.75f)
+                .background(Black)
         )
 
         Box(
-          Modifier
-            .weight(1f - VERTICAL_COMPLICATION_OFFSET * 2 - VERTICAL_COMPLICATION_WIDTH * 2 + extend)
-            .fillMaxHeight()
-            .alpha(opacity * 0.75f)
-            .background(Black)
+            Modifier
+                .weight(1f - VERTICAL_COMPLICATION_OFFSET * 2 - VERTICAL_COMPLICATION_WIDTH * 2 + extend)
+                .fillMaxHeight()
+                .alpha(opacity * 0.75f)
+                .background(Black)
         )
 
         Box(
-          Modifier
-            .weight(VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH)
-            .fillMaxHeight()
-            .alpha(opacity2 * 0.75f)
-            .background(Black)
+            Modifier
+                .weight(VERTICAL_COMPLICATION_OFFSET + VERTICAL_COMPLICATION_WIDTH)
+                .fillMaxHeight()
+                .alpha(opacity2 * 0.75f)
+                .background(Black)
         )
       }
 
       Box(
-        Modifier
-          .weight(HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT)
-          .fillMaxWidth()
-          .alpha(opacity2 * 0.75f)
-          .background(Black)
+          Modifier
+              .weight(HORIZONTAL_COMPLICATION_OFFSET + HORIZONTAL_COMPLICATION_HEIGHT)
+              .fillMaxWidth()
+              .alpha(opacity2 * 0.75f)
+              .background(Black)
       )
     }
   }
@@ -659,9 +684,9 @@ fun Options(
     ) {
       ToggleChip(
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(12.dp, 0.dp)
-          .height((40.dp)),
+            .fillMaxWidth()
+            .padding(12.dp, 0.dp)
+            .height((40.dp)),
         checked = militaryTime,
         colors = ToggleChipDefaults.toggleChipColors(
           checkedStartBackgroundColor = Transparent,
@@ -691,9 +716,9 @@ fun Options(
 
       ToggleChip(
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(12.dp, 0.dp)
-          .height((40.dp)),
+            .fillMaxWidth()
+            .padding(12.dp, 0.dp)
+            .height((40.dp)),
         checked = bigAmbient,
         colors = ToggleChipDefaults.toggleChipColors(
           checkedStartBackgroundColor = Transparent,
@@ -768,8 +793,8 @@ fun Preview(
     bitmap = bitmap,
     contentDescription = "Preview",
     modifier = Modifier
-      .fillMaxSize()
-      .zIndex(1f)
+        .fillMaxSize()
+        .zIndex(1f)
   )
 }
 
@@ -963,10 +988,10 @@ fun ColorPicker(
       alignment = Alignment.CenterVertically
     ),
     modifier = Modifier
-      .fillMaxSize()
-      .focusable()
-      .focusRequester(focusRequester)
-      .rotaryWithSnap(adapter, focusRequester),
+        .fillMaxSize()
+        .focusable()
+        .focusRequester(focusRequester)
+        .rotaryWithSnap(adapter, focusRequester),
     state = state,
     autoCentering = AutoCenteringParams(itemIndex = 0, itemOffset = 0),
     scalingParams = ScalingLazyColumnDefaults.scalingParams(
@@ -995,133 +1020,273 @@ fun ComplicationPicker(
 ) {
   Log.d("Editor", "ComplicationPicker()")
 
-  Box (
+  Box(
     Modifier
       .fillMaxSize()
   ) {
+//    Column(
+//      Modifier
+//        .fillMaxSize()
+//    ) {
+//      Row(
+//        modifier = Modifier
+//          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
+//      ) {}
+//      Row(
+//        modifier = Modifier
+//          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
+//      ) {
+//        Box(
+//            Modifier
+//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+//                .fillMaxHeight()
+//        )
+//        OutlinedButton(
+//          onClick = { stateHolder.setComplication(TOP_COMPLICATION_ID) },
+//          border = outlinedButtonBorder(
+//            Color(0xFF5c6063),
+//            borderWidth = 2.dp
+//          ),
+//          modifier = Modifier
+//              .weight(
+//                  HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND,
+//                  true
+//              )
+//              .fillMaxHeight()
+//        ) {}
+//        Box(
+//            Modifier
+//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+//                .fillMaxHeight()
+//        )
+//      }
+//      Box(
+//        modifier = Modifier
+//          .weight(
+//            1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2,
+//            true
+//          )
+//      )
+//      Row(
+//        modifier = Modifier
+//          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
+//      ) {
+//        Box(
+//            Modifier
+//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+//                .fillMaxHeight()
+//        )
+//        OutlinedButton(
+//          onClick = { stateHolder.setComplication(BOTTOM_COMPLICATION_ID) },
+//          border = outlinedButtonBorder(
+//            Color(0xFF5c6063),
+//            borderWidth = 2.dp
+//          ),
+//          modifier = Modifier
+//              .weight(
+//                  HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND,
+//                  true
+//              )
+//              .fillMaxHeight()
+//        ) {}
+//        Box(
+//            Modifier
+//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
+//                .fillMaxHeight()
+//        )
+//      }
+//      Row(
+//        modifier = Modifier
+//          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
+//      ) {}
+//    }
+
+    ComplicationButton(
+      HORIZONTAL_COMPLICATION_LEFT_BOUND,
+      TOP_COMPLICATION_TOP_BOUND,
+      HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+      TOP_COMPLICATION_BOTTOM_BOUND,
+    )
+
+    ComplicationButton(
+      HORIZONTAL_COMPLICATION_LEFT_BOUND,
+      BOTTOM_COMPLICATION_TOP_BOUND,
+      HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+      BOTTOM_COMPLICATION_BOTTOM_BOUND,
+    )
+
+//    Column(
+//      Modifier
+//        .fillMaxSize()
+//    ) {
+//      Box(
+//        modifier = Modifier
+//          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
+//      )
+//
+//      Row(
+//        modifier = Modifier
+//          .weight(1f - VERTICAL_COMPLICATION_TOP_BOUND * 2, true)
+//      ) {
+//        Box(
+//          Modifier
+//            .weight(VERTICAL_COMPLICATION_OFFSET, true)
+//            .fillMaxHeight()
+//        )
+//        OutlinedButton(
+//          onClick = { stateHolder.setComplication(LEFT_COMPLICATION_ID) },
+//          border = outlinedButtonBorder(
+//            Color(0xFF5c6063),
+//            borderWidth = 2.dp
+//          ),
+//          modifier = Modifier
+//            .weight(VERTICAL_COMPLICATION_WIDTH, true)
+//            .fillMaxHeight(),
+//        ) {}
+//        Box(
+//          Modifier
+//            .weight(1f - VERTICAL_COMPLICATION_WIDTH * 2 - VERTICAL_COMPLICATION_OFFSET * 2, true)
+//            .fillMaxHeight()
+//        )
+//        OutlinedButton(
+//          onClick = { stateHolder.setComplication(RIGHT_COMPLICATION_ID) },
+//          border = outlinedButtonBorder(
+//            Color(0xFF5c6063),
+//            borderWidth = 2.dp
+//          ),
+//          modifier = Modifier
+//            .weight(VERTICAL_COMPLICATION_WIDTH, true)
+//            .fillMaxHeight(),
+//        ) {}
+//        Box(
+//          Modifier
+//            .weight(VERTICAL_COMPLICATION_OFFSET, true)
+//            .fillMaxHeight()
+//        )
+//      }
+//
+//      Box(
+//        modifier = Modifier
+//          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
+//      )
+//    }
+
+    ComplicationButton(
+      TOP_LEFT_COMPLICATION_LEFT_BOUND,
+      TOP_LEFT_COMPLICATION_TOP_BOUND,
+      TOP_LEFT_COMPLICATION_RIGHT_BOUND,
+      TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
+    )
+
+    ComplicationButton(
+      BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
+      BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
+      BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
+      BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
+    )
+
+    ComplicationButton(
+      TOP_RIGHT_COMPLICATION_LEFT_BOUND,
+      TOP_RIGHT_COMPLICATION_TOP_BOUND,
+      TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
+      TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
+    )
+
+    ComplicationButton(
+      BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
+      BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
+      BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
+      BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
+    )
+
+//    Row(
+//      Modifier
+//        .fillMaxSize()
+//    ){
+//      Box(
+//        modifier = Modifier
+//          .fillMaxHeight()
+//          .weight(TOP_LEFT_COMPLICATION_LEFT_BOUND, true).background(Color.Red)
+//      )
+//
+//      Column(
+//        Modifier
+//          .fillMaxHeight()
+//          .weight(TOP_LEFT_COMPLICATION_RIGHT_BOUND-TOP_LEFT_COMPLICATION_LEFT_BOUND, true)
+//      ) {
+//        Box(
+//          modifier = Modifier
+//            .fillMaxWidth()
+//            .weight(TOP_LEFT_COMPLICATION_TOP_BOUND, true).background(Color.Red)
+//        )
+//
+//        Box(
+//          modifier = Modifier
+//            .fillMaxWidth()
+//            .weight(TOP_LEFT_COMPLICATION_BOTTOM_BOUND-TOP_LEFT_COMPLICATION_TOP_BOUND, true).background(Color.Blue)
+//        )
+//
+//        Box(
+//          modifier = Modifier
+//            .fillMaxWidth()
+//            .weight(1f - TOP_LEFT_COMPLICATION_BOTTOM_BOUND , true).background(Color.Red)
+//        )
+//
+//      }
+//
+//      Box(
+//        modifier = Modifier
+//          .fillMaxHeight()
+//          .weight(1f-TOP_LEFT_COMPLICATION_RIGHT_BOUND, true).background(Color.Red)
+//      )
+//
+//
+//    }
+
+
+  }
+}
+
+@Composable
+fun ComplicationButton(left: Float, top: Float, right: Float, bottom: Float) {
+  var left = left - 0.012f
+  var  right = right + 0.012f
+  var top = top - 0.012f
+  var  bottom = bottom + 0.012f
+
+  Log.d("Editor", "ComplicationButton(${left}, ${top}, ${right}, ${bottom})")
+
+  Row(Modifier.fillMaxSize()) {
+    Box(Modifier.weight(left, true))
     Column(
-      Modifier
-        .fillMaxSize()
+        Modifier
+            .fillMaxSize()
+            .weight(right - left, true)
     ) {
-      Row(
-        modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-      ) {}
-      Row(
-        modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
-      ) {
-        Box(
-          Modifier
-            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
-        )
-        OutlinedButton(
-          onClick = { stateHolder.setComplication(TOP_COMPLICATION_ID) },
+      Box(Modifier.weight(top, true))
+
+      OutlinedButton(
+          onClick = {Log.d("@@@", "CLICK") },
           border = outlinedButtonBorder(
             Color(0xFF5c6063),
             borderWidth = 2.dp
           ),
+//          shape = RoundedCornerShape(16.dp),
           modifier = Modifier
-            .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
+            .weight(bottom - top, true)
+            .fillMaxSize(),
         ) {}
-        Box(
-          Modifier
-            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
-        )
-      }
-      Box(
-        modifier = Modifier
-          .weight(1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2, true)
-      )
-      Row(
-        modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
-      ) {
-        Box(
-          Modifier
-            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
-        )
-        OutlinedButton(
-          onClick = { stateHolder.setComplication(BOTTOM_COMPLICATION_ID) },
-          border = outlinedButtonBorder(
-            Color(0xFF5c6063),
-            borderWidth = 2.dp
-          ),
-          modifier = Modifier
-            .weight(HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
-        ) {}
-        Box(
-          Modifier
-            .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-            .fillMaxHeight()
-        )
-      }
-      Row(
-        modifier = Modifier
-          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-      ) {}
+
+//      Box(
+//          Modifier
+//              .fillMaxWidth()
+//              .weight(bottom - top, true)
+//              .alpha(.3f)
+//              .background(Color.Blue)
+//      )
+      Box(Modifier.weight(1f - bottom, true))
     }
-
-    Column(
-      Modifier
-        .fillMaxSize()
-    ) {
-      Box(
-        modifier = Modifier
-          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-      )
-
-      Row(
-        modifier = Modifier
-          .weight(1f - VERTICAL_COMPLICATION_TOP_BOUND * 2, true)
-      ) {
-        Box(
-          Modifier
-            .weight(VERTICAL_COMPLICATION_OFFSET, true)
-            .fillMaxHeight()
-        )
-        OutlinedButton(
-          onClick = { stateHolder.setComplication(LEFT_COMPLICATION_ID) },
-          border = outlinedButtonBorder(
-            Color(0xFF5c6063),
-            borderWidth = 2.dp
-          ),
-          modifier = Modifier
-            .weight(VERTICAL_COMPLICATION_WIDTH, true)
-            .fillMaxHeight(),
-        ) {}
-        Box(
-          Modifier
-            .weight(1f - VERTICAL_COMPLICATION_WIDTH * 2 - VERTICAL_COMPLICATION_OFFSET * 2, true)
-            .fillMaxHeight()
-        )
-        OutlinedButton(
-          onClick = { stateHolder.setComplication(RIGHT_COMPLICATION_ID) },
-          border = outlinedButtonBorder(
-            Color(0xFF5c6063),
-            borderWidth = 2.dp
-          ),
-          modifier = Modifier
-            .weight(VERTICAL_COMPLICATION_WIDTH, true)
-            .fillMaxHeight(),
-        ) {}
-        Box(
-          Modifier
-            .weight(VERTICAL_COMPLICATION_OFFSET, true)
-            .fillMaxHeight()
-        )
-      }
-
-      Box(
-        modifier = Modifier
-          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-      )
-    }
+    Box(Modifier.weight(1f - right, true))
   }
 }
 
@@ -1140,11 +1305,11 @@ fun ColorName(name: String) {
       text = name,
       textAlign = TextAlign.Center,
       modifier = Modifier
-        .weight(4f)
-        .height(20.dp)
-        .clip(RoundedCornerShape(10.dp))
-        .background(Color(0xFF202124))
-        .padding(12.dp, 1.dp),
+          .weight(4f)
+          .height(20.dp)
+          .clip(RoundedCornerShape(10.dp))
+          .background(Color(0xFF202124))
+          .padding(12.dp, 1.dp),
       fontSize = 12.sp,
       fontWeight = Medium,
       fontFamily = Default,
@@ -1179,10 +1344,10 @@ fun Label(label: String) {
       text = label,
       textAlign = TextAlign.Center,
       modifier = Modifier
-        .weight(4f)
-        .clip(RoundedCornerShape(10.dp))
-        .background(Color(0xFF000000))
-        .padding(12.dp, 1.dp),
+          .weight(4f)
+          .clip(RoundedCornerShape(10.dp))
+          .background(Color(0xFF000000))
+          .padding(12.dp, 1.dp),
       fontSize = 12.sp,
       fontWeight = Medium,
       fontFamily = Default,
@@ -1200,10 +1365,10 @@ fun ColorItem() {
 
   Box(
     modifier = Modifier
-      .padding(0.dp, 0.dp)
-      .height(48.dp)
-      .width(0.dp)
-      .alpha(0.0F)
+        .padding(0.dp, 0.dp)
+        .height(48.dp)
+        .width(0.dp)
+        .alpha(0.0F)
   )
 }
 
@@ -1213,12 +1378,12 @@ fun DebugColorItem(colorId: Int?) {
 
   Box(
     modifier = Modifier
-      .padding(0.dp, 0.dp)
-      .height(48.dp)
-      .fillMaxWidth()
-      .alpha(0.0F)
+        .padding(0.dp, 0.dp)
+        .height(48.dp)
+        .fillMaxWidth()
+        .alpha(0.0F)
 //        .alpha(0.2F)
-      .background(colorId?.let { colorResource(colorId) } ?: Black)
+        .background(colorId?.let { colorResource(colorId) } ?: Black)
   )
 }
 

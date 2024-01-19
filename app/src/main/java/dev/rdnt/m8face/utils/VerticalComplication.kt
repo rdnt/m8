@@ -192,20 +192,20 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       iconOffsetY = (height - iconBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      iconOffsetY += 6f / 132f * bounds.height()
+      iconOffsetY += 9f / 132f * bounds.height()
       if (isBattery) {
         iconOffsetY = iconOffsetY.toInt().toFloat()
       }
 
-      textOffsetY += 6f / 132f * bounds.height()
+      textOffsetY += 3f / 132f * bounds.height()
     } else if (title != null) {
       val height = titleBounds.height() + textBounds.height()
 
       titleOffsetY = (height - titleBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      titleOffsetY += 6f / 132f * bounds.height()
-      textOffsetY += 6f / 132f * bounds.height()
+      titleOffsetY += 9f / 132f * bounds.height()
+      textOffsetY += 3f / 132f * bounds.height()
     }
 
     if (icon != null) {
