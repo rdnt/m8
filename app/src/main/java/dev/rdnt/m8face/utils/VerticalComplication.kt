@@ -204,8 +204,8 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       titleOffsetY = (height - titleBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      titleOffsetY += 9f / 132f * bounds.height()
-      textOffsetY += 3f / 132f * bounds.height()
+      titleOffsetY += 6f / 132f * bounds.height()
+      textOffsetY += 6f / 132f * bounds.height()
     }
 
     if (icon != null) {

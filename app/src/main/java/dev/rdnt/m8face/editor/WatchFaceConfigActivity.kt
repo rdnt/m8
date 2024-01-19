@@ -22,7 +22,6 @@
 
 package dev.rdnt.m8face.editor
 
-import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
@@ -460,7 +459,7 @@ fun ConfigScaffold(
         1 -> ColorStyleSelect(focusRequester1, stateHolder, colorStyles, colorIndex)
         2 -> SecondsStyleSelect(focusRequester2, stateHolder, secondsStyles, secondsStyleIndex)
         3 -> AmbientStyleSelect(focusRequester3, stateHolder, ambientStyles, ambientStyleIndex)
-        4 -> ComplicationPicker(stateHolder)
+        4 -> ComplicationPicker(stateHolder, layoutIndex)
         5 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled)
       }
     }
@@ -1019,6 +1018,7 @@ fun ColorPicker(
 @Composable
 fun ComplicationPicker(
   stateHolder: WatchFaceConfigStateHolder,
+  layoutIndex: Int,
 ) {
   Log.d("Editor", "ComplicationPicker()")
 
@@ -1026,249 +1026,178 @@ fun ComplicationPicker(
     Modifier
       .fillMaxSize()
   ) {
-//    Column(
-//      Modifier
-//        .fillMaxSize()
-//    ) {
-//      Row(
-//        modifier = Modifier
-//          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-//      ) {}
-//      Row(
-//        modifier = Modifier
-//          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
-//      ) {
-//        Box(
-//            Modifier
-//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-//                .fillMaxHeight()
-//        )
-//        OutlinedButton(
-//          onClick = { stateHolder.setComplication(TOP_COMPLICATION_ID) },
-//          border = outlinedButtonBorder(
-//            Color(0xFF5c6063),
-//            borderWidth = 2.dp
-//          ),
-//          modifier = Modifier
-//              .weight(
-//                  HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND,
-//                  true
-//              )
-//              .fillMaxHeight()
-//        ) {}
-//        Box(
-//            Modifier
-//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-//                .fillMaxHeight()
-//        )
-//      }
-//      Box(
-//        modifier = Modifier
-//          .weight(
-//            1f - HORIZONTAL_COMPLICATION_OFFSET * 2 - HORIZONTAL_COMPLICATION_HEIGHT * 2,
-//            true
-//          )
-//      )
-//      Row(
-//        modifier = Modifier
-//          .weight(HORIZONTAL_COMPLICATION_HEIGHT, true)
-//      ) {
-//        Box(
-//            Modifier
-//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-//                .fillMaxHeight()
-//        )
-//        OutlinedButton(
-//          onClick = { stateHolder.setComplication(BOTTOM_COMPLICATION_ID) },
-//          border = outlinedButtonBorder(
-//            Color(0xFF5c6063),
-//            borderWidth = 2.dp
-//          ),
-//          modifier = Modifier
-//              .weight(
-//                  HORIZONTAL_COMPLICATION_RIGHT_BOUND - HORIZONTAL_COMPLICATION_LEFT_BOUND,
-//                  true
-//              )
-//              .fillMaxHeight()
-//        ) {}
-//        Box(
-//            Modifier
-//                .weight(HORIZONTAL_COMPLICATION_LEFT_BOUND, true)
-//                .fillMaxHeight()
-//        )
-//      }
-//      Row(
-//        modifier = Modifier
-//          .weight(HORIZONTAL_COMPLICATION_OFFSET, true)
-//      ) {}
-//    }
 
-    ComplicationButton(
-      stateHolder,
-      TOP_COMPLICATION_ID,
-      RectF(
-        HORIZONTAL_COMPLICATION_LEFT_BOUND,
-        TOP_COMPLICATION_TOP_BOUND,
-        HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-        TOP_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+    when (layoutIndex) {
+      0 -> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-    ComplicationButton(
-      stateHolder,
-      BOTTOM_COMPLICATION_ID,
-      RectF(
-        HORIZONTAL_COMPLICATION_LEFT_BOUND,
-        BOTTOM_COMPLICATION_TOP_BOUND,
-        HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-        BOTTOM_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-//    Column(
-//      Modifier
-//        .fillMaxSize()
-//    ) {
-//      Box(
-//        modifier = Modifier
-//          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-//      )
-//
-//      Row(
-//        modifier = Modifier
-//          .weight(1f - VERTICAL_COMPLICATION_TOP_BOUND * 2, true)
-//      ) {
-//        Box(
-//          Modifier
-//            .weight(VERTICAL_COMPLICATION_OFFSET, true)
-//            .fillMaxHeight()
-//        )
-//        OutlinedButton(
-//          onClick = { stateHolder.setComplication(LEFT_COMPLICATION_ID) },
-//          border = outlinedButtonBorder(
-//            Color(0xFF5c6063),
-//            borderWidth = 2.dp
-//          ),
-//          modifier = Modifier
-//            .weight(VERTICAL_COMPLICATION_WIDTH, true)
-//            .fillMaxHeight(),
-//        ) {}
-//        Box(
-//          Modifier
-//            .weight(1f - VERTICAL_COMPLICATION_WIDTH * 2 - VERTICAL_COMPLICATION_OFFSET * 2, true)
-//            .fillMaxHeight()
-//        )
-//        OutlinedButton(
-//          onClick = { stateHolder.setComplication(RIGHT_COMPLICATION_ID) },
-//          border = outlinedButtonBorder(
-//            Color(0xFF5c6063),
-//            borderWidth = 2.dp
-//          ),
-//          modifier = Modifier
-//            .weight(VERTICAL_COMPLICATION_WIDTH, true)
-//            .fillMaxHeight(),
-//        ) {}
-//        Box(
-//          Modifier
-//            .weight(VERTICAL_COMPLICATION_OFFSET, true)
-//            .fillMaxHeight()
-//        )
-//      }
-//
-//      Box(
-//        modifier = Modifier
-//          .weight(VERTICAL_COMPLICATION_TOP_BOUND, true)
-//      )
-//    }
+        ComplicationButton(
+          stateHolder,
+          LEFT_COMPLICATION_ID,
+          RectF(
+            LEFT_COMPLICATION_LEFT_BOUND,
+            VERTICAL_COMPLICATION_TOP_BOUND,
+            LEFT_COMPLICATION_RIGHT_BOUND,
+            VERTICAL_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-    ComplicationButton(
-      stateHolder,
-      TOP_LEFT_COMPLICATION_ID,
-      RectF(
-        TOP_LEFT_COMPLICATION_LEFT_BOUND,
-        TOP_LEFT_COMPLICATION_TOP_BOUND,
-        TOP_LEFT_COMPLICATION_RIGHT_BOUND,
-        TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+        ComplicationButton(
+          stateHolder,
+          RIGHT_COMPLICATION_ID,
+          RectF(
+            RIGHT_COMPLICATION_LEFT_BOUND,
+            VERTICAL_COMPLICATION_TOP_BOUND,
+            RIGHT_COMPLICATION_RIGHT_BOUND,
+            VERTICAL_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+      }
+      1 -> {
+        ComplicationButton(
+          stateHolder,
+          LEFT_ICON_COMPLICATION_ID,
+          RectF(
+            LEFT_ICON_COMPLICATION_LEFT_BOUND,
+            LEFT_ICON_COMPLICATION_TOP_BOUND,
+            LEFT_ICON_COMPLICATION_RIGHT_BOUND,
+            LEFT_ICON_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
+        ComplicationButton(
+          stateHolder,
+          RIGHT_ICON_COMPLICATION_ID,
+          RectF(
+            RIGHT_ICON_COMPLICATION_LEFT_BOUND,
+            RIGHT_ICON_COMPLICATION_TOP_BOUND,
+            RIGHT_ICON_COMPLICATION_RIGHT_BOUND,
+            RIGHT_ICON_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+      }
+      2 -> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-    ComplicationButton(
-      stateHolder,
-      BOTTOM_LEFT_COMPLICATION_ID,
-      RectF(
-        BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
-        BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
-        BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
-        BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-    ComplicationButton(
-      stateHolder,
-      TOP_RIGHT_COMPLICATION_ID,
-      RectF(
-        TOP_RIGHT_COMPLICATION_LEFT_BOUND,
-        TOP_RIGHT_COMPLICATION_TOP_BOUND,
-        TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
-        TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+        ComplicationButton(
+          stateHolder,
+          RIGHT_TEXT_COMPLICATION_ID,
+          RectF(
+            RIGHT_TEXT_COMPLICATION_LEFT_BOUND,
+            RIGHT_TEXT_COMPLICATION_TOP_BOUND,
+            RIGHT_TEXT_COMPLICATION_RIGHT_BOUND,
+            RIGHT_TEXT_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+      }
+      3-> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-    ComplicationButton(
-      stateHolder,
-      BOTTOM_RIGHT_COMPLICATION_ID,
-      RectF(
-        BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
-        BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
-        BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
-        BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
-      ),
-    )
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
 
-//    Row(
-//      Modifier
-//        .fillMaxSize()
-//    ){
-//      Box(
-//        modifier = Modifier
-//          .fillMaxHeight()
-//          .weight(TOP_LEFT_COMPLICATION_LEFT_BOUND, true).background(Color.Red)
-//      )
-//
-//      Column(
-//        Modifier
-//          .fillMaxHeight()
-//          .weight(TOP_LEFT_COMPLICATION_RIGHT_BOUND-TOP_LEFT_COMPLICATION_LEFT_BOUND, true)
-//      ) {
-//        Box(
-//          modifier = Modifier
-//            .fillMaxWidth()
-//            .weight(TOP_LEFT_COMPLICATION_TOP_BOUND, true).background(Color.Red)
-//        )
-//
-//        Box(
-//          modifier = Modifier
-//            .fillMaxWidth()
-//            .weight(TOP_LEFT_COMPLICATION_BOTTOM_BOUND-TOP_LEFT_COMPLICATION_TOP_BOUND, true).background(Color.Blue)
-//        )
-//
-//        Box(
-//          modifier = Modifier
-//            .fillMaxWidth()
-//            .weight(1f - TOP_LEFT_COMPLICATION_BOTTOM_BOUND , true).background(Color.Red)
-//        )
-//
-//      }
-//
-//      Box(
-//        modifier = Modifier
-//          .fillMaxHeight()
-//          .weight(1f-TOP_LEFT_COMPLICATION_RIGHT_BOUND, true).background(Color.Red)
-//      )
-//
-//
-//    }
+        ComplicationButton(
+          stateHolder,
+          TOP_LEFT_COMPLICATION_ID,
+          RectF(
+            TOP_LEFT_COMPLICATION_LEFT_BOUND,
+            TOP_LEFT_COMPLICATION_TOP_BOUND,
+            TOP_LEFT_COMPLICATION_RIGHT_BOUND,
+            TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_LEFT_COMPLICATION_ID,
+          RectF(
+            BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
+            BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
+            BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          TOP_RIGHT_COMPLICATION_ID,
+          RectF(
+            TOP_RIGHT_COMPLICATION_LEFT_BOUND,
+            TOP_RIGHT_COMPLICATION_TOP_BOUND,
+            TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
+            TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_RIGHT_COMPLICATION_ID,
+          RectF(
+            BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
+            BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
+            BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+      }
+    }
 
 
   }
@@ -1281,10 +1210,10 @@ fun ComplicationButton(
   bounds: RectF,
 //  left: Float, top: Float, right: Float, bottom: Float
 ) {
-  var left = bounds.left - 0.012f
-  var  right = bounds.right + 0.012f
-  var top = bounds.top - 0.012f
-  var  bottom = bounds.bottom + 0.012f
+  var left= bounds.left - 0.015625f
+  var right= bounds.right + 0.015625f
+  var top= bounds.top - 0.015625f
+  var bottom= bounds.bottom + 0.015625f
 
   Log.d("Editor", "ComplicationButton(${left}, ${top}, ${right}, ${bottom})")
 
