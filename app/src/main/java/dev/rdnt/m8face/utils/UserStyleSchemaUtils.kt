@@ -16,8 +16,11 @@
 package dev.rdnt.m8face.utils
 
 import android.content.Context
+import android.graphics.RectF
 import android.graphics.drawable.Icon
 import android.text.format.DateFormat
+import androidx.wear.watchface.complications.ComplicationSlotBounds
+import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.style.UserStyleSchema
 import androidx.wear.watchface.style.UserStyleSetting
 import androidx.wear.watchface.style.UserStyleSetting.ComplicationSlotsUserStyleSetting
@@ -50,135 +53,237 @@ const val BIG_AMBIENT_SETTING = "big_ambient_setting"
 fun createUserStyleSchema(context: Context): UserStyleSchema {
   // 1. Allows user to change the color styles of the watch face (if any are available).
 
+  val info1 = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.INFO1.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.info1_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        TOP_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        BOTTOM_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
+  val info2 = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.INFO2.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.info2_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        RIGHT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        TOP_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        BOTTOM_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
+  val info3 = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.INFO3.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.info3_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        TOP_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        BOTTOM_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
+  val info4 = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.INFO4.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.info4_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        TOP_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        BOTTOM_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_TOP_RIGHT_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        COMPLICATIONS_BOTTOM_RIGHT_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
+  val sport = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.SPORT.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.sport_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+        complicationSlotBounds = ComplicationSlotBounds(RectF(
+          HOUR_SPORT_COMPLICATION_LEFT_BOUND,
+          HOUR_SPORT_COMPLICATION_TOP_BOUND,
+          HOUR_SPORT_COMPLICATION_RIGHT_BOUND,
+          HOUR_SPORT_COMPLICATION_BOTTOM_BOUND,
+        )),
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+        complicationSlotBounds = ComplicationSlotBounds(RectF(
+          MINUTE_SPORT_COMPLICATION_LEFT_BOUND,
+          MINUTE_SPORT_COMPLICATION_TOP_BOUND,
+          MINUTE_SPORT_COMPLICATION_RIGHT_BOUND,
+          MINUTE_SPORT_COMPLICATION_BOTTOM_BOUND,
+        )),
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        TOP_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        BOTTOM_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        RIGHT_TEXT_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
+  val focus = ComplicationSlotsOption(
+    id = UserStyleSetting.Option.Id(LayoutStyle.FOCUS.id),
+    resources = context.resources,
+    displayNameResourceId = R.string.focus_layout_style_name,
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    complicationSlotOverlays = listOf(
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        HOUR_COMPLICATION_ID,
+        enabled = true,
+        complicationSlotBounds = ComplicationSlotBounds(RectF(
+          HOUR_FOCUS_COMPLICATION_LEFT_BOUND,
+          HOUR_FOCUS_COMPLICATION_TOP_BOUND,
+          HOUR_FOCUS_COMPLICATION_RIGHT_BOUND,
+          HOUR_FOCUS_COMPLICATION_BOTTOM_BOUND,
+        )),
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        MINUTE_COMPLICATION_ID,
+        enabled = true,
+        complicationSlotBounds = ComplicationSlotBounds(RectF(
+          MINUTE_FOCUS_COMPLICATION_LEFT_BOUND,
+          MINUTE_FOCUS_COMPLICATION_TOP_BOUND,
+          MINUTE_FOCUS_COMPLICATION_RIGHT_BOUND,
+          MINUTE_FOCUS_COMPLICATION_BOTTOM_BOUND,
+        )),
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        FOCUS_LEFT_ICON_COMPLICATION_ID,
+        enabled = true
+      ),
+      ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
+        FOCUS_RIGHT_ICON_COMPLICATION_ID,
+        enabled = true
+      ),
+    )
+  )
+
   val layoutStyleSetting =
     ComplicationSlotsUserStyleSetting(
       id = UserStyleSetting.Id(LAYOUT_STYLE_SETTING),
       resources = context.resources,
       displayNameResourceId = R.string.layout_style_setting,
       descriptionResourceId = R.string.layout_style_setting_description,
-      icon = Icon.createWithResource(context, R.drawable.mauve_style_icon),
+      icon = Icon.createWithResource(context, R.drawable.mauve_style_icon), // TODO: @rdnt fix icon
       complicationConfig = listOf(
-        ComplicationSlotsOption(
-          id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
-          resources = context.resources,
-          displayNameResourceId = R.string.default_layout_style_name,
-          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
-          complicationSlotOverlays = listOf(
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              LEFT_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              RIGHT_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              TOP_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              BOTTOM_COMPLICATION_ID,
-              enabled = true
-            ),
-          )
-        ),
-
-        ComplicationSlotsOption(
-          id = UserStyleSetting.Option.Id(LayoutStyle.FOCUS.id),
-          resources = context.resources,
-          displayNameResourceId = R.string.focus_layout_style_name,
-          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
-          complicationSlotOverlays = listOf(
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              LEFT_ICON_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              RIGHT_ICON_COMPLICATION_ID,
-              enabled = true
-            ),
-          )
-        ),
-
-        ComplicationSlotsOption(
-          id = UserStyleSetting.Option.Id(LayoutStyle.SPORT.id),
-          resources = context.resources,
-          displayNameResourceId = R.string.sport_layout_style_name,
-          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
-          complicationSlotOverlays = listOf(
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              TOP_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              BOTTOM_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              RIGHT_TEXT_COMPLICATION_ID,
-              enabled = true
-            ),
-          )
-        ),
-
-        ComplicationSlotsOption(
-          id = UserStyleSetting.Option.Id(LayoutStyle.COMPLICATIONS.id),
-          resources = context.resources,
-          displayNameResourceId = R.string.complications_layout_style_name,
-          icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
-          complicationSlotOverlays = listOf(
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              TOP_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              BOTTOM_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              TOP_LEFT_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              BOTTOM_LEFT_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              TOP_RIGHT_COMPLICATION_ID,
-              enabled = true
-            ),
-            ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-              BOTTOM_RIGHT_COMPLICATION_ID,
-              enabled = true
-            ),
-          )
-        ),
+        info1,
+        info2,
+        info3,
+        info4,
+        sport,
+        focus,
       ),
       listOf(WatchFaceLayer.COMPLICATIONS),
-      defaultOption = ComplicationSlotsOption(
-        id = UserStyleSetting.Option.Id(LayoutStyle.DEFAULT.id),
-        resources = context.resources,
-        displayNameResourceId = R.string.default_layout_style_name,
-        icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
-        complicationSlotOverlays = listOf(
-          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-            LEFT_COMPLICATION_ID,
-            enabled = true
-          ),
-          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-            RIGHT_COMPLICATION_ID,
-            enabled = true
-          ),
-          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-            TOP_COMPLICATION_ID,
-            enabled = true
-          ),
-          ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
-            BOTTOM_COMPLICATION_ID,
-            enabled = true
-          ),
-        )
-      ),
+      defaultOption = info2,
     )
 
   val colorStyleSetting =

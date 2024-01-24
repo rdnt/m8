@@ -1028,14 +1028,83 @@ fun ComplicationPicker(
   ) {
 
     when (layoutIndex) {
+      0, 1, 2, 3 -> {
+        ComplicationButton(
+          stateHolder,
+          HOUR_COMPLICATION_ID,
+          RectF(
+            HOUR_COMPLICATION_LEFT_BOUND + 6f / 384f,
+            HOUR_COMPLICATION_TOP_BOUND + 6f / 384f,
+            HOUR_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            HOUR_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+        ComplicationButton(
+          stateHolder,
+          MINUTE_COMPLICATION_ID,
+          RectF(
+            MINUTE_COMPLICATION_LEFT_BOUND + 6f / 384f,
+            MINUTE_COMPLICATION_TOP_BOUND + 6f / 384f,
+            MINUTE_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            MINUTE_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+      }
+      4 -> {
+        ComplicationButton(
+          stateHolder,
+          HOUR_COMPLICATION_ID,
+          RectF(
+            HOUR_SPORT_COMPLICATION_LEFT_BOUND + 6f / 384f,
+            HOUR_SPORT_COMPLICATION_TOP_BOUND + 6f / 384f,
+            HOUR_SPORT_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            HOUR_SPORT_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+        ComplicationButton(
+          stateHolder,
+          MINUTE_COMPLICATION_ID,
+          RectF(
+            MINUTE_SPORT_COMPLICATION_LEFT_BOUND,
+            MINUTE_SPORT_COMPLICATION_TOP_BOUND + 6f / 384f,
+            MINUTE_SPORT_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            MINUTE_SPORT_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+      }
+      5 -> {
+        ComplicationButton(
+          stateHolder,
+          HOUR_COMPLICATION_ID,
+          RectF(
+            HOUR_FOCUS_COMPLICATION_LEFT_BOUND + 6f / 384f,
+            HOUR_FOCUS_COMPLICATION_TOP_BOUND + 6f / 384f,
+            HOUR_FOCUS_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            HOUR_FOCUS_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+        ComplicationButton(
+          stateHolder,
+          MINUTE_COMPLICATION_ID,
+          RectF(
+            MINUTE_FOCUS_COMPLICATION_LEFT_BOUND + 6f / 384f,
+            MINUTE_FOCUS_COMPLICATION_TOP_BOUND + 6f / 384f,
+            MINUTE_FOCUS_COMPLICATION_RIGHT_BOUND - 6f / 384f,
+            MINUTE_FOCUS_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
+          ),
+        )
+      }
+    }
+
+    when (layoutIndex) {
       0 -> {
         ComplicationButton(
           stateHolder,
           TOP_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_LEFT_BOUND,
             TOP_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_RIGHT_BOUND,
             TOP_COMPLICATION_BOTTOM_BOUND,
           ),
         )
@@ -1044,9 +1113,43 @@ fun ComplicationPicker(
           stateHolder,
           BOTTOM_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_LEFT_BOUND,
             BOTTOM_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          LEFT_COMPLICATION_ID,
+          RectF(
+            LEFT_COMPLICATION_LEFT_BOUND,
+            VERTICAL_COMPLICATION_TOP_BOUND,
+            LEFT_COMPLICATION_RIGHT_BOUND,
+            VERTICAL_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+      }
+      1 -> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            TOP_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            TOP_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            BOTTOM_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            BOTTOM_COMPLICATION_RIGHT_BOUND,
             BOTTOM_COMPLICATION_BOTTOM_BOUND,
           ),
         )
@@ -1073,37 +1176,15 @@ fun ComplicationPicker(
           ),
         )
       }
-      1 -> {
-        ComplicationButton(
-          stateHolder,
-          LEFT_ICON_COMPLICATION_ID,
-          RectF(
-            LEFT_ICON_COMPLICATION_LEFT_BOUND,
-            LEFT_ICON_COMPLICATION_TOP_BOUND,
-            LEFT_ICON_COMPLICATION_RIGHT_BOUND,
-            LEFT_ICON_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
 
-        ComplicationButton(
-          stateHolder,
-          RIGHT_ICON_COMPLICATION_ID,
-          RectF(
-            RIGHT_ICON_COMPLICATION_LEFT_BOUND,
-            RIGHT_ICON_COMPLICATION_TOP_BOUND,
-            RIGHT_ICON_COMPLICATION_RIGHT_BOUND,
-            RIGHT_ICON_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
-      }
       2 -> {
         ComplicationButton(
           stateHolder,
           TOP_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_LEFT_BOUND,
             TOP_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_RIGHT_BOUND,
             TOP_COMPLICATION_BOTTOM_BOUND,
           ),
         )
@@ -1112,9 +1193,123 @@ fun ComplicationPicker(
           stateHolder,
           BOTTOM_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_LEFT_BOUND,
             BOTTOM_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
+          RectF(
+            TOP_LEFT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            TOP_LEFT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            TOP_LEFT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            TOP_LEFT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
+          RectF(
+            BOTTOM_LEFT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            BOTTOM_LEFT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+      }
+
+      3-> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            TOP_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            TOP_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            BOTTOM_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            BOTTOM_COMPLICATION_RIGHT_BOUND,
+            BOTTOM_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
+          RectF(
+            TOP_LEFT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            TOP_LEFT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            TOP_LEFT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            TOP_LEFT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
+          RectF(
+            BOTTOM_LEFT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            BOTTOM_LEFT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_TOP_RIGHT_COMPLICATION_ID,
+          RectF(
+            TOP_RIGHT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            TOP_RIGHT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            TOP_RIGHT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            TOP_RIGHT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          COMPLICATIONS_BOTTOM_RIGHT_COMPLICATION_ID,
+          RectF(
+            BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND - 3f / 384f,
+            BOTTOM_RIGHT_COMPLICATION_TOP_BOUND - 6f / 384f,
+            BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND + 3f / 384f,
+            BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND + 6f / 384f,
+          ),
+        )
+      }
+
+      4 -> {
+        ComplicationButton(
+          stateHolder,
+          TOP_COMPLICATION_ID,
+          RectF(
+            TOP_COMPLICATION_LEFT_BOUND,
+            TOP_COMPLICATION_TOP_BOUND,
+            TOP_COMPLICATION_RIGHT_BOUND,
+            TOP_COMPLICATION_BOTTOM_BOUND,
+          ),
+        )
+
+        ComplicationButton(
+          stateHolder,
+          BOTTOM_COMPLICATION_ID,
+          RectF(
+            BOTTOM_COMPLICATION_LEFT_BOUND,
+            BOTTOM_COMPLICATION_TOP_BOUND,
+            BOTTOM_COMPLICATION_RIGHT_BOUND,
             BOTTOM_COMPLICATION_BOTTOM_BOUND,
           ),
         )
@@ -1130,70 +1325,27 @@ fun ComplicationPicker(
           ),
         )
       }
-      3-> {
+
+      5 -> {
         ComplicationButton(
           stateHolder,
-          TOP_COMPLICATION_ID,
+          FOCUS_LEFT_ICON_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
-            TOP_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-            TOP_COMPLICATION_BOTTOM_BOUND,
+            LEFT_ICON_COMPLICATION_LEFT_BOUND - 9f / 384f,
+            LEFT_ICON_COMPLICATION_TOP_BOUND + 6f / 384f,
+            LEFT_ICON_COMPLICATION_RIGHT_BOUND + 9f / 384f,
+            LEFT_ICON_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
           ),
         )
 
         ComplicationButton(
           stateHolder,
-          BOTTOM_COMPLICATION_ID,
+          FOCUS_RIGHT_ICON_COMPLICATION_ID,
           RectF(
-            HORIZONTAL_COMPLICATION_LEFT_BOUND,
-            BOTTOM_COMPLICATION_TOP_BOUND,
-            HORIZONTAL_COMPLICATION_RIGHT_BOUND,
-            BOTTOM_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
-
-        ComplicationButton(
-          stateHolder,
-          TOP_LEFT_COMPLICATION_ID,
-          RectF(
-            TOP_LEFT_COMPLICATION_LEFT_BOUND,
-            TOP_LEFT_COMPLICATION_TOP_BOUND,
-            TOP_LEFT_COMPLICATION_RIGHT_BOUND,
-            TOP_LEFT_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
-
-        ComplicationButton(
-          stateHolder,
-          BOTTOM_LEFT_COMPLICATION_ID,
-          RectF(
-            BOTTOM_LEFT_COMPLICATION_LEFT_BOUND,
-            BOTTOM_LEFT_COMPLICATION_TOP_BOUND,
-            BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND,
-            BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
-
-        ComplicationButton(
-          stateHolder,
-          TOP_RIGHT_COMPLICATION_ID,
-          RectF(
-            TOP_RIGHT_COMPLICATION_LEFT_BOUND,
-            TOP_RIGHT_COMPLICATION_TOP_BOUND,
-            TOP_RIGHT_COMPLICATION_RIGHT_BOUND,
-            TOP_RIGHT_COMPLICATION_BOTTOM_BOUND,
-          ),
-        )
-
-        ComplicationButton(
-          stateHolder,
-          BOTTOM_RIGHT_COMPLICATION_ID,
-          RectF(
-            BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND,
-            BOTTOM_RIGHT_COMPLICATION_TOP_BOUND,
-            BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND,
-            BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND,
+            RIGHT_ICON_COMPLICATION_LEFT_BOUND - 9f / 384f,
+            RIGHT_ICON_COMPLICATION_TOP_BOUND + 6f / 384f,
+            RIGHT_ICON_COMPLICATION_RIGHT_BOUND + 9f / 384f,
+            RIGHT_ICON_COMPLICATION_BOTTOM_BOUND - 6f / 384f,
           ),
         )
       }
@@ -1210,12 +1362,17 @@ fun ComplicationButton(
   bounds: RectF,
 //  left: Float, top: Float, right: Float, bottom: Float
 ) {
-  var left= bounds.left - 0.015625f
-  var right= bounds.right + 0.015625f
-  var top= bounds.top - 0.015625f
-  var bottom= bounds.bottom + 0.015625f
+//  var left= bounds.left - 6f / 384f
+//  var right= bounds.right + 6f / 384f
+//  var top= bounds.top - 6f / 384f
+//  var bottom= bounds.bottom + 6f / 384f
 
-  Log.d("Editor", "ComplicationButton(${left}, ${top}, ${right}, ${bottom})")
+  var left= bounds.left
+  var right= bounds.right
+  var top= bounds.top
+  var bottom= bounds.bottom
+
+//  Log.d("Editor", "ComplicationButton(${left}, ${top}, ${right}, ${bottom})")
 
   Row(Modifier.fillMaxSize()) {
     Box(Modifier.weight(left, true))

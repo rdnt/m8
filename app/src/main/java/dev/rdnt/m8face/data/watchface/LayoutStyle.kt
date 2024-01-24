@@ -31,14 +31,24 @@ enum class LayoutStyle(
   // TODO: @rdnt use SVGs or compress the pngs to conserve wire memory for both
   //  these and other styles (so that we don't exceed transfer limitations of
   //  watchface config over BLE)
-  DEFAULT(
-    id = "default",
-    nameResourceId = R.string.default_layout_style_name,
+  INFO1(
+    id = "info1",
+    nameResourceId = R.string.info1_layout_style_name,
     iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   ),
-  FOCUS(
-    id = "focus",
-    nameResourceId = R.string.focus_layout_style_name,
+  INFO2(
+    id = "info2",
+    nameResourceId = R.string.info2_layout_style_name,
+    iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
+  ),
+  INFO3(
+    id = "info3",
+    nameResourceId = R.string.info3_layout_style_name,
+    iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
+  ),
+  INFO4(
+    id = "info4",
+    nameResourceId = R.string.info4_layout_style_name,
     iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   ),
   SPORT(
@@ -46,20 +56,22 @@ enum class LayoutStyle(
     nameResourceId = R.string.sport_layout_style_name,
     iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   ),
-  COMPLICATIONS(
-    id = "complications",
-    nameResourceId = R.string.complications_layout_style_name,
+  FOCUS(
+    id = "focus",
+    nameResourceId = R.string.focus_layout_style_name,
     iconResourceId = R.drawable.steel_style_icon, // TODO @rdnt fix icon
   );
 
   companion object {
     fun getLayoutStyleConfig(id: String): LayoutStyle {
       return when (id) {
-        DEFAULT.id -> DEFAULT
-        FOCUS.id -> FOCUS
+        INFO1.id -> INFO1
+        INFO2.id -> INFO2
+        INFO3.id -> INFO3
+        INFO4.id -> INFO4
         SPORT.id -> SPORT
-        COMPLICATIONS.id -> COMPLICATIONS
-        else -> DEFAULT
+        FOCUS.id -> FOCUS
+        else -> INFO1
       }
     }
   }

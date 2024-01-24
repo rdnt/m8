@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toRect
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
@@ -78,7 +79,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     if (bounds.isEmpty) return
 
     canvas.drawRect(bounds, Paint().apply {
-      color = Color.parseColor("#11ffffff")
+      color = Color.parseColor("#22ffffff")
     })
 
     when (data.type) {

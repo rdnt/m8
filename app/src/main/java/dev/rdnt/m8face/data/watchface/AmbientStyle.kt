@@ -31,17 +31,20 @@ enum class AmbientStyle(
   OUTLINE(
     id = "outline",
     nameResourceId = R.string.outline_ambient_style_name,
-    iconResourceId = R.drawable.outline_style_icon,
+//    iconResourceId = R.drawable.outline_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   ),
   BOLD_OUTLINE(
     id = "bold_outline",
     nameResourceId = R.string.bold_outline_ambient_style_name,
-    iconResourceId = R.drawable.bold_outline_style_icon,
+//    iconResourceId = R.drawable.bold_outline_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   ),
   FILLED(
     id = "filled",
     nameResourceId = R.string.filled_ambient_style_name,
-    iconResourceId = R.drawable.filled_style_icon,
+//    iconResourceId = R.drawable.filled_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   );
 
   companion object {

@@ -50,6 +50,7 @@ import dev.rdnt.m8face.utils.BIG_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.COLOR_STYLE_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
 import dev.rdnt.m8face.utils.IconComplication
+import dev.rdnt.m8face.utils.InvisibleComplication
 import dev.rdnt.m8face.utils.LAYOUT_STYLE_SETTING
 import dev.rdnt.m8face.utils.MILITARY_TIME_SETTING
 import dev.rdnt.m8face.utils.SECONDS_STYLE_SETTING
@@ -104,6 +105,7 @@ class WatchCanvasRenderer(
     secondsStyle = SecondsStyle.NONE,
     militaryTime = true,
     bigAmbient = false,
+    layoutStyle = LayoutStyle.INFO1,
   )
 
   // Converts resource ids into Colors and ComplicationDrawable.
@@ -133,7 +135,8 @@ class WatchCanvasRenderer(
   private val hourPaint = Paint().apply {
     isAntiAlias = true // make sure text is not anti-aliased even with this on
     typeface = context.resources.getFont(R.font.m8stealth57)
-    textSize = 112f / 14f * 14f // TODO: 98f/112f
+//    textSize = 112f / 14f * 14f // TODO: 98f/112f
+    textSize = 112f / 14f
     color = watchFaceColors.primaryColor
   }
 
@@ -170,7 +173,8 @@ class WatchCanvasRenderer(
   private val minutePaint = Paint().apply {
     isAntiAlias = true // make sure text is not anti-aliased even with this on
     typeface = context.resources.getFont(R.font.m8stealth57)
-    textSize = 112f / 14f * 14f // TODO: 98f/112F
+//    textSize = 112f / 14f * 14f // TODO: 98f/112F
+    textSize = 112f / 14f
     color = watchFaceColors.secondaryColor
   }
 
@@ -530,6 +534,106 @@ class WatchCanvasRenderer(
         }
       }
 
+      val timeTextSize = fun(): Float {
+        return when (watchFaceData.layoutStyle.id) {
+          LayoutStyle.FOCUS.id -> {
+            18f;
+          }
+
+          else -> {
+            14f;
+          }
+        }
+      }()
+
+      val hourOffsetX = fun(): Float {
+        return when (watchFaceData.layoutStyle.id) {
+          LayoutStyle.SPORT.id -> {
+            81f;
+          }
+
+          LayoutStyle.FOCUS.id -> {
+            93f;
+          }
+
+          else -> {
+            115f;
+          }
+        }
+      }()
+
+      val hourOffsetY = fun(): Float {
+        return when (watchFaceData.layoutStyle.id) {
+          LayoutStyle.FOCUS.id -> {
+            183f;
+          }
+
+          else -> {
+            185f;
+          }
+        }
+      }()
+
+      val minuteOffsetX = fun(): (Float) {
+        return when (watchFaceData.layoutStyle.id) {
+          LayoutStyle.SPORT.id -> {
+            81f
+          }
+
+          LayoutStyle.FOCUS.id -> {
+            93f;
+          }
+
+          else -> {
+            115f;
+          }
+        }
+      }()
+
+      val minuteOffsetY = fun(): (Float) {
+        return when (watchFaceData.layoutStyle.id) {
+          LayoutStyle.FOCUS.id -> {
+            327f
+          }
+
+          else -> {
+            297f;
+          }
+        }
+      }()
+
+
+      drawTime2(
+        canvas,
+        bounds,
+        hour,
+        hourPaint,
+        hourOffsetX,
+        hourOffsetY,
+        timeTextSize
+      )
+
+      drawTime2(
+        canvas,
+        bounds,
+        zonedDateTime.minute,
+        hourPaint,
+        minuteOffsetX,
+        minuteOffsetY,
+        timeTextSize
+      )
+
+
+//      var hour: Int
+//      if (is24Format) {
+//        hour = zonedDateTime.hour
+//      } else {
+//        hour = zonedDateTime.hour % 12
+//        if (hour == 0) {
+//          hour = 12
+//        }
+//      }
+
       if (drawProperties.timeScale == 0f) {
         var hourOffsetX = 0f
         var hourOffsetY = 0f
@@ -664,6 +768,31 @@ class WatchCanvasRenderer(
     }
   }
 
+  private fun drawTime2(
+    canvas: Canvas,
+    bounds: Rect,
+    time: Int,
+    paint: Paint,
+    offsetX: Float,
+    offsetY: Float,
+    textSize: Float
+  ) {
+    val p = Paint(paint)
+//    p.textSize = p.textSize  // / 384F * bounds.width()
+    p.textSize *= textSize
+
+    val scale = 1f
+
+    canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
+      canvas.drawText(
+        time.toString().padStart(2, '0'),
+        offsetX,
+        offsetY,
+        p
+      )
+    }
+  }
+
   private fun drawTime(
     canvas: Canvas,
     bounds: Rect,
@@ -673,11 +802,27 @@ class WatchCanvasRenderer(
     offsetY: Float,
     scaleOffset: Float
   ) {
+    return
+
     // dx:70 dy:98
     val p = Paint(paint)
     p.textSize = p.textSize / 384F * bounds.width()
 
     var scale = 1f
+
+    when {
+      watchFaceData.layoutStyle.id == LayoutStyle.FOCUS.id
+        && watchFaceData.secondsStyle.id == SecondsStyle.NONE.id
+      -> {
+        scale = scale / 14f * 18f
+      }
+
+      watchFaceData.layoutStyle.id == LayoutStyle.FOCUS.id
+        && (watchFaceData.secondsStyle.id == SecondsStyle.DASHES.id || watchFaceData.secondsStyle.id == SecondsStyle.DOTS.id)
+      -> {
+        scale = scale / 14f * 18f
+      }
+    }
 
     p.isAntiAlias = true
 
@@ -714,17 +859,17 @@ class WatchCanvasRenderer(
 
     val transitionOffset: Float = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 16f
 
-    canvas.withRotation(secondsRotation, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.drawRect(
-        RectF(
-          (bounds.width() / 2f - 1.25f / 384F * bounds.width()),
-          transitionOffset / 384F * bounds.width(),
-          (bounds.width() / 2f + 1.25f / 384F * bounds.width()),
-          (secondHandSize + transitionOffset * 2) / 384F * bounds.width(),
-        ),
-        secondHandPaint,
-      )
-    }
+//    canvas.withRotation(secondsRotation, bounds.exactCenterX(), bounds.exactCenterY()) {
+//      canvas.drawRect(
+//        RectF(
+//          (bounds.width() / 2f - 1.25f / 384F * bounds.width()),
+//          transitionOffset / 384F * bounds.width(),
+//          (bounds.width() / 2f + 1.25f / 384F * bounds.width()),
+//          (secondHandSize + transitionOffset * 2) / 384F * bounds.width(),
+//        ),
+//        secondHandPaint,
+//      )
+//    }
 
     val maxAlpha = 255f
 
@@ -740,17 +885,17 @@ class WatchCanvasRenderer(
 
       if (i.mod(90f) == 0f) { // cardinals
         color = watchFaceColors.primaryColor
-        maxSize = 18f
+        maxSize = 12f
         weight = 1.75f
         minAlpha = maxAlpha / 4f
       } else if (i.mod(30f) == 0f) { // intermediates
         color = watchFaceColors.secondaryColor
-        maxSize = 14f
+        maxSize = 10f
         weight = 1.75f
         minAlpha = maxAlpha / 4f
       } else {
         color = watchFaceColors.tertiaryColor
-        maxSize = 10f
+        maxSize = 8f
         weight = 1.5f
         minAlpha = maxAlpha / 8f
       }

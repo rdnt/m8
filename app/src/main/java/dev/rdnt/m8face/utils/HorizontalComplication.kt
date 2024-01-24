@@ -1,16 +1,24 @@
 package dev.rdnt.m8face.utils
 
 import android.content.Context
-import android.graphics.*
-import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.Rect
+import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.withRotation
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
-import androidx.wear.watchface.complications.data.*
+import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.NoDataComplicationData
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -77,7 +85,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     if (bounds.isEmpty) return
 
     canvas.drawRect(bounds, Paint().apply {
-      color = Color.parseColor("#11ffffff")
+      color = Color.parseColor("#22ffffff")
     })
 
     when (data.type) {

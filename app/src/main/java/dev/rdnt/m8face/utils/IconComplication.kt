@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toRect
 import androidx.core.graphics.withRotation
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
@@ -48,7 +49,7 @@ class IconComplication(private val context: Context) : CanvasComplication {
     if (bounds.isEmpty) return
 
     canvas.drawRect(bounds, Paint().apply {
-      color = Color.parseColor("#11ffffff")
+      color = Color.parseColor("#22ffffff")
     })
 
     when (data.type) {
@@ -78,7 +79,7 @@ class IconComplication(private val context: Context) : CanvasComplication {
 
     val drawable = data.monochromaticImage.image.loadDrawable(context) ?: return
 
-    val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.8f).toInt()
+    val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.75f).toInt()
 
     icon = drawable.toBitmap(size, size)
     iconBounds = Rect(0, 0, size, size)
