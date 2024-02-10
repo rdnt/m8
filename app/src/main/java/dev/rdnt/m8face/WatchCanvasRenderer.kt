@@ -230,6 +230,7 @@ class WatchCanvasRenderer(
 
   private val ambientTransitionMs = 1000L
   private var drawProperties = DrawProperties()
+  private var isHeadless = false
 
   private val ambientExitAnimator =
     AnimatorSet().apply {
@@ -289,6 +290,7 @@ class WatchCanvasRenderer(
 
     coroutineScope.launch {
       watchState.isAmbient.collect { isAmbient ->
+        isHeadless = watchState.isHeadless
         if (!watchState.isHeadless) {
           if (isAmbient!!) { // you call this readable? come on
             ambientExitAnimator.cancel()
@@ -298,13 +300,18 @@ class WatchCanvasRenderer(
             ambientExitAnimator.start()
           }
         } else {
-          if (isAmbient!!) { // you call this readable? come on
-            ambientExitAnimator.setupStartValues()
-            drawProperties.timeScale = 0f
-          } else {
-            ambientExitAnimator.setupEndValues()
-            drawProperties.timeScale = 1f
-          }
+          ambientExitAnimator.setupStartValues()
+          drawProperties.timeScale = 0f
+//          ambientExitAnimator.setupEndValues()
+//          drawProperties.timeScale = 1f
+
+//          if (isAmbient!!) { // you call this readable? come on
+//            ambientExitAnimator.setupStartValues()
+//            drawProperties.timeScale = 0f
+//          } else {
+//            ambientExitAnimator.setupEndValues()
+//            drawProperties.timeScale = 1f
+//          }
         }
       }
     }
@@ -513,6 +520,90 @@ class WatchCanvasRenderer(
     }
   }
 
+//        val scaleOffset = if (this.watchFaceData.bigAmbient) {
+//          18f / 14f - 1f
+//        } else {
+//          16f / 14f - 1f
+//        }
+
+ private val scale = if (!isHeadless) drawProperties.timeScale else 1f
+//private val scale = 1f
+
+  val timeTextSize: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        18f;
+      }
+
+      else -> {
+        14f;
+      }
+    } * scale
+
+  val hourOffsetX: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.SPORT.id -> {
+        81f;
+      }
+
+      LayoutStyle.FOCUS.id -> {
+        93f;
+      }
+
+      else -> {
+        115f;
+      }
+    } * scale
+
+  val hourOffsetY: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        183f;
+      }
+
+      else -> {
+        185f;
+      }
+    } * scale
+
+  val minuteOffsetX: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.SPORT.id -> {
+        81f
+      }
+
+      LayoutStyle.FOCUS.id -> {
+        93f;
+      }
+
+      else -> {
+        115f;
+      }
+    } * scale
+
+  val minuteOffsetY: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        327f
+      }
+
+      else -> {
+        297f;
+      }
+    } * scale
+
+  fun getHour(zonedDateTime: ZonedDateTime): Int {
+    if (is24Format) {
+      return zonedDateTime.hour
+    } else {
+      val hour = zonedDateTime.hour % 12
+      if (hour == 0) {
+        return 12
+      }
+      return hour
+    }
+  }
+
   override fun render(
     canvas: Canvas,
     bounds: Rect,
@@ -524,96 +615,17 @@ class WatchCanvasRenderer(
     canvas.drawColor(Color.parseColor("#ff000000"))
 
     if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-      var hour: Int
-      if (is24Format) {
-        hour = zonedDateTime.hour
-      } else {
-        hour = zonedDateTime.hour % 12
-        if (hour == 0) {
-          hour = 12
-        }
-      }
-
-      val timeTextSize = fun(): Float {
-        return when (watchFaceData.layoutStyle.id) {
-          LayoutStyle.FOCUS.id -> {
-            18f;
-          }
-
-          else -> {
-            14f;
-          }
-        }
-      }()
-
-      val hourOffsetX = fun(): Float {
-        return when (watchFaceData.layoutStyle.id) {
-          LayoutStyle.SPORT.id -> {
-            81f;
-          }
-
-          LayoutStyle.FOCUS.id -> {
-            93f;
-          }
-
-          else -> {
-            115f;
-          }
-        }
-      }()
-
-      val hourOffsetY = fun(): Float {
-        return when (watchFaceData.layoutStyle.id) {
-          LayoutStyle.FOCUS.id -> {
-            183f;
-          }
-
-          else -> {
-            185f;
-          }
-        }
-      }()
-
-      val minuteOffsetX = fun(): (Float) {
-        return when (watchFaceData.layoutStyle.id) {
-          LayoutStyle.SPORT.id -> {
-            81f
-          }
-
-          LayoutStyle.FOCUS.id -> {
-            93f;
-          }
-
-          else -> {
-            115f;
-          }
-        }
-      }()
-
-      val minuteOffsetY = fun(): (Float) {
-        return when (watchFaceData.layoutStyle.id) {
-          LayoutStyle.FOCUS.id -> {
-            327f
-          }
-
-          else -> {
-            297f;
-          }
-        }
-      }()
-
-
-      drawTime2(
+      drawTime(
         canvas,
         bounds,
-        hour,
+        getHour(zonedDateTime),
         hourPaint,
         hourOffsetX,
         hourOffsetY,
         timeTextSize
       )
 
-      drawTime2(
+      drawTime(
         canvas,
         bounds,
         zonedDateTime.minute,
@@ -623,117 +635,110 @@ class WatchCanvasRenderer(
         timeTextSize
       )
 
-
-//      var hour: Int
-//      if (is24Format) {
-//        hour = zonedDateTime.hour
-//      } else {
-//        hour = zonedDateTime.hour % 12
-//        if (hour == 0) {
-//          hour = 12
+//      if (drawProperties.timeScale == 0f) {
+//        var hourOffsetX = 0f
+//        var hourOffsetY = 0f
+//        var minuteOffsetX = 0f
+//        var minuteOffsetY = 0f
+//
+//        when (watchFaceData.ambientStyle.id) {
+//          AmbientStyle.OUTLINE.id -> {
+//            if (watchFaceData.bigAmbient) {
+//              hourOffsetX = -99f
+//              hourOffsetY = -9f
+//              minuteOffsetX = -99f
+//              minuteOffsetY = 135f
+//            } else {
+//              hourOffsetX = -88f
+//              hourOffsetY = -8f
+//              minuteOffsetX = -88f
+//              minuteOffsetY = 120f
+//            }
+//          }
+//
+//          AmbientStyle.BOLD_OUTLINE.id -> {
+//            if (watchFaceData.bigAmbient) {
+//              hourOffsetX = -99f
+//              hourOffsetY = -9f
+//              minuteOffsetX = -99f
+//              minuteOffsetY = 135f
+//            } else {
+//              hourOffsetX = -88f
+//              hourOffsetY = -8f
+//              minuteOffsetX = -88f
+//              minuteOffsetY = 120f
+//            }
+//          }
+//
+//          AmbientStyle.FILLED.id -> {
+//            if (watchFaceData.bigAmbient) {
+//              hourOffsetX = -99f
+//              hourOffsetY = -9f
+//              minuteOffsetX = -99f
+//              minuteOffsetY = 135f
+//            } else {
+//              hourOffsetX = -88f
+//              hourOffsetY = -8f
+//              minuteOffsetX = -88f
+//              minuteOffsetY = 120f
+//            }
+//          }
 //        }
+//
+////        drawTimeOld(canvas, bounds, hour, ambientHourPaint, hourOffsetX, hourOffsetY, 0f)
+////        drawTimeOld(
+////          canvas,
+////          bounds,
+////          zonedDateTime.minute,
+////          ambientMinutePaint,
+////          minuteOffsetX,
+////          minuteOffsetY,
+////          0f
+////        )
+//      } else {
+//        when (watchFaceData.secondsStyle.id) {
+//          SecondsStyle.NONE.id -> {
+//
+//          }
+//
+//          SecondsStyle.DASHES.id -> {
+//            drawDashes(canvas, bounds, zonedDateTime)
+//          }
+//
+//          SecondsStyle.DOTS.id -> {
+//            drawDots(canvas, bounds, zonedDateTime)
+//          }
+//        }
+//
+//        val scaleOffset = if (this.watchFaceData.bigAmbient) {
+//          18f / 14f - 1f
+//        } else {
+//          16f / 14f - 1f
+//        }
+//
+////        drawTimeOld(canvas, bounds, hour, hourPaint, -77f, -7f, scaleOffset) // Rect(0, 0, 152, 14))
+////        drawTimeOld(
+////          canvas,
+////          bounds,
+////          zonedDateTime.minute,
+////          minutePaint,
+////          -77f,
+////          105f,
+////          scaleOffset
+////        )//Rect(0, 0, 152, -210))
 //      }
 
-      if (drawProperties.timeScale == 0f) {
-        var hourOffsetX = 0f
-        var hourOffsetY = 0f
-        var minuteOffsetX = 0f
-        var minuteOffsetY = 0f
-
-        when (watchFaceData.ambientStyle.id) {
-          AmbientStyle.OUTLINE.id -> {
-            if (watchFaceData.bigAmbient) {
-              hourOffsetX = -99f
-              hourOffsetY = -9f
-              minuteOffsetX = -99f
-              minuteOffsetY = 135f
-            } else {
-              hourOffsetX = -88f
-              hourOffsetY = -8f
-              minuteOffsetX = -88f
-              minuteOffsetY = 120f
-            }
-          }
-
-          AmbientStyle.BOLD_OUTLINE.id -> {
-            if (watchFaceData.bigAmbient) {
-              hourOffsetX = -99f
-              hourOffsetY = -9f
-              minuteOffsetX = -99f
-              minuteOffsetY = 135f
-            } else {
-              hourOffsetX = -88f
-              hourOffsetY = -8f
-              minuteOffsetX = -88f
-              minuteOffsetY = 120f
-            }
-          }
-
-          AmbientStyle.FILLED.id -> {
-            if (watchFaceData.bigAmbient) {
-              hourOffsetX = -99f
-              hourOffsetY = -9f
-              minuteOffsetX = -99f
-              minuteOffsetY = 135f
-            } else {
-              hourOffsetX = -88f
-              hourOffsetY = -8f
-              minuteOffsetX = -88f
-              minuteOffsetY = 120f
-            }
-          }
-        }
-
-        drawTime(canvas, bounds, hour, ambientHourPaint, hourOffsetX, hourOffsetY, 0f)
-        drawTime(
-          canvas,
-          bounds,
-          zonedDateTime.minute,
-          ambientMinutePaint,
-          minuteOffsetX,
-          minuteOffsetY,
-          0f
-        )
-      } else {
-        when (watchFaceData.secondsStyle.id) {
-          SecondsStyle.NONE.id -> {
-
-          }
-
-          SecondsStyle.DASHES.id -> {
-            drawDashes(canvas, bounds, zonedDateTime)
-          }
-
-          SecondsStyle.DOTS.id -> {
-            drawDots(canvas, bounds, zonedDateTime)
-          }
-        }
-
-        val scaleOffset = if (this.watchFaceData.bigAmbient) {
-          18f / 14f - 1f
-        } else {
-          16f / 14f - 1f
-        }
-
-        drawTime(canvas, bounds, hour, hourPaint, -77f, -7f, scaleOffset) // Rect(0, 0, 152, 14))
-        drawTime(
-          canvas,
-          bounds,
-          zonedDateTime.minute,
-          minutePaint,
-          -77f,
-          105f,
-          scaleOffset
-        )//Rect(0, 0, 152, -210))
-      }
-
     }
 
-    if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
-      drawProperties.timeScale != 0f
-    ) {
+    if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS)) {
       drawComplications(canvas, zonedDateTime)
     }
+
+//    if (renderParameters.watchFaceLayesr.contains(WatchFaceLayer.COMPLICATIONS) &&
+//      drawProperties.timeScale != 0f
+//    ) {
+//      drawComplications(canvas, zonedDateTime)
+//    }
   }
 
   override fun shouldAnimate(): Boolean {
@@ -768,7 +773,7 @@ class WatchCanvasRenderer(
     }
   }
 
-  private fun drawTime2(
+  private fun drawTime(
     canvas: Canvas,
     bounds: Rect,
     time: Int,
@@ -793,7 +798,7 @@ class WatchCanvasRenderer(
     }
   }
 
-  private fun drawTime(
+  private fun drawTimeOld(
     canvas: Canvas,
     bounds: Rect,
     time: Int,
