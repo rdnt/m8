@@ -66,6 +66,7 @@ class WatchFaceConfigStateHolder(
   private lateinit var secondsStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var militaryTimeKey: UserStyleSetting.BooleanUserStyleSetting
   private lateinit var bigAmbientKey: UserStyleSetting.BooleanUserStyleSetting
+  private lateinit var detailedAmbientKey: UserStyleSetting.BooleanUserStyleSetting
 
   val uiState: StateFlow<EditWatchFaceUiState> =
     flow<EditWatchFaceUiState> {
@@ -123,6 +124,10 @@ class WatchFaceConfigStateHolder(
         BIG_AMBIENT_SETTING -> {
           bigAmbientKey = setting as UserStyleSetting.BooleanUserStyleSetting
         }
+
+        DETAILED_AMBIENT_SETTING -> {
+          detailedAmbientKey = setting as UserStyleSetting.BooleanUserStyleSetting
+        }
       }
     }
   }
@@ -168,6 +173,9 @@ class WatchFaceConfigStateHolder(
     val bigAmbient =
       userStyle[bigAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
+    val detailedAmbient =
+      userStyle[detailedAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
+
     return UserStylesAndPreview(
       layoutStyleId = layoutStyle.id.toString(),
       colorStyleId = colorStyle.id.toString(),
@@ -175,6 +183,7 @@ class WatchFaceConfigStateHolder(
       secondsStyleId = secondsStyle.id.toString(),
       militaryTime = militaryTime.value,
       bigAmbient = bigAmbient.value,
+      detailedAmbient = detailedAmbient.value,
       previewImage = bitmap,
     )
   }
@@ -350,6 +359,27 @@ class WatchFaceConfigStateHolder(
       bigAmbientKey,
       UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
     )
+
+    if (enabled) {
+      setUserStyleOption(
+        detailedAmbientKey,
+        UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(false)
+      )
+    }
+  }
+
+  fun setDetailedAmbient(enabled: Boolean) {
+    setUserStyleOption(
+      detailedAmbientKey,
+      UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
+    )
+
+    if (enabled) {
+      setUserStyleOption(
+        bigAmbientKey,
+        UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(false)
+      )
+    }
   }
 
   // Saves User Style Option change back to the back to the EditorSession.
@@ -384,7 +414,8 @@ class WatchFaceConfigStateHolder(
     val secondsStyleId: String,
     val militaryTime: Boolean,
     val bigAmbient: Boolean,
-    val previewImage: Bitmap
+    val detailedAmbient: Boolean,
+    val previewImage: Bitmap,
   )
 
   companion object {

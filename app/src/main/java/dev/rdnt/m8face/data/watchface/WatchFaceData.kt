@@ -25,4 +25,5 @@ data class WatchFaceData(
   val secondsStyle: SecondsStyle = SecondsStyle.NONE,
   val militaryTime: Boolean = true,
   val bigAmbient: Boolean = true,
+  val detailedAmbient: Boolean = false,
 )

@@ -348,6 +348,7 @@ fun WatchfaceConfigApp(
             secondsStyles.indexOfFirst { it.id == state.userStylesAndPreview.secondsStyleId }
           val militaryTimeEnabled = state.userStylesAndPreview.militaryTime
           val bigAmbientEnabled = state.userStylesAndPreview.bigAmbient
+          val detailedAmbientEnabled = state.userStylesAndPreview.detailedAmbient
 
           Box(
               Modifier
@@ -368,6 +369,7 @@ fun WatchfaceConfigApp(
               secondsStyleIndex,
               militaryTimeEnabled,
               bigAmbientEnabled,
+              detailedAmbientEnabled,
             )
           }
         }
@@ -402,6 +404,7 @@ fun ConfigScaffold(
   secondsStyleIndex: Int,
   militaryTimeEnabled: Boolean,
   bigAmbientEnabled: Boolean,
+  detailedAmbientEnabled: Boolean,
 ) {
   Log.d(
     "Editor",
@@ -460,7 +463,7 @@ fun ConfigScaffold(
         2 -> SecondsStyleSelect(focusRequester2, stateHolder, secondsStyles, secondsStyleIndex)
         3 -> AmbientStyleSelect(focusRequester3, stateHolder, ambientStyles, ambientStyleIndex)
         4 -> ComplicationPicker(stateHolder, layoutIndex)
-        5 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled)
+        5 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled, detailedAmbientEnabled)
       }
     }
 
@@ -673,6 +676,7 @@ fun Options(
   stateHolder: WatchFaceConfigStateHolder,
   militaryTime: Boolean,
   bigAmbient: Boolean,
+  detailedAmbient: Boolean,
 ) {
   Box(
     Modifier
@@ -707,7 +711,7 @@ fun Options(
         label = {
           Text(
             text = "Military Time",
-            fontSize = 14.sp,
+            fontSize = 12.sp,
             fontWeight = Medium,
             fontFamily = Default,
             color = White
@@ -717,9 +721,9 @@ fun Options(
 
       ToggleChip(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp, 0.dp)
-            .height((40.dp)),
+          .fillMaxWidth()
+          .padding(12.dp, 0.dp)
+          .height((40.dp)),
         checked = bigAmbient,
         colors = ToggleChipDefaults.toggleChipColors(
           checkedStartBackgroundColor = Transparent,
@@ -739,7 +743,39 @@ fun Options(
         label = {
           Text(
             text = "Big Ambient",
-            fontSize = 14.sp,
+            fontSize = 12.sp,
+            fontWeight = Medium,
+            fontFamily = Default,
+            color = White
+          )
+        },
+      )
+
+      ToggleChip(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(12.dp, 0.dp)
+          .height((40.dp)),
+        checked = detailedAmbient,
+        colors = ToggleChipDefaults.toggleChipColors(
+          checkedStartBackgroundColor = Transparent,
+          checkedEndBackgroundColor = Transparent,
+          uncheckedStartBackgroundColor = Transparent,
+          uncheckedEndBackgroundColor = Transparent,
+        ),
+        onCheckedChange = {
+          stateHolder.setDetailedAmbient(it)
+        },
+        toggleControl = {
+          Switch(
+            modifier = Modifier.padding(0.dp),
+            checked = detailedAmbient,
+          )
+        },
+        label = {
+          Text(
+            text = "Detailed Ambient",
+            fontSize = 12.sp,
             fontWeight = Medium,
             fontFamily = Default,
             color = White
