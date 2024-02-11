@@ -558,10 +558,8 @@ class WatchCanvasRenderer(
         if (watchFaceData.detailedAmbient) {
           14f
         } else {
-          interpolate(18f, 14f)
+          interpolate(if (watchFaceData.bigAmbient) 18f else 16f, 14f)
         }
-
-//        14f + (1f - scale) * (18f - 14f);
       }
     }
 
