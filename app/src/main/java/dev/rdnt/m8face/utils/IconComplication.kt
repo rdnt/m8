@@ -48,9 +48,10 @@ class IconComplication(private val context: Context) : CanvasComplication {
   ) {
     if (bounds.isEmpty) return
 
-    canvas.drawRect(bounds, Paint().apply {
-      color = Color.parseColor("#22ffffff")
-    })
+//    // DEBUG
+//    canvas.drawRect(bounds, Paint().apply {
+//      color = Color.parseColor("#22ffffff")
+//    })
 
     when (data.type) {
       ComplicationType.MONOCHROMATIC_IMAGE -> {
