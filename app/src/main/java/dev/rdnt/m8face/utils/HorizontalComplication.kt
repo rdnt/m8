@@ -12,6 +12,8 @@ import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.withScale
+import androidx.core.graphics.withTranslation
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
@@ -48,6 +50,10 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       prefixPaint.color = color
       prefixPaint.alpha = 100
     }
+
+  var offsetX: Float = 0f
+
+  var scale: Float = 1f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -122,11 +128,11 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
       icon = drawable.toBitmap(
-        (32f / 48f * bounds.height()).toInt(),
-        (32f / 48f * bounds.height()).toInt()
+        (32f / 384 * canvas.width).toInt(),
+        (32f / 384 * canvas.width).toInt()
       )
       iconBounds =
-        Rect(0, 0, (32f / 48f * bounds.height()).toInt(), (32f / 48f * bounds.height()).toInt())
+        Rect(0, 0, (32f / 384 * canvas.width).toInt(), (32f / 384 * canvas.width).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {
@@ -148,7 +154,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       title = data.title!!.getTextAt(context.resources, now).toString().uppercase()
     }
 
-    textPaint.textSize = 24F / 48f * bounds.height()
+    textPaint.textSize = 24F / 384 * canvas.width
 
     val textBounds = Rect()
 
@@ -175,24 +181,37 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       titleOffsetX = (width - titleBounds.width()).toFloat() / 2f
       textOffsetX = (width - textBounds.width()).toFloat() / 2f
 
-      titleOffsetX += 6f / 156f * bounds.width()
-      textOffsetX += 6f / 156f * bounds.width()
+      titleOffsetX += 6f / 384f * canvas.width
+      textOffsetX += 6f / 384f * canvas.width
     } else if (icon != null) {
       val width = iconBounds.width() + textBounds.width()
 
       iconOffsetX = (width - iconBounds.width()).toFloat() / 2f
       textOffsetX = (width - textBounds.width()).toFloat() / 2f
 
-      iconOffsetX += 9f / 156f * bounds.width()
-      textOffsetX += 9f / 156f * bounds.width()
+      iconOffsetX += 9f / 384f * canvas.width
+      textOffsetX += 9f / 384f * canvas.width
 
       if (isBattery) {
         iconOffsetX = iconOffsetX.toInt().toFloat()
       }
     }
 
+//    textOffsetX += offsetX
+//    titleOffsetX += offsetX
+//    iconOffsetX -= offsetX
+
+
+    val cacheBitmap = Bitmap.createBitmap(
+      canvas.width,
+      canvas.height,
+      Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(cacheBitmap)
+
+
     if (title != null) {
-      canvas.drawText(
+      bitmapCanvas.drawText(
         title,
         bounds.exactCenterX() - titleBounds.width() / 2 - titleOffsetX,
         bounds.exactCenterY() + titleBounds.height() / 2,
@@ -206,14 +225,15 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
         bounds.exactCenterY() + iconBounds.height() / 2f,
       )
 
-      canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
+      bitmapCanvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     }
+
 
     if (prefixLen > 0) {
       val prefix = "".padStart(prefixLen, '0')
       prefixPaint.textSize = textPaint.textSize
 
-      canvas.drawText(
+      bitmapCanvas.drawText(
         prefix,
         bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
         bounds.exactCenterY() + textBounds.height() / 2,
@@ -221,12 +241,24 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       )
     }
 
-    canvas.drawText(
+    bitmapCanvas.drawText(
       text,
       bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
       bounds.exactCenterY() + textBounds.height() / 2,
       textPaint
     )
+
+
+    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      canvas.withTranslation(offsetX, 0f) {
+        canvas.drawBitmap(
+          cacheBitmap,
+          0f,
+          0f,
+          Paint(),
+        )
+      }
+    }
   }
 
   override fun drawHighlight(

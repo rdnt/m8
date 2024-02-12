@@ -104,23 +104,23 @@ internal const val SPORT_MINUTE_COMPLICATION_ID = 120
 
 const val TOP_LEFT_COMPLICATION_LEFT_BOUND = 33f / 384f
 const val TOP_LEFT_COMPLICATION_TOP_BOUND = 93f / 384f
-const val TOP_LEFT_COMPLICATION_RIGHT_BOUND = 33f / 384f + 66f / 384f
-const val TOP_LEFT_COMPLICATION_BOTTOM_BOUND = 93f / 384f + 87f / 384f
+const val TOP_LEFT_COMPLICATION_RIGHT_BOUND = 33f / 384f + 60f / 384f
+const val TOP_LEFT_COMPLICATION_BOTTOM_BOUND = 93f / 384f + 90f / 384f
 
 const val BOTTOM_LEFT_COMPLICATION_LEFT_BOUND = 33f / 384f
-const val BOTTOM_LEFT_COMPLICATION_TOP_BOUND = 204f / 384f
-const val BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND = 33f / 384f + 66f / 384f
-const val BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND = 204f / 384f + 87f / 384f
+const val BOTTOM_LEFT_COMPLICATION_TOP_BOUND = 201f / 384f
+const val BOTTOM_LEFT_COMPLICATION_RIGHT_BOUND = 33f / 384f + 60f / 384f
+const val BOTTOM_LEFT_COMPLICATION_BOTTOM_BOUND = 201f / 384f + 90f / 384f
 
 const val TOP_RIGHT_COMPLICATION_LEFT_BOUND = 285f / 384f
 const val TOP_RIGHT_COMPLICATION_TOP_BOUND = 93f / 384f
-const val TOP_RIGHT_COMPLICATION_RIGHT_BOUND = 285f / 384f + 66f / 384f
-const val TOP_RIGHT_COMPLICATION_BOTTOM_BOUND = 93f / 384f + 87f / 384f
+const val TOP_RIGHT_COMPLICATION_RIGHT_BOUND = 285f / 384f + 60f / 384f
+const val TOP_RIGHT_COMPLICATION_BOTTOM_BOUND = 93f / 384f + 90f / 384f
 
 const val BOTTOM_RIGHT_COMPLICATION_LEFT_BOUND = 285f / 384f
-const val BOTTOM_RIGHT_COMPLICATION_TOP_BOUND = 204f / 384f
-const val BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND = 285f / 384f + 66f / 384f
-const val BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND = 204f / 384f + 87f / 384f
+const val BOTTOM_RIGHT_COMPLICATION_TOP_BOUND = 201f / 384f
+const val BOTTOM_RIGHT_COMPLICATION_RIGHT_BOUND = 285f / 384f + 60f / 384f
+const val BOTTOM_RIGHT_COMPLICATION_BOTTOM_BOUND = 201f / 384f + 90f / 384f
 
 const val LEFT_ICON_COMPLICATION_LEFT_BOUND = 24f / 384f
 const val LEFT_ICON_COMPLICATION_TOP_BOUND = 126f / 384f
@@ -132,10 +132,10 @@ const val RIGHT_ICON_COMPLICATION_TOP_BOUND = 126f / 384f
 const val RIGHT_ICON_COMPLICATION_RIGHT_BOUND = 306f / 384f + 54f / 384f
 const val RIGHT_ICON_COMPLICATION_BOTTOM_BOUND = 126f / 384f + 132f / 384f
 
-const val RIGHT_TEXT_COMPLICATION_LEFT_BOUND = 248f / 384f
-const val RIGHT_TEXT_COMPLICATION_TOP_BOUND = 248f / 384f
-const val RIGHT_TEXT_COMPLICATION_RIGHT_BOUND = 248f / 384f + 66f / 384f
-const val RIGHT_TEXT_COMPLICATION_BOTTOM_BOUND = 248f / 384f + 15f / 384f
+const val RIGHT_TEXT_COMPLICATION_LEFT_BOUND = 249f / 384f - 14f / 384f
+const val RIGHT_TEXT_COMPLICATION_TOP_BOUND = 246f / 384f - 14f / 384f
+const val RIGHT_TEXT_COMPLICATION_RIGHT_BOUND = 249f / 384f + 82f / 384f + 14f / 384f
+const val RIGHT_TEXT_COMPLICATION_BOTTOM_BOUND = 246f / 384f + 14f / 384f + 14f / 384f
 
 const val HOUR_COMPLICATION_LEFT_BOUND = 114f / 384f
 const val HOUR_COMPLICATION_TOP_BOUND = 87f / 384f
@@ -492,6 +492,7 @@ fun createComplicationSlotManager(
   val verticalComplicationFactory = createVerticalComplicationFactory(context)
   val horizontalComplicationFactory = createHorizontalComplicationFactory(context)
   val invisibleComplicationFactory = createInvisibleComplicationFactory(context)
+  val horizontalTextComplicationFactory = createHorizontalTextComplicationFactory(context)
 
   val hourComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = HOUR_COMPLICATION_ID,
@@ -777,7 +778,7 @@ fun createComplicationSlotManager(
 
   val textComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = RIGHT_TEXT_COMPLICATION_ID,
-    canvasComplicationFactory = horizontalComplicationFactory,
+    canvasComplicationFactory = horizontalTextComplicationFactory,
     supportedTypes = listOf(
       ComplicationType.SHORT_TEXT,
     ),
