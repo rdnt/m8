@@ -673,7 +673,7 @@ class WatchCanvasRenderer(
       }
 
       else -> {
-        0f
+        129f
       }
     }
 
@@ -784,8 +784,6 @@ class WatchCanvasRenderer(
           bounds,
           zonedDateTime.second,
           secondPaint,
-//          95f,
-//          -31f,
           secondsOffsetX,
           secondsOffsetY,
           secondsTextSize,
