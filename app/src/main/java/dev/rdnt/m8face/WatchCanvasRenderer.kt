@@ -251,6 +251,8 @@ class WatchCanvasRenderer(
   private var isHeadless = false
   private var isAmbient = false
 
+  private val secondsBitmapCache: BitmapCache = BitmapCache()
+
   private val ambientExitAnimator =
     AnimatorSet().apply {
       val linearOutSlow =
@@ -654,9 +656,30 @@ class WatchCanvasRenderer(
       else -> false
     }
 
+//  val secondsOffsetX: Float
+//    get() = when(watchFaceData.layoutStyle.id) {
+//      LayoutStyle.SPORT.id -> 95f
+//      else -> 0f
+//    }
+
+  val secondsOffsetX: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.SPORT.id -> {
+        if (watchFaceData.detailedAmbient) {
+          95f
+        } else {
+          interpolate(129f, 95f)
+        }
+      }
+
+      else -> {
+        0f
+      }
+    }
+
   val secondsOffsetY: Float
     get() = when(watchFaceData.layoutStyle.id) {
-      LayoutStyle.SPORT.id -> -28f
+      LayoutStyle.SPORT.id -> -31f
       else -> 0f
     }
 
@@ -675,6 +698,21 @@ class WatchCanvasRenderer(
     }
 
   val secondsTextScale: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        18f / 14f
+      }
+
+      else -> {
+        if (watchFaceData.detailedAmbient) {
+          14f / 14f
+        } else {
+          interpolate(if (watchFaceData.bigAmbient) 18f / 14f else 16f / 14f, 14f / 14f)
+        }
+      }
+    }
+
+  val ampmTextScale: Float
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.FOCUS.id -> {
         18f / 14f
@@ -746,7 +784,9 @@ class WatchCanvasRenderer(
           bounds,
           zonedDateTime.second,
           secondPaint,
-          timeOffsetX,
+//          95f,
+//          -31f,
+          secondsOffsetX,
           secondsOffsetY,
           secondsTextSize,
           secondsTextScale,
@@ -758,12 +798,11 @@ class WatchCanvasRenderer(
         drawAmPm(
           canvas,
           bounds,
-          zonedDateTime
-          "pm",
+          getAmPm(zonedDateTime),
           secondPaint,
           timeOffsetX,
           25f,
-          timeTextSize,
+          ampmTextScale,
         )
       }
 
@@ -945,38 +984,71 @@ class WatchCanvasRenderer(
     var opacity = if (watchFaceData.detailedAmbient) .75f + this.easeInOutCirc(drawProperties.timeScale)/4 else this.easeInOutCirc(drawProperties.timeScale)
     opacity = 1f
 
+    val bitmap = renderSeconds(text, paint, textSize, watchFaceColors.tertiaryColor, opacity)
+
+    canvas.withScale(textScale, textScale, bounds.exactCenterX(), bounds.exactCenterY()) {
+        canvas.drawBitmap(
+          bitmap,
+          192f - bitmap.width/2 + offsetX,
+          192f - bitmap.height/2 + offsetY,
+          Paint(),
+        )
+    }
+  }
+
+  private fun renderSeconds(
+    text: String,
+    paint: Paint,
+    textSize: Float,
+    color: Int,
+    opacity: Float,
+    ): Bitmap {
+    val key = "${text},${textSize},${color},${opacity}"
+
+    val cached = secondsBitmapCache.get(key)
+    if (cached != null) {
+      return cached
+    }
+
     val p = Paint(paint)
     p.textSize *= textSize
+    p.color = ColorUtils.blendARGB(Color.TRANSPARENT, color, opacity)
 
-    val cacheBitmap = Bitmap.createBitmap(
+    val textBounds = Rect()
+    p.getTextBounds(text, 0, text.length, textBounds)
+    val bounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+    val bitmap = Bitmap.createBitmap(
       bounds.width(),
       bounds.height(),
       Bitmap.Config.ARGB_8888
     )
-    val bitmapCanvas = Canvas(cacheBitmap)
+    val canvas = Canvas(bitmap)
 
-    val textBounds = Rect()
-    p.getTextBounds(text, 0, text.length, textBounds)
-    p.color = ColorUtils.blendARGB(Color.TRANSPARENT, watchFaceColors.tertiaryColor, opacity)
-
-    bitmapCanvas.drawText(
+    canvas.drawText(
       text,
-      192f,
-      192f+textBounds.height()/2+offsetY,
+      0f,
+      bounds.height().toFloat(),
       p,
     )
 
+    // DEBUG --------------------
+    canvas.drawRect(bounds, Paint().apply {
+      this.color = Color.parseColor("#22ffffff")
+    })
+    val p2 = Paint()
+    p2.color = Color.WHITE
+    canvas.drawText(
+      "r ${secondsBitmapCache.loads} w ${secondsBitmapCache.renders}",
+      0f,
+      bounds.height().toFloat(),
+      p2,
+    )
+    // ---------------------------
 
-    canvas.withScale(textScale, textScale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.withTranslation(offsetX, 0f) {
-        canvas.drawBitmap(
-          cacheBitmap,
-          91f,
-          0f,
-          Paint(),
-        )
-      }
-    }
+    secondsBitmapCache.set(key, bitmap)
+
+    return bitmap
   }
 
   private fun drawAmPm(
@@ -1016,15 +1088,15 @@ class WatchCanvasRenderer(
     bitmapCanvas.drawText(
       text,
       192f,
-      192f+textBounds.height()/2+offsetY,
+      192f+textBounds.height()/2,
       p,
     )
 
     canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.withTranslation(offsetX, 0f) {
+      canvas.withTranslation(offsetX, offsetY) {
         canvas.drawBitmap(
           cacheBitmap,
-          91f,
+          0f,
           0f,
           Paint(),
         )
@@ -1598,14 +1670,23 @@ fun bitmapCache(canvas: Canvas, bounds: Rect) {
 }
 
 class BitmapCache {
-  private val key: String = ""
-  private val bitmap: Bitmap? = null;
+  var renders: Int = 0
+  var loads: Int = 0
+  private var key: String = ""
+  private var bitmap: Bitmap? = null;
 
-  fun get(k: String): Bitmap {
+  fun get(k: String): Bitmap? {
+    loads++
     if (bitmap != null && k == key) {
       return bitmap
     }
 
+    return null
+  }
 
+  fun set(k: String, b: Bitmap?) {
+    renders++
+    key = k
+    bitmap = b
   }
 }
