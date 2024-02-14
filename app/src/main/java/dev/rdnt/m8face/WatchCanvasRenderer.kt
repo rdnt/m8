@@ -805,7 +805,6 @@ class WatchCanvasRenderer(
       }
 
       if (shouldDrawAmPm) {
-        // TODO
         drawAmPm(
           canvas,
           bounds,
