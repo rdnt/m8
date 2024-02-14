@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 const val HOURS_BITMAP_KEY = "hours"
 const val MINUTES_BITMAP_KEY = "minutes"
 const val SECONDS_BITMAP_KEY = "seconds"
+const val AMPM_BITMAP_KEY = "ampm"
 
 class BitmapCache {
   private val entries: MutableMap<String, BitmapCacheEntry> = mutableMapOf()

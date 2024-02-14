@@ -691,6 +691,13 @@ class WatchCanvasRenderer(
       else -> false
     }
 
+  val ampmOffsetX: Float
+    get() = if (watchFaceData.detailedAmbient) {
+      84f
+    } else {
+      interpolate(84f+34f, 84f)
+    }
+
   val secondsTextSize: Float
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.INFO1.id -> 6f
@@ -797,15 +804,14 @@ class WatchCanvasRenderer(
         )
       }
 
-
-      if (shouldDrawAmPm && false) {
+      if (shouldDrawAmPm) {
         // TODO
         drawAmPm(
           canvas,
           bounds,
           getAmPm(zonedDateTime),
           secondPaint,
-          timeOffsetX,
+          ampmOffsetX,
           25f,
           ampmTextScale,
         )
@@ -1059,7 +1065,7 @@ class WatchCanvasRenderer(
     paint: Paint,
     offsetX: Float,
     offsetY: Float,
-    _scale: Float,
+    textScale: Float,
   ) {
     val text = ampm.uppercase()
 
@@ -1069,41 +1075,109 @@ class WatchCanvasRenderer(
       )
     opacity = 1f
 
+    val bitmap = renderAmPm(text, paint, 5f, AMPM_BITMAP_KEY)
+
+    canvas.withScale(textScale, textScale, bounds.exactCenterX(), bounds.exactCenterY()) {
+      canvas.drawBitmap(
+        bitmap,
+        192f - bitmap.width / 2 + offsetX,
+        192f - bitmap.height / 2 + offsetY,
+        Paint(),
+      )
+    }
+
+
+
+
+
+
+
+//    val p = Paint(paint)
+////    p.textSize *= 5f
+////    p.isAntiAlias = true
+////    p.isDither = true
+////    p.isFilterBitmap = true
+//
+//    var scale = _scale / 14f
+////    scale = 1f
+//
+//    val cacheBitmap = Bitmap.createBitmap(
+//      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+//    )
+//    val bitmapCanvas = Canvas(cacheBitmap)
+//
+//    val textBounds = Rect()
+//    p.getTextBounds(text, 0, text.length, textBounds)
+//    p.color = ColorUtils.blendARGB(Color.TRANSPARENT, watchFaceColors.tertiaryColor, opacity)
+//
+//    bitmapCanvas.drawText(
+//      text,
+//      192f,
+//      192f + textBounds.height() / 2,
+//      p,
+//    )
+//
+//    canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
+//      canvas.withTranslation(offsetX, offsetY) {
+//        canvas.drawBitmap(
+//          cacheBitmap,
+//          0f,
+//          0f,
+//          Paint(),
+//        )
+//      }
+//    }
+  }
+
+  private fun renderAmPm(
+    text: String,
+    paint: Paint,
+    textSize: Float,
+    cacheKey: String,
+  ): Bitmap {
+    val hash = "${text},${textSize}"
+
+    val cached = bitmapCache.get(cacheKey, hash)
+    if (cached != null) {
+      return cached
+    }
+
     val p = Paint(paint)
-    p.textSize *= 5f
-    p.isAntiAlias = true
-    p.isDither = true
-    p.isFilterBitmap = true
-
-    var scale = _scale / 14f
-//    scale = 1f
-
-    val cacheBitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(cacheBitmap)
+    p.textSize *= textSize
 
     val textBounds = Rect()
     p.getTextBounds(text, 0, text.length, textBounds)
-    p.color = ColorUtils.blendARGB(Color.TRANSPARENT, watchFaceColors.tertiaryColor, opacity)
+    val bounds = Rect(0, 0, textBounds.width(), textBounds.height())
 
-    bitmapCanvas.drawText(
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val canvas = Canvas(bitmap)
+
+    canvas.drawText(
       text,
-      192f,
-      192f + textBounds.height() / 2,
+      0f,
+      bounds.height().toFloat(),
       p,
     )
 
-    canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.withTranslation(offsetX, offsetY) {
-        canvas.drawBitmap(
-          cacheBitmap,
-          0f,
-          0f,
-          Paint(),
-        )
-      }
-    }
+    // DEBUG --------------------
+    canvas.drawRect(bounds, Paint().apply {
+      this.color = Color.parseColor("#22ffffff")
+    })
+    val p2 = Paint()
+    p2.color = Color.WHITE
+    canvas.drawText(
+      "r ${bitmapCache.loads(cacheKey)} w ${bitmapCache.renders(cacheKey)}",
+      0f,
+      bounds.height().toFloat(),
+      p2,
+    )
+    // ---------------------------
+
+    bitmapCache.set(cacheKey, hash, bitmap)
+
+    return bitmap
   }
 
   private fun drawTime(
