@@ -33,6 +33,7 @@ import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.get
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
@@ -73,6 +74,8 @@ import kotlinx.coroutines.launch
 
 // Default for how long each frame is displayed at expected frame rate.
 private const val DEFAULT_INTERACTIVE_DRAW_MODE_UPDATE_DELAY_MILLIS: Long = 16
+
+
 
 /**
  * Renders watch face via data in Room database. Also, updates watch face state based on setting
@@ -249,9 +252,7 @@ class WatchCanvasRenderer(
   private var isHeadless = false
   private var isAmbient = false
 
-  private val secondsBitmap: BitmapCache = BitmapCache()
-  private val hoursBitmap: BitmapCache = BitmapCache()
-  private val minutesBitmap: BitmapCache = BitmapCache()
+  private val bitmapCache: BitmapCache = BitmapCache()
 
   private val ambientExitAnimator = AnimatorSet().apply {
     val linearOutSlow = AnimationUtils.loadInterpolator(
@@ -759,7 +760,7 @@ class WatchCanvasRenderer(
     canvas.drawColor(Color.parseColor("#ff000000"))
 
     if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-      drawHours(
+      drawTime(
         canvas,
         bounds,
         getHour(zonedDateTime),
@@ -767,10 +768,11 @@ class WatchCanvasRenderer(
         timeOffsetX,
         hourOffsetY,
         timeTextSize,
-        timeTextScale
+        timeTextScale,
+        HOURS_BITMAP_KEY
       )
 
-      drawMinutes(
+      drawTime(
         canvas,
         bounds,
         zonedDateTime.minute,
@@ -778,7 +780,8 @@ class WatchCanvasRenderer(
         timeOffsetX,
         minuteOffsetY,
         timeTextSize,
-        timeTextScale
+        timeTextScale,
+        MINUTES_BITMAP_KEY
       )
 
       if (shouldDrawSeconds) {
@@ -795,7 +798,8 @@ class WatchCanvasRenderer(
       }
 
 
-      if (shouldDrawAmPm) {
+      if (shouldDrawAmPm && false) {
+        // TODO
         drawAmPm(
           canvas,
           bounds,
@@ -1002,9 +1006,9 @@ class WatchCanvasRenderer(
     color: Int,
     opacity: Float,
   ): Bitmap {
-    val key = "${text},${textSize},${color},${opacity}"
+    val hash = "${text},${textSize},${color},${opacity}"
 
-    val cached = secondsBitmap.get(key)
+    val cached = bitmapCache.get(SECONDS_BITMAP_KEY, hash)
     if (cached != null) {
       return cached
     }
@@ -1036,14 +1040,14 @@ class WatchCanvasRenderer(
     val p2 = Paint()
     p2.color = Color.WHITE
     canvas.drawText(
-      "r ${secondsBitmap.loads} w ${secondsBitmap.renders}",
+      "r ${bitmapCache.loads(SECONDS_BITMAP_KEY)} w ${bitmapCache.renders(SECONDS_BITMAP_KEY)}",
       0f,
       bounds.height().toFloat(),
       p2,
     )
     // ---------------------------
 
-    secondsBitmap.set(key, bitmap)
+    bitmapCache.set(SECONDS_BITMAP_KEY, hash, bitmap)
 
     return bitmap
   }
@@ -1102,7 +1106,7 @@ class WatchCanvasRenderer(
     }
   }
 
-  private fun drawHours(
+  private fun drawTime(
     canvas: Canvas,
     bounds: Rect,
     time: Int,
@@ -1111,16 +1115,14 @@ class WatchCanvasRenderer(
     offsetY: Float,
     textSize: Float,
     textScale: Float,
+    cacheKey: String,
   ) {
     val text = time.toString().padStart(2, '0')
 
     val p = Paint(paint)
     p.textSize *= 14f
-//    p.isAntiAlias = true
-//    p.isDither = true
-//    p.isFilterBitmap = true
 
-    val bitmap = renderHours(text, paint, textSize)
+    val bitmap = renderTime(text, paint, textSize, cacheKey)
 
     canvas.withScale(textScale, textScale, bounds.exactCenterX(), bounds.exactCenterY()) {
       canvas.drawBitmap(
@@ -1132,44 +1134,15 @@ class WatchCanvasRenderer(
     }
   }
 
-  private fun drawMinutes(
-    canvas: Canvas,
-    bounds: Rect,
-    time: Int,
-    paint: Paint,
-    offsetX: Float,
-    offsetY: Float,
-    textSize: Float,
-    textScale: Float,
-  ) {
-    val text = time.toString().padStart(2, '0')
-
-    val p = Paint(paint)
-    p.textSize *= 14f
-//    p.isAntiAlias = true
-//    p.isDither = true
-//    p.isFilterBitmap = true
-
-    val bitmap = renderMinutes(text, paint, textSize)
-
-    canvas.withScale(textScale, textScale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.drawBitmap(
-        bitmap,
-        192f - bitmap.width / 2 + offsetX,
-        192f - bitmap.height / 2 + offsetY,
-        Paint(),
-      )
-    }
-  }
-
-  private fun renderHours(
+  private fun renderTime(
     text: String,
     paint: Paint,
     textSize: Float,
+    cacheKey: String,
   ): Bitmap {
-    val key = "${text},${textSize}"
+    val hash = "${text},${textSize}"
 
-    val cached = hoursBitmap.get(key)
+    val cached = bitmapCache.get(cacheKey, hash)
     if (cached != null) {
       return cached
     }
@@ -1200,240 +1173,16 @@ class WatchCanvasRenderer(
     val p2 = Paint()
     p2.color = Color.WHITE
     canvas.drawText(
-      "r ${hoursBitmap.loads} w ${hoursBitmap.renders}",
+      "r ${bitmapCache.loads(cacheKey)} w ${bitmapCache.renders(cacheKey)}",
       0f,
       bounds.height().toFloat(),
       p2,
     )
     // ---------------------------
 
-    hoursBitmap.set(key, bitmap)
+    bitmapCache.set(cacheKey, hash, bitmap)
 
     return bitmap
-  }
-
-  private fun renderMinutes(
-    text: String,
-    paint: Paint,
-    textSize: Float,
-  ): Bitmap {
-    val key = "${text},${textSize}"
-
-    val cached = minutesBitmap.get(key)
-    if (cached != null) {
-      return cached
-    }
-
-    val p = Paint(paint)
-    p.textSize *= textSize
-
-    val textBounds = Rect()
-    p.getTextBounds(text, 0, text.length, textBounds)
-    val bounds = Rect(0, 0, textBounds.width(), textBounds.height())
-
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val canvas = Canvas(bitmap)
-
-    canvas.drawText(
-      text,
-      0f,
-      bounds.height().toFloat(),
-      p,
-    )
-
-    // DEBUG --------------------
-    canvas.drawRect(bounds, Paint().apply {
-      this.color = Color.parseColor("#22ffffff")
-    })
-    val p2 = Paint()
-    p2.color = Color.WHITE
-    canvas.drawText(
-      "r ${minutesBitmap.loads} w ${minutesBitmap.renders}",
-      0f,
-      bounds.height().toFloat(),
-      p2,
-    )
-    // ---------------------------
-
-    minutesBitmap.set(key, bitmap)
-
-    return bitmap
-  }
-
-  private fun drawTimeBitmap(
-    canvas: Canvas,
-    bounds: Rect,
-    time: Int,
-    paint: Paint,
-    offsetX: Float,
-    offsetY: Float,
-    textSize: Float,
-//    timeScale: Float
-  ) {
-    val p = Paint(paint)
-//    p.textSize = p.textSize  // / 384F * bounds.width()
-    p.textSize = 14f * 8f
-    p.isSubpixelText = true
-    p.isAntiAlias = true
-//    p.textSize = 14f
-
-    var scale = 1f
-
-    scale = scale * (textSize / 14f)
-
-
-    val text = time.toString().padStart(2, '0')
-
-    val textBounds = Rect()
-    p.getTextBounds(text, 0, text.length, textBounds)
-
-
-    val cacheBitmap = Bitmap.createBitmap(
-      384, 384, Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(cacheBitmap)
-
-    val bitmapPaint = Paint(paint)
-    bitmapPaint.textSize *= 14f
-//    bitmapPaint.color = Color.WHITE
-//    bitmapPaint.isAntiAlias = true
-//    bitmapPaint.isDither = true
-//    bitmapPaint.isFilterBitmap = true
-
-
-//    bitmapCanvas.drawText(text, 0f, 0f, bitmapPaint)
-
-    bitmapCanvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      bitmapCanvas.drawText(text, 192f, 192f, bitmapPaint)
-    }
-
-
-//    val resources: Resources = context.resources
-//    val density = resources.displayMetrics.density
-////    var bitmap = BitmapFactory.decodeResource(resources, 0)
-//
-//    var bitmap = Bitmap.createBitmap(textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888);
-//
-//
-//    val bitmapConfig = bitmap.config
-//
-//    // set default bitmap config if none
-////    if(bitmapConfig == null) {
-////      bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
-////    }
-////    val drawable = data.smallImage.image.loadDrawable(context) ?: return
-//
-//
-//    bitmap = bitmap.copy(bitmapConfig, true)
-//
-////    val bitmapCanvas = Canvas(bitmap)
-//
-//    val x = (bitmap.width - textBounds.width()) / 2
-//    val y = (bitmap.height + textBounds.height()) / 2
-//
-//
-//    val paint2 = Paint(Paint.ANTI_ALIAS_FLAG)
-//    // text color - #3D3D3D
-//    // text color - #3D3D3D
-//    paint2.color = Color.rgb(61, 61, 61)
-//    // text size in pixels
-//    // text size in pixels
-//    paint2.textSize = (14 * scale).toInt().toFloat()
-//    // text shadow
-//    // text shadow
-//    paint2.setShadowLayer(1f, 0f, 1f, Color.WHITE)
-//
-//    bitmapCanvas.drawText(text, 0f, 0f, paint2)
-
-
-//    iconBounds = Rect(0, 0, 0, size)
-
-//    val dstRect = RectF(
-//      bounds.exactCenterX() - textBounds.width() / 2,
-//      bounds.exactCenterY() - textBounds.height() / 2,
-//      bounds.exactCenterX() + textBounds.width() / 2,
-//      bounds.exactCenterY() + textBounds.height() / 2,
-    val imgPaint = Paint()
-//    imgPaint.color = Color.WHITE
-//    imgPaint.isAntiAlias = true
-//    imgPaint.isDither = true
-//    imgPaint.isFilterBitmap = true
-
-    val colorMatrix = ColorMatrix()
-    colorMatrix.setSaturation(0f)
-    val filter = ColorMatrixColorFilter(colorMatrix)
-    imgPaint.colorFilter = filter
-
-//    p.isDither = true
-//    p.isFilterBitmap = true
-//    p.isAntiAlias = true
-
-//    )
-    canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.drawText(text, 192f, 192f, p)
-    }
-
-    canvas.withTranslation(0f, 0f) {
-//      canvas.drawBitmap(cacheBitmap, 0f, 0f, imgPaint)
-//      canvas.drawText(text, 192f, 192f, p)
-    }
-//    canvas.withTranslation(offsetX, offsetY) {
-
-//      canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-//        canvas.withTranslation(-77f, -7f) {
-//          canvas.drawText(
-//            time.toString().padStart(2, '0'),
-//            192f, 192f,
-//  //          offsetX,
-//  //          offsetY,
-//            p
-//          )
-//        }
-//      }
-//    }
-  }
-
-  private fun drawTimeOld(
-    canvas: Canvas,
-    bounds: Rect,
-    time: Int,
-    paint: Paint,
-    offsetX: Float,
-    offsetY: Float,
-    scaleOffset: Float
-  ) {
-    return
-
-    // dx:70 dy:98
-    val p = Paint(paint)
-    p.textSize = p.textSize / 384F * bounds.width()
-
-    var scale = 1f
-
-    when {
-      watchFaceData.layoutStyle.id == LayoutStyle.FOCUS.id && watchFaceData.secondsStyle.id == SecondsStyle.NONE.id -> {
-        scale = scale / 14f * 18f
-      }
-
-      watchFaceData.layoutStyle.id == LayoutStyle.FOCUS.id && (watchFaceData.secondsStyle.id == SecondsStyle.DASHES.id || watchFaceData.secondsStyle.id == SecondsStyle.DOTS.id) -> {
-        scale = scale / 14f * 18f
-      }
-    }
-
-    p.isAntiAlias = true
-
-    scale += (1f - this.easeInOutCirc(drawProperties.timeScale)) * scaleOffset
-
-    canvas.withScale(scale, scale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.drawText(
-        time.toString().padStart(2, '0'),
-        bounds.exactCenterX() + offsetX / 384F * bounds.width().toFloat(),
-        bounds.exactCenterY() + offsetY / 384F * bounds.height().toFloat(),
-        p
-      )
-    }
   }
 
   private fun drawDashes(
@@ -1746,39 +1495,3 @@ class WatchCanvasRenderer(
   }
 }
 
-fun bitmapCache(canvas: Canvas, bounds: Rect) {
-  val cacheBitmap = Bitmap.createBitmap(
-    bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-  )
-  val text = "example"
-  val bitmapCanvas = Canvas(cacheBitmap)
-  val bitmapPaint = Paint()
-  bitmapPaint.textSize = 14f
-  bitmapCanvas.drawText(text, 192f + 10f, 192f, bitmapPaint)
-
-  canvas.withScale(1f, 1f, bounds.exactCenterX(), bounds.exactCenterY()) {
-    canvas.drawBitmap(cacheBitmap, 0f, 0f, Paint())
-  }
-}
-
-class BitmapCache {
-  var renders: Int = 0
-  var loads: Int = 0
-  private var key: String = ""
-  private var bitmap: Bitmap? = null
-
-  fun get(k: String): Bitmap? {
-    loads++
-    if (bitmap != null && k == key) {
-      return bitmap
-    }
-
-    return null
-  }
-
-  fun set(k: String, b: Bitmap?) {
-    renders++
-    key = k
-    bitmap = b
-  }
-}
