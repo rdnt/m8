@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.withScale
-import androidx.core.graphics.withTranslation
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
@@ -95,6 +94,55 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
   ) {
     if (bounds.isEmpty) return
 
+    val bitmap: Bitmap
+
+    when (data.type) {
+      ComplicationType.SHORT_TEXT -> {
+        bitmap = drawShortTextComplication(bounds, data as ShortTextComplicationData)
+      }
+
+      else -> return
+    }
+
+    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      canvas.drawBitmap(
+        bitmap,
+        bounds.left + offsetX,
+        bounds.top.toFloat(),
+        Paint(),
+      )
+    }
+  }
+
+
+  private fun drawShortTextComplication(
+    bounds: Rect,
+    data: ShortTextComplicationData
+  ): Bitmap {
+    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${opacity},${debug}"
+
+    val cached = bitmapCache.get(hash)
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderShortTextComplication(bitmapCanvas, rect, data)
+
+    renderDebug(bitmapCanvas, rect)
+
+    bitmapCache.set(hash, bitmap)
+
+    return bitmap
+  }
+
+  private fun renderDebug(canvas: Canvas, bounds: Rect) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
         this.color = Color.parseColor("#aa02d7f2")
@@ -112,20 +160,12 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
         p2,
       )
     }
-
-    when (data.type) {
-      ComplicationType.SHORT_TEXT -> {
-        renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
-      }
-
-      else -> return
-    }
   }
 
   private fun renderShortTextComplication(
     canvas: Canvas,
     bounds: Rect,
-    data: ShortTextComplicationData,
+    data: ShortTextComplicationData
   ) {
     val now = Instant.now()
 
@@ -146,11 +186,11 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
       icon = drawable.toBitmap(
-        (32f / 384 * canvas.width).toInt(),
-        (32f / 384 * canvas.width).toInt()
+        (32f / 186f * canvas.width).toInt(),
+        (32f / 186f * canvas.width).toInt()
       )
       iconBounds =
-        Rect(0, 0, (32f / 384 * canvas.width).toInt(), (32f / 384 * canvas.width).toInt())
+        Rect(0, 0, (32f / 186f * canvas.width).toInt(), (32f / 186f * canvas.width).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {
@@ -172,7 +212,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       title = data.title!!.getTextAt(context.resources, now).toString().uppercase()
     }
 
-    textPaint.textSize = 24F / 384 * canvas.width
+    textPaint.textSize = 24F / 186f * canvas.width
 
     val textBounds = Rect()
 
@@ -199,37 +239,24 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       titleOffsetX = (width - titleBounds.width()).toFloat() / 2f
       textOffsetX = (width - textBounds.width()).toFloat() / 2f
 
-      titleOffsetX += 6f / 384f * canvas.width
-      textOffsetX += 6f / 384f * canvas.width
+      titleOffsetX += 6f / 186f * canvas.width
+      textOffsetX += 6f / 186f * canvas.width
     } else if (icon != null) {
       val width = iconBounds.width() + textBounds.width()
 
       iconOffsetX = (width - iconBounds.width()).toFloat() / 2f
       textOffsetX = (width - textBounds.width()).toFloat() / 2f
 
-      iconOffsetX += 9f / 384f * canvas.width
-      textOffsetX += 9f / 384f * canvas.width
+      iconOffsetX += 9f / 186f * canvas.width
+      textOffsetX += 9f / 186f * canvas.width
 
       if (isBattery) {
         iconOffsetX = iconOffsetX.toInt().toFloat()
       }
     }
 
-//    textOffsetX += offsetX
-//    titleOffsetX += offsetX
-//    iconOffsetX -= offsetX
-
-
-    val cacheBitmap = Bitmap.createBitmap(
-      canvas.width,
-      canvas.height,
-      Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(cacheBitmap)
-
-
     if (title != null) {
-      bitmapCanvas.drawText(
+      canvas.drawText(
         title,
         bounds.exactCenterX() - titleBounds.width() / 2 - titleOffsetX,
         bounds.exactCenterY() + titleBounds.height() / 2,
@@ -243,7 +270,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
         bounds.exactCenterY() + iconBounds.height() / 2f,
       )
 
-      bitmapCanvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
+      canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     }
 
 
@@ -251,7 +278,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       val prefix = "".padStart(prefixLen, '0')
       prefixPaint.textSize = textPaint.textSize
 
-      bitmapCanvas.drawText(
+      canvas.drawText(
         prefix,
         bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
         bounds.exactCenterY() + textBounds.height() / 2,
@@ -259,24 +286,12 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       )
     }
 
-    bitmapCanvas.drawText(
+    canvas.drawText(
       text,
       bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
       bounds.exactCenterY() + textBounds.height() / 2,
       textPaint
     )
-
-
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-      canvas.withTranslation(offsetX, 0f) {
-        canvas.drawBitmap(
-          cacheBitmap,
-          0f,
-          0f,
-          Paint(),
-        )
-      }
-    }
   }
 
   override fun drawHighlight(

@@ -68,6 +68,91 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
   ) {
     if (bounds.isEmpty) return
 
+
+    val bitmap: Bitmap
+
+    when (data.type) {
+      ComplicationType.SHORT_TEXT -> {
+        bitmap = drawShortTextComplication(bounds, data as ShortTextComplicationData)
+      }
+
+      else -> return
+    }
+
+    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      canvas.drawBitmap(
+        bitmap,
+        bounds.left + offsetX,
+        bounds.top.toFloat(),
+        Paint(),
+      )
+    }
+  }
+
+  private fun drawShortTextComplication(
+    bounds: Rect,
+    data: ShortTextComplicationData
+  ): Bitmap {
+    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${opacity},${debug}"
+
+    val cached = bitmapCache.get(hash)
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderShortTextComplication(bitmapCanvas, rect, data)
+
+    renderDebug(bitmapCanvas, rect)
+
+    bitmapCache.set(hash, bitmap)
+
+    return bitmap
+  }
+
+  private fun renderShortTextComplication(
+    canvas: Canvas,
+    bounds: Rect,
+    data: ShortTextComplicationData,
+  ) {
+    val now = Instant.now()
+
+    var text = data.text.getTextAt(context.resources, now).toString().uppercase()
+    if (text == "--") {
+      return
+    }
+
+    val p = Paint(textPaint)
+    p.textSize *= 14f
+
+//    val textBounds = Rect()
+//    p.getTextBounds(text, 0, text.length, textBounds)
+
+
+
+
+    val textBounds = Rect()
+    p.getTextBounds(text, 0, text.length, textBounds)
+
+    canvas.drawText(
+      text,
+//      192f-textBounds.width().toFloat()/2f,
+//      192f+textBounds.height()/2+offsetY,
+//      0f,
+//      bounds.height().toFloat()/2f,
+      bounds.left.toFloat() + 14f,
+      bounds.exactCenterY() + textBounds.height() / 2,
+      p,
+    )
+  }
+
+  private fun renderDebug(canvas: Canvas, bounds: Rect) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
         this.color = Color.parseColor("#aa02d7f2")
@@ -84,83 +169,6 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
         bounds.bottom - 3f,
         p2,
       )
-    }
-
-    when (data.type) {
-      ComplicationType.SHORT_TEXT -> {
-        renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
-      }
-
-      else -> return
-    }
-  }
-
-  private fun renderShortTextComplication(
-    canvas: Canvas,
-    bounds: Rect,
-    data: ShortTextComplicationData,
-  ) {
-    val now = Instant.now()
-
-    var text = data.text.getTextAt(context.resources, now).toString().uppercase()
-    if (text == "--") {
-      return
-    }
-
-    val p = Paint(textPaint)
-    p.textSize *= 14f / 42f * bounds.height()
-
-//    val textBounds = Rect()
-//    p.getTextBounds(text, 0, text.length, textBounds)
-
-
-
-
-    val cacheBitmap = Bitmap.createBitmap(
-      bounds.width(),
-      bounds.height(),
-      Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(cacheBitmap)
-
-    val textBounds = Rect()
-    p.getTextBounds(text, 0, text.length, textBounds)
-
-    bitmapCanvas.drawText(
-      text,
-//      192f-textBounds.width().toFloat()/2f,
-//      192f+textBounds.height()/2+offsetY,
-      0f,
-      bounds.height().toFloat()/2f,
-//      bounds.left.toFloat() + 14f / 42f * bounds.height(),
-//      bounds.exactCenterY() + textBounds.height() / 2,
-      p,
-    )
-
-
-
-
-
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-      canvas.withTranslation(offsetX, 0f) {
-        canvas.drawBitmap(
-          cacheBitmap,
-          bounds.left.toFloat() + 14f / 42f * bounds.height(),
-//        bounds.top.toFloat(),
-          bounds.top.toFloat() + textBounds.height() / 2,
-//        bounds.left.toFloat() + 14f / 42f * bounds.height(),
-//        bounds.exactCenterY() + textBounds.height() / 2,
-
-          Paint(),
-        )
-
-//      canvas.drawText(
-//        text,
-//        bounds.left.toFloat() + 14f / 42f * bounds.height(),
-//        bounds.exactCenterY() + textBounds.height() / 2,
-//        p
-//      )
-      }
     }
   }
 

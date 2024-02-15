@@ -89,6 +89,119 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
   ) {
     if (bounds.isEmpty) return
 
+    val bitmap: Bitmap
+
+    when (data.type) {
+      ComplicationType.SHORT_TEXT -> {
+        bitmap = drawShortTextComplication(bounds, data as ShortTextComplicationData)
+      }
+
+      ComplicationType.MONOCHROMATIC_IMAGE -> {
+        bitmap = drawMonochromaticImageComplication(
+          bounds,
+          data as MonochromaticImageComplicationData
+        )
+      }
+
+      ComplicationType.SMALL_IMAGE -> {
+        bitmap = drawSmallImageComplication(bounds, data as SmallImageComplicationData)
+      }
+
+      else -> return
+    }
+
+    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      canvas.drawBitmap(
+        bitmap,
+        bounds.left.toFloat(),
+        bounds.top.toFloat(),
+        Paint(),
+      )
+    }
+  }
+
+  private fun drawShortTextComplication(
+    bounds: Rect,
+    data: ShortTextComplicationData
+  ): Bitmap {
+    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${opacity},${debug}"
+
+    val cached = bitmapCache.get(hash)
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderShortTextComplication(bitmapCanvas, rect, data)
+
+    renderDebug(bitmapCanvas, rect)
+
+    bitmapCache.set(hash, bitmap)
+
+    return bitmap
+  }
+
+  private fun drawMonochromaticImageComplication(
+    bounds: Rect,
+    data: MonochromaticImageComplicationData
+  ): Bitmap {
+    val hash = "${bounds},${data.monochromaticImage.image.resId},${tertiaryColor},${opacity},${debug}"
+
+    val cached = bitmapCache.get(hash)
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderMonochromaticImageComplication(bitmapCanvas, rect, data)
+
+    renderDebug(bitmapCanvas, rect)
+
+    bitmapCache.set(hash, bitmap)
+
+    return bitmap
+  }
+
+  private fun drawSmallImageComplication(
+    bounds: Rect,
+    data: SmallImageComplicationData
+  ): Bitmap {
+    val hash = "${bounds},${data.smallImage.image.resId},${tertiaryColor},${opacity},${debug}"
+
+    val cached = bitmapCache.get(hash)
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderSmallImageComplication(bitmapCanvas, rect, data)
+
+    renderDebug(bitmapCanvas, rect)
+
+    bitmapCache.set(hash, bitmap)
+
+    return bitmap
+  }
+
+  private fun renderDebug(canvas: Canvas, bounds: Rect) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
         this.color = Color.parseColor("#aa02d7f2")
@@ -111,26 +224,6 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
         bounds.bottom - 3f,
         p2,
       )
-    }
-
-    when (data.type) {
-      ComplicationType.SHORT_TEXT -> {
-        renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
-      }
-
-      ComplicationType.MONOCHROMATIC_IMAGE -> {
-        renderMonochromaticImageComplication(
-          canvas,
-          bounds,
-          data as MonochromaticImageComplicationData
-        )
-      }
-
-      ComplicationType.SMALL_IMAGE -> {
-        renderSmallImageComplication(canvas, bounds, data as SmallImageComplicationData)
-      }
-
-      else -> return
     }
   }
 
@@ -158,11 +251,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     if (isBattery) {
       val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
       icon = drawable.toBitmap(
-        (32f / 384f * canvas.width).toInt(),
-        (32f / 384f * canvas.width).toInt()
+        (32f).toInt(),
+        (32f).toInt()
       )
       iconBounds =
-        Rect(0, 0, (32f / 384f * canvas.width).toInt(), (32f / 384f * canvas.width).toInt())
+        Rect(0, 0, (32f).toInt(), (32f).toInt())
     } else if (data.monochromaticImage != null) {
       val drawable = data.monochromaticImage!!.image.loadDrawable(context)
       if (drawable != null) {
@@ -185,11 +278,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     }
 
     if (text.length <= 3) {
-      textPaint.textSize = 24F / 384f * canvas.width
+      textPaint.textSize = 24F
     } else if (text.length <= 6) {
-      textPaint.textSize = 16F / 384f * canvas.width
+      textPaint.textSize = 16F
     } else {
-      textPaint.textSize = 12F / 384f * canvas.width
+      textPaint.textSize = 12F
     }
 
     val textBounds = Rect()
@@ -204,11 +297,11 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
 
     if (title != null) {
       if (title.length <= 3) {
-        titlePaint.textSize = 24F / 384f * canvas.width
+        titlePaint.textSize = 24F
       } else if (title.length <= 6) {
-        titlePaint.textSize = 16F / 384f * canvas.width
+        titlePaint.textSize = 16F
       } else {
-        titlePaint.textSize = 12F / 384f * canvas.width
+        titlePaint.textSize = 12F
       }
 
       titlePaint.getTextBounds(title, 0, title.length, titleBounds)
@@ -224,34 +317,25 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       iconOffsetY = (height - iconBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      iconOffsetY += 6f / 384f * canvas.width
+      iconOffsetY += 6f
       if (isBattery) {
         iconOffsetY = iconOffsetY.toInt().toFloat()
       }
 
-      textOffsetY += 6f / 384f * canvas.width
+      textOffsetY += 6f
     } else if (title != null) {
       val height = titleBounds.height() + textBounds.height()
 
       titleOffsetY = (height - titleBounds.height()).toFloat() / 2f
       textOffsetY = (height - textBounds.height()).toFloat() / 2f
 
-      titleOffsetY += 6f / 384f * canvas.width
-      textOffsetY += 6f / 384f * canvas.width
+      titleOffsetY += 6f
+      textOffsetY += 6f
     }
 
 
 
 
-
-
-
-    val cacheBitmap = Bitmap.createBitmap(
-      canvas.width,
-      canvas.height,
-      Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(cacheBitmap)
 
 
 
@@ -263,9 +347,9 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
         bounds.exactCenterY() + iconBounds.height() / 2 - iconOffsetY,
       )
 
-      bitmapCanvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
+      canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     } else if (title != null) {
-      bitmapCanvas.drawText(
+      canvas.drawText(
         title,
         bounds.exactCenterX() - titleBounds.width() / 2,
         bounds.exactCenterY() + titleBounds.height() / 2 - titleOffsetY,
@@ -277,7 +361,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       val prefix = "".padStart(prefixLen, '0')
       prefixPaint.textSize = textPaint.textSize
 
-      bitmapCanvas.drawText(
+      canvas.drawText(
         prefix,
         bounds.exactCenterX() - textBounds.width() / 2,
         bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
@@ -285,72 +369,12 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       )
     }
 
-    bitmapCanvas.drawText(
+    canvas.drawText(
       text,
       bounds.exactCenterX() - textBounds.width() / 2,
       bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
       textPaint
     )
-
-
-
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-      canvas.drawBitmap(
-        cacheBitmap,
-        0f,
-        0f,
-        Paint(),
-      )
-    }
-
-
-
-
-
-
-
-    return
-
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-
-      if (icon != null) {
-        val dstRect = RectF(
-          bounds.exactCenterX() - iconBounds.width() / 2,
-          bounds.exactCenterY() - iconBounds.height() / 2 - iconOffsetY,
-          bounds.exactCenterX() + iconBounds.width() / 2,
-          bounds.exactCenterY() + iconBounds.height() / 2 - iconOffsetY,
-        )
-
-        canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
-      } else if (title != null) {
-        canvas.drawText(
-          title,
-          bounds.exactCenterX() - titleBounds.width() / 2,
-          bounds.exactCenterY() + titleBounds.height() / 2 - titleOffsetY,
-          titlePaint
-        )
-      }
-
-      if (prefixLen > 0) {
-        val prefix = "".padStart(prefixLen, '0')
-        prefixPaint.textSize = textPaint.textSize
-
-        canvas.drawText(
-          prefix,
-          bounds.exactCenterX() - textBounds.width() / 2,
-          bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
-          prefixPaint
-        )
-      }
-
-      canvas.drawText(
-        text,
-        bounds.exactCenterX() - textBounds.width() / 2,
-        bounds.exactCenterY() + textBounds.height() / 2 + textOffsetY,
-        textPaint
-      )
-
-    }
 
   }
 

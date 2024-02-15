@@ -1050,7 +1050,7 @@ class WatchCanvasRenderer(
       canvas.drawRect(bounds, Paint().apply {
         this.color = Color.parseColor("#aaf2e900")
         style = Paint.Style.STROKE
-        strokeWidth = 4f
+        strokeWidth = 2f
       })
       val p2 = Paint()
       p2.color = Color.parseColor("#aaf2e900")
@@ -1058,15 +1058,15 @@ class WatchCanvasRenderer(
       p2.textSize = 8f
       canvas.drawText(
         "r ${bitmapCache.loads(cacheKey)}",
-        4f,
-        bounds.height().toFloat() - 13f,
+        3f,
+        bounds.height().toFloat() - 12f,
         p2,
       )
 
       canvas.drawText(
         "w ${bitmapCache.renders(cacheKey)}",
-        4f,
-        bounds.height().toFloat() - 4f,
+        3f,
+        bounds.height().toFloat() - 3f,
         p2,
       )
     }
