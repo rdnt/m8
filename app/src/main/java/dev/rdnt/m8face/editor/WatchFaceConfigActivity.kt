@@ -1428,16 +1428,10 @@ fun ComplicationButton(
 //          shape = RoundedCornerShape(16.dp),
           modifier = Modifier
             .weight(bottom - top, true)
+//            .background(Color.Blue)
             .fillMaxSize(),
         ) {}
 
-//      Box(
-//          Modifier
-//              .fillMaxWidth()
-//              .weight(bottom - top, true)
-//              .alpha(.3f)
-//              .background(Color.Blue)
-//      )
       Box(Modifier.weight(1f - bottom, true))
     }
     Box(Modifier.weight(1f - right, true))
