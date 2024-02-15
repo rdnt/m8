@@ -12,11 +12,17 @@ import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
 import androidx.wear.watchface.complications.data.*
+import dev.rdnt.m8face.BitmapCache
+import dev.rdnt.m8face.BitmapCacheEntry
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
 
 class VerticalComplication(private val context: Context) : CanvasComplication {
+  private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
+
+  var debug: Boolean = false;
+
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {
       field = tertiaryColor
@@ -83,10 +89,29 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
   ) {
     if (bounds.isEmpty) return
 
-//    // DEBUG
-//    canvas.drawRect(bounds, Paint().apply {
-//      color = Color.parseColor("#22ffffff")
-//    })
+    if (debug) {
+      canvas.drawRect(bounds, Paint().apply {
+        this.color = Color.parseColor("#aa02d7f2")
+        style = Paint.Style.STROKE
+        strokeWidth = 2f
+      })
+      val p2 = Paint()
+      p2.color = Color.parseColor("#aa02d7f2")
+      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+      p2.textSize = 8f
+      canvas.drawText(
+        "r ${bitmapCache.loads}",
+        bounds.left + 3f,
+        bounds.bottom - 12f,
+        p2,
+      )
+      canvas.drawText(
+        "w ${bitmapCache.renders}",
+        bounds.left + 3f,
+        bounds.bottom - 3f,
+        p2,
+      )
+    }
 
     when (data.type) {
       ComplicationType.SHORT_TEXT -> {

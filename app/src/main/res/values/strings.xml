@@ -146,6 +146,7 @@
   <string name="military_time_setting">Military Time</string>
   <string name="big_ambient_setting">Big Ambient</string>
   <string name="detailed_ambient_setting">Detailed Ambient</string>
+  <string name="debug_setting">Debug</string>
 
   <!-- Subtitle for the menu option to configure if we should draw pips to mark each hour
    on the watch face -->
@@ -153,6 +154,7 @@
   <string name="military_time_setting_description">Whether to use military instead of standard time</string>
   <string name="big_ambient_setting_description">Use big time on ambient mode</string>
   <string name="detailed_ambient_setting_description">Show complications on ambient mode</string>
+  <string name="debug_setting_description">&gt;.&gt;</string>
 
   <!-- A menu option to select a widget that lets us configure the length of the watch hands
   [CHAR LIMIT=20] -->

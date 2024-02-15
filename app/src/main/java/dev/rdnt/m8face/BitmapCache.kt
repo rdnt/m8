@@ -20,17 +20,17 @@ class BitmapCache {
   }
 
   fun renders(k: String): Int {
-    return entries[k]?.renders ?: 0
+    return entries[k]?.renders ?: 1
   }
 
   fun loads(k: String): Int {
-    return entries[k]?.loads ?: 0
+    return entries[k]?.loads ?: 1
   }
 }
 
 class BitmapCacheEntry {
-  var renders: Int = 0
-  var loads: Int = 0
+  var renders: Int = 1
+  var loads: Int = 1
   private var hash: String = ""
   private var bitmap: Bitmap? = null
 

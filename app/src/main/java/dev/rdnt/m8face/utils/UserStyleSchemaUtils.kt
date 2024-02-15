@@ -45,6 +45,7 @@ const val SECONDS_STYLE_SETTING = "seconds_style_setting"
 const val MILITARY_TIME_SETTING = "military_time_setting"
 const val BIG_AMBIENT_SETTING = "big_ambient_setting"
 const val DETAILED_AMBIENT_SETTING = "detailed_ambient_setting"
+const val DEBUG_SETTING = "debug_setting"
 
 /*
  * Creates user styles in the settings activity associated with the watch face, so users can
@@ -354,6 +355,16 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     false,
   )
 
+  val debugSetting = UserStyleSetting.BooleanUserStyleSetting(
+    UserStyleSetting.Id(DEBUG_SETTING),
+    context.resources,
+    R.string.debug_setting,
+    R.string.debug_setting_description,
+    null,
+    listOf(WatchFaceLayer.BASE),
+    DateFormat.is24HourFormat(context), // default
+  )
+
   // 4. Create style settings to hold all options.
   return UserStyleSchema(
     listOf(
@@ -364,6 +375,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
       militaryTimeSetting,
       bigAmbientSetting,
       detailedAmbientSetting,
+      debugSetting,
     )
   )
 }

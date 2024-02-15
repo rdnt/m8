@@ -50,6 +50,7 @@ import dev.rdnt.m8face.data.watchface.WatchFaceData
 import dev.rdnt.m8face.utils.AMBIENT_STYLE_SETTING
 import dev.rdnt.m8face.utils.BIG_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.COLOR_STYLE_SETTING
+import dev.rdnt.m8face.utils.DEBUG_SETTING
 import dev.rdnt.m8face.utils.DETAILED_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
 import dev.rdnt.m8face.utils.HorizontalTextComplication
@@ -114,6 +115,7 @@ class WatchCanvasRenderer(
     militaryTime = true,
     bigAmbient = false,
     layoutStyle = LayoutStyle.INFO1,
+    debug = false,
   )
 
   // Converts resource ids into Colors and ComplicationDrawable.
@@ -243,6 +245,8 @@ class WatchCanvasRenderer(
   }
 
   private var is24Format: Boolean = watchFaceData.militaryTime
+
+  private var debug: Boolean = watchFaceData.debug
 
   private val ambientTransitionMs = 1000L
   private var drawProperties = DrawProperties()
@@ -451,6 +455,14 @@ class WatchCanvasRenderer(
             detailedAmbient = booleanValue.value,
           )
         }
+
+        DEBUG_SETTING -> {
+          val booleanValue = options.value as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
+
+          newWatchFaceData = newWatchFaceData.copy(
+            debug = booleanValue.value,
+          )
+        }
       }
     }
 
@@ -524,6 +536,7 @@ class WatchCanvasRenderer(
       }
 
       is24Format = watchFaceData.militaryTime
+      debug = watchFaceData.debug
 
       interactiveFrameDelay = when (watchFaceData.secondsStyle.id) {
         SecondsStyle.NONE.id -> if (shouldDrawSeconds) 1000 else 60000
@@ -793,7 +806,7 @@ class WatchCanvasRenderer(
     }
   }
 
-  private var renders: Int = 0
+  private var frame: Int = 0
 
   override fun render(
     canvas: Canvas,
@@ -801,9 +814,28 @@ class WatchCanvasRenderer(
     zonedDateTime: ZonedDateTime,
     sharedAssets: AnalogSharedAssets,
   ) {
-    renders++
+    frame++
 
     canvas.drawColor(Color.parseColor("#ff000000"))
+
+    if (debug) {
+      val p2 = Paint()
+      p2.color = Color.parseColor("#aaff1111")
+      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+      p2.textSize = 8f
+
+      val text = "f $frame"
+
+      val textBounds = Rect()
+      p2.getTextBounds(text, 0, text.length, textBounds)
+
+      canvas.drawText(
+        text,
+        192f - textBounds.width() / 2,
+        192f + textBounds.height() / 2,
+        p2,
+      )
+    }
 
 //    val p2 = Paint()
 //    p2.color = Color.WHITE
@@ -883,15 +915,15 @@ class WatchCanvasRenderer(
         )
       }
 
-//      when (watchFaceData.secondsStyle.id) {
-//        SecondsStyle.DASHES.id -> {
-//          drawDashes(canvas, bounds, zonedDateTime)
-//        }
-//
-//        SecondsStyle.DOTS.id -> {
-//          drawDots(canvas, bounds, zonedDateTime)
-//        }
-//      }
+      when (watchFaceData.secondsStyle.id) {
+        SecondsStyle.DASHES.id -> {
+          drawDashes(canvas, bounds, zonedDateTime)
+        }
+
+        SecondsStyle.DOTS.id -> {
+          drawDots(canvas, bounds, zonedDateTime)
+        }
+      }
 
     }
 
@@ -913,7 +945,8 @@ class WatchCanvasRenderer(
       if (watchFaceData.detailedAmbient) .75f + this.easeInOutCirc(drawProperties.timeScale) / 4 else this.easeInOutCirc(
         drawProperties.timeScale
       )
-    opacity = 1f
+//    opacity = 1f
+
     val offsetX =
       if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id) interpolate(34f, 0f) else 0f
     val scale = interpolate(16f / 14f, 1f)
@@ -924,21 +957,27 @@ class WatchCanvasRenderer(
           is VerticalComplication -> {
             (complication.renderer as VerticalComplication).opacity = opacity
             (complication.renderer as VerticalComplication).scale = scale
+            (complication.renderer as VerticalComplication).debug = debug
           }
 
           is HorizontalComplication -> {
             (complication.renderer as HorizontalComplication).opacity = opacity
             (complication.renderer as HorizontalComplication).offsetX = offsetX
             (complication.renderer as HorizontalComplication).scale = scale
+            (complication.renderer as HorizontalComplication).debug = debug
           }
 
           is HorizontalTextComplication -> {
             (complication.renderer as HorizontalTextComplication).opacity = opacity
             (complication.renderer as HorizontalTextComplication).offsetX = offsetX
             (complication.renderer as HorizontalTextComplication).scale = scale
+            (complication.renderer as HorizontalTextComplication).debug = debug
           }
 
-          is IconComplication -> (complication.renderer as IconComplication).opacity = opacity
+          is IconComplication -> {
+            (complication.renderer as IconComplication).opacity = opacity
+            (complication.renderer as IconComplication).debug = debug
+          }
 
           else -> {}
         }
@@ -980,7 +1019,7 @@ class WatchCanvasRenderer(
     opacity: Float,
     cacheKey: String,
   ): Bitmap {
-    val hash = "${text},${textSize},${color},${opacity}"
+    val hash = "${text},${textSize},${color},${opacity},${debug}"
 
     val cached = bitmapCache.get(cacheKey, hash)
     if (cached != null) {
@@ -1007,19 +1046,30 @@ class WatchCanvasRenderer(
       p,
     )
 
-//    // DEBUG --------------------
-//    canvas.drawRect(bounds, Paint().apply {
-//      this.color = Color.parseColor("#22ffffff")
-//    })
-//    val p2 = Paint()
-//    p2.color = Color.WHITE
-//    canvas.drawText(
-//      "r ${bitmapCache.loads(cacheKey)} w ${bitmapCache.renders(cacheKey)}",
-//      0f,
-//      bounds.height().toFloat(),
-//      p2,
-//    )
-//    // ---------------------------
+    if (debug) {
+      canvas.drawRect(bounds, Paint().apply {
+        this.color = Color.parseColor("#aaf2e900")
+        style = Paint.Style.STROKE
+        strokeWidth = 4f
+      })
+      val p2 = Paint()
+      p2.color = Color.parseColor("#aaf2e900")
+      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+      p2.textSize = 8f
+      canvas.drawText(
+        "r ${bitmapCache.loads(cacheKey)}",
+        4f,
+        bounds.height().toFloat() - 13f,
+        p2,
+      )
+
+      canvas.drawText(
+        "w ${bitmapCache.renders(cacheKey)}",
+        4f,
+        bounds.height().toFloat() - 4f,
+        p2,
+      )
+    }
 
     bitmapCache.set(cacheKey, hash, bitmap)
 

@@ -349,6 +349,7 @@ fun WatchfaceConfigApp(
           val militaryTimeEnabled = state.userStylesAndPreview.militaryTime
           val bigAmbientEnabled = state.userStylesAndPreview.bigAmbient
           val detailedAmbientEnabled = state.userStylesAndPreview.detailedAmbient
+//          val debugEnabled = state.userStylesAndPreview.debug
 
           Box(
               Modifier

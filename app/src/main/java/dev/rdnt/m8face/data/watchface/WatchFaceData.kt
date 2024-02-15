@@ -26,4 +26,5 @@ data class WatchFaceData(
   val militaryTime: Boolean = true,
   val bigAmbient: Boolean = true,
   val detailedAmbient: Boolean = false,
+  val debug: Boolean = false,
 )
