@@ -155,12 +155,12 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
   private fun renderDebug(canvas: Canvas, bounds: Rect) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
-        this.color = Color.parseColor("#aa02d7f2")
+        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
         style = Paint.Style.STROKE
         strokeWidth = 2f
       })
       val p2 = Paint()
-      p2.color = Color.parseColor("#aa02d7f2")
+      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
       p2.typeface = context.resources.getFont(R.font.m8stealth57)
       p2.textSize = 8f
       canvas.drawText(

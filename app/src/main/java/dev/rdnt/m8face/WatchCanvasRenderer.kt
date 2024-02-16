@@ -54,7 +54,6 @@ import dev.rdnt.m8face.utils.DEBUG_SETTING
 import dev.rdnt.m8face.utils.DETAILED_AMBIENT_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
 import dev.rdnt.m8face.utils.HorizontalTextComplication
-import dev.rdnt.m8face.utils.IconComplication
 import dev.rdnt.m8face.utils.LAYOUT_STYLE_SETTING
 import dev.rdnt.m8face.utils.MILITARY_TIME_SETTING
 import dev.rdnt.m8face.utils.SECONDS_STYLE_SETTING
@@ -563,9 +562,6 @@ class WatchCanvasRenderer(
           is HorizontalTextComplication -> (complication.renderer as HorizontalTextComplication).tertiaryColor =
             watchFaceColors.tertiaryColor
 
-          is IconComplication -> (complication.renderer as IconComplication).tertiaryColor =
-            watchFaceColors.tertiaryColor
-
           else -> {}
         }
       }
@@ -949,7 +945,8 @@ class WatchCanvasRenderer(
 
     val offsetX =
       if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id) interpolate(34f, 0f) else 0f
-    val scale = interpolate(16f / 14f, 1f)
+
+    val scale = if (watchFaceData.detailedAmbient) 1f else interpolate(16f / 14f, 1f)
 
     for ((_, complication) in complicationSlotsManager.complicationSlots) {
       if (complication.enabled) {
@@ -972,11 +969,6 @@ class WatchCanvasRenderer(
             (complication.renderer as HorizontalTextComplication).offsetX = offsetX
             (complication.renderer as HorizontalTextComplication).scale = scale
             (complication.renderer as HorizontalTextComplication).debug = debug
-          }
-
-          is IconComplication -> {
-            (complication.renderer as IconComplication).opacity = opacity
-            (complication.renderer as IconComplication).debug = debug
           }
 
           else -> {}
@@ -1048,12 +1040,12 @@ class WatchCanvasRenderer(
 
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
-        this.color = Color.parseColor("#aaf2e900")
+        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), opacity)
         style = Paint.Style.STROKE
         strokeWidth = 2f
       })
       val p2 = Paint()
-      p2.color = Color.parseColor("#aaf2e900")
+      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), opacity)
       p2.typeface = context.resources.getFont(R.font.m8stealth57)
       p2.textSize = 8f
       canvas.drawText(

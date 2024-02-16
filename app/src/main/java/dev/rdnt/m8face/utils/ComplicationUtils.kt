@@ -488,7 +488,6 @@ fun createComplicationSlotManager(
   context: Context,
   currentUserStyleRepository: CurrentUserStyleRepository,
 ): ComplicationSlotsManager {
-  val iconComplicationFactory = createIconComplicationFactory(context)
   val verticalComplicationFactory = createVerticalComplicationFactory(context)
   val horizontalComplicationFactory = createHorizontalComplicationFactory(context)
   val invisibleComplicationFactory = createInvisibleComplicationFactory(context)
@@ -732,7 +731,7 @@ fun createComplicationSlotManager(
 
   val leftIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = FOCUS_LEFT_ICON_COMPLICATION_ID,
-    canvasComplicationFactory = iconComplicationFactory,
+    canvasComplicationFactory = verticalComplicationFactory,
     supportedTypes = listOf(
       ComplicationType.MONOCHROMATIC_IMAGE,
       ComplicationType.SMALL_IMAGE
@@ -755,7 +754,7 @@ fun createComplicationSlotManager(
 
   val rightIconComplication = ComplicationSlot.createRoundRectComplicationSlotBuilder(
     id = FOCUS_RIGHT_ICON_COMPLICATION_ID,
-    canvasComplicationFactory = iconComplicationFactory,
+    canvasComplicationFactory = verticalComplicationFactory,
     supportedTypes = listOf(
       ComplicationType.MONOCHROMATIC_IMAGE,
       ComplicationType.SMALL_IMAGE
