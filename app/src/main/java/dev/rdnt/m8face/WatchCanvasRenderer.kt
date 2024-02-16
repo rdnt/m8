@@ -879,7 +879,7 @@ class WatchCanvasRenderer(
         drawText(
           canvas,
           bounds,
-          zonedDateTime.second.toString().padStart(2, '0'),
+          if (ambientEnterAnimator.isRunning || isAmbient) "M8" else zonedDateTime.second.toString().padStart(2, '0'),
           secondPaint,
           opacity,
           secondsOffsetX,
@@ -944,7 +944,7 @@ class WatchCanvasRenderer(
 //    opacity = 1f
 
     val offsetX =
-      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id) interpolate(34f, 0f) else 0f
+      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(34f, 0f) else 0f
 
     val scale = if (watchFaceData.detailedAmbient) 1f else interpolate(16f / 14f, 1f)
 
@@ -1084,7 +1084,7 @@ class WatchCanvasRenderer(
     secondHandPaint.alpha =
       (this.easeInOutCirc(this.drawProperties.timeScale) * secondHandPaint.alpha).toInt()
 
-    val transitionOffset: Float = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 16f
+    val transitionOffset: Float = this.easeInOutCirc(1 - this.drawProperties.timeScale) * -16f * 0
 
 //    canvas.withRotation(secondsRotation, bounds.exactCenterX(), bounds.exactCenterY()) {
 //      canvas.drawRect(
@@ -1113,17 +1113,17 @@ class WatchCanvasRenderer(
       if (i.mod(90f) == 0f) { // cardinals
         color = watchFaceColors.primaryColor
         maxSize = 12f
-        weight = 1.75f
+        weight = 2f
         minAlpha = maxAlpha / 4f
       } else if (i.mod(30f) == 0f) { // intermediates
         color = watchFaceColors.secondaryColor
         maxSize = 10f
-        weight = 1.75f
+        weight = 2f
         minAlpha = maxAlpha / 4f
       } else {
         color = watchFaceColors.tertiaryColor
         maxSize = 8f
-        weight = 1.5f
+        weight = 1.75f
         minAlpha = maxAlpha / 8f
       }
 
@@ -1219,20 +1219,20 @@ class WatchCanvasRenderer(
 
     var centerY = 8f * this.easeInOutCirc(this.drawProperties.timeScale)
     val secondHandSize = 3.5f * this.easeInOutCirc(this.drawProperties.timeScale)
-    val transitionOffset = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 24f
+    val transitionOffset = this.easeInOutCirc(1 - this.drawProperties.timeScale) * 24f * 0
 
     val secondHandPaint = Paint(this.secondHandPaint)
     secondHandPaint.alpha =
       (this.easeInOutCirc(this.drawProperties.timeScale) * secondHandPaint.alpha).toInt()
 
-    canvas.withRotation(rotation, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.drawCircle(
-        bounds.centerX().toFloat(),
-        (centerY + transitionOffset),
-        secondHandSize / 384F * bounds.width(),
-        secondHandPaint
-      )
-    }
+//    canvas.withRotation(rotation, bounds.exactCenterX(), bounds.exactCenterY()) {
+//      canvas.drawCircle(
+//        bounds.centerX().toFloat(),
+//        (centerY + transitionOffset),
+//        secondHandSize / 384F * bounds.width(),
+//        secondHandPaint
+//      )
+//    }
 
     val maxAlpha = 255f
 
