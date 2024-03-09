@@ -923,11 +923,11 @@ class WatchCanvasRenderer(
 
     }
 
-//    if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
-//      watchFaceData.detailedAmbient || drawProperties.timeScale != 0f
-//      ) {
+    if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
+      (watchFaceData.detailedAmbient || drawProperties.timeScale != 0f)
+      ) {
     drawComplications(canvas, zonedDateTime)
-//    }
+    }
 
   }
 

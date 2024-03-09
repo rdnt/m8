@@ -469,7 +469,7 @@ fun ConfigScaffold(
     }
 
 
-    if (pagerState.currentPage == 2) { // special background for third page (ambient style)
+    if (pagerState.currentPage == 3) { // special background for third page (ambient style)
       var id = 0
       val current =
         ambientStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.ambientStyleId }
@@ -539,7 +539,7 @@ fun ConfigScaffold(
       Preview(bitmap)
     }
 
-    Overlay(pagerState)
+//    Overlay(pagerState) // TODO fix
 
     LaunchedEffect(pagerState.currentPage) {
       Log.d("Editor", "LaunchedEffect(${pagerState.currentPage})")
