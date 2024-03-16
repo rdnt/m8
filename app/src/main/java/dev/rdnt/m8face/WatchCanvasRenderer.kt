@@ -593,6 +593,24 @@ class WatchCanvasRenderer(
       }
     }
 
+  val timeTextSizeThick: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+//        22f / 16f
+        0f
+      }
+
+      else -> {
+        if (watchFaceData.detailedAmbient) {
+//          18f / 16f
+          0f
+        } else {
+//          interpolate(if (watchFaceData.bigAmbient) 18f else 16f, 14f)
+          18f / 16f
+        }
+      }
+    }
+
   val timeTextScale: Float
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.FOCUS.id -> {
@@ -608,13 +626,45 @@ class WatchCanvasRenderer(
       }
     }
 
+  val timeTextScaleThick: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        18f / 18f
+      }
+
+      else -> {
+        if (watchFaceData.detailedAmbient) {
+          14f / 18f
+        } else {
+          interpolate(if (watchFaceData.bigAmbient) 18f / 18f else 16f / 18f, 14f / 18f)
+        }
+      }
+    }
+
   val timeOffsetX: Float
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.SPORT.id -> {
         if (watchFaceData.detailedAmbient) {
-          -34f
+          -35f
         } else {
-          -34f
+          -35f
+//          interpolate(0f, -34f)
+        }
+
+      }
+
+      else -> {
+        0f
+      }
+    }
+
+  val timeOffsetXThick: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.SPORT.id -> {
+        if (watchFaceData.detailedAmbient) {
+          -35f/14f*18f
+        } else {
+          -35f/14f*18f
 //          interpolate(0f, -34f)
         }
 
@@ -644,12 +694,28 @@ class WatchCanvasRenderer(
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.FOCUS.id -> {
 //        183f - 192f
-        -58f - 10f - 4f
+        -72f
 //        -7f - 49f
       }
 
       else -> {
         -56f
+//        185f - 192f
+//        -7f - 49f
+//        interpolate(183f, 185f)
+      }
+    }
+
+  val hourOffsetYThick: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+//        183f - 192f
+        -72f
+//        -7f - 49f
+      }
+
+      else -> {
+        -72f
 //        185f - 192f
 //        -7f - 49f
 //        interpolate(183f, 185f)
@@ -680,6 +746,18 @@ class WatchCanvasRenderer(
 
       else -> {
         56f
+//        interpolate(327f, 297f)
+      }
+    }
+
+  val minuteOffsetYThick: Float
+    get() = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.FOCUS.id -> {
+        72f
+      }
+
+      else -> {
+        72f
 //        interpolate(327f, 297f)
       }
     }
@@ -815,12 +893,114 @@ class WatchCanvasRenderer(
       )
     }
 
+    var offsetX =
+      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
+        35f/14f*18f,
+        0f
+      ) else 0f
+//    val offsetX = 0f
+
+    val text14 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 144f
+    }
+
+    val text16 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57thin)
+      textSize = 9f
+    }
+
+    val text18 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57thick)
+      textSize = 9f
+    }
+
+    val hourText = when  {
+      (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
+        Paint(text16)
+      }
+      (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
+        Paint(text18)
+      }
+      else -> {
+        Paint(text14)
+      }
+    }
+
+    val minuteText14 = Paint(minutePaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 144f
+    }
+
+    val minuteText16 = Paint(minutePaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57thin)
+      textSize = 9f
+    }
+
+    val minuteText18 = Paint(minutePaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57thick)
+      textSize = 9f
+    }
+
+
+    val minuteText = when  {
+      (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
+        Paint(minuteText16)
+      }
+      (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
+        Paint(minuteText18)
+      }
+      else -> {
+        Paint(minuteText14)
+      }
+    }
+
+      canvas.withScale(timeTextScaleThick, timeTextScaleThick, bounds.exactCenterX(), bounds.exactCenterY()) {
+
+        canvas.withTranslation(offsetX, 0f) {
+        if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
+          drawText(
+            canvas,
+            bounds,
+            getHour(zonedDateTime).toString().padStart(2, '0'),
+            hourText,
+            1f,
+            timeOffsetXThick,
+            hourOffsetYThick,
+            1f,
+            HOURS_BITMAP_KEY
+          )
+
+          drawText(
+            canvas,
+            bounds,
+            zonedDateTime.minute.toString().padStart(2, '0'),
+            minuteText,
+            1f,
+            timeOffsetXThick,
+            minuteOffsetYThick,
+            1f,
+            MINUTES_BITMAP_KEY
+          )
+        }
+      }
+    }
+
+    offsetX =
+      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
+        35f,
+        0f
+      ) else 0f
+
+
+
     canvas.withScale(timeTextScale, timeTextScale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      val offsetX =
-        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
-          34f,
-          0f
-        ) else 0f
       canvas.withTranslation(offsetX, 0f) {
 
         val compBmp = Bitmap.createBitmap(
@@ -830,29 +1010,31 @@ class WatchCanvasRenderer(
         val compCanvas = Canvas(compBmp)
 
         if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-          drawText(
-            canvas,
-            bounds,
-            getHour(zonedDateTime).toString().padStart(2, '0'),
-            hourPaint,
-            1f,
-            timeOffsetX,
-            hourOffsetY,
-            timeTextSize,
-            HOURS_BITMAP_KEY
-          )
+//          drawText(
+//            canvas,
+//            bounds,
+//            getHour(zonedDateTime).toString().padStart(2, '0'),
+//            hourPaint,
+//            1f,
+//            timeOffsetX,
+//            hourOffsetY,
+//            timeTextSize,
+//            HOURS_BITMAP_KEY
+//          )
 
-          drawText(
-            canvas,
-            bounds,
-            zonedDateTime.minute.toString().padStart(2, '0'),
-            minutePaint,
-            1f,
-            timeOffsetX,
-            minuteOffsetY,
-            timeTextSize,
-            MINUTES_BITMAP_KEY
-          )
+
+
+//          drawText(
+//            canvas,
+//            bounds,
+//            zonedDateTime.minute.toString().padStart(2, '0'),
+//            minutePaint,
+//            1f,
+//            timeOffsetX,
+//            minuteOffsetY,
+//            timeTextSize,
+//            MINUTES_BITMAP_KEY
+//          )
 
           if (shouldDrawSeconds) {
             drawText(
@@ -1002,10 +1184,10 @@ class WatchCanvasRenderer(
   ): Bitmap {
     val hash = "${text},${textSize},${color},${debug}"
 
-    val cached = bitmapCache.get(cacheKey, hash)
-    if (cached != null) {
-      return cached
-    }
+//    val cached = bitmapCache.get(cacheKey, hash)
+//    if (cached != null) {
+//      return cached
+//    }
 
     val p = Paint(paint)
     p.textSize *= textSize
