@@ -63,7 +63,6 @@ import dev.rdnt.m8face.utils.VerticalComplication
 import java.time.Duration
 import java.time.ZonedDateTime
 import kotlin.math.pow
-import kotlin.math.round
 import kotlin.math.sqrt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,7 +73,6 @@ import kotlinx.coroutines.launch
 
 // Default for how long each frame is displayed at expected frame rate.
 private const val DEFAULT_INTERACTIVE_DRAW_MODE_UPDATE_DELAY_MILLIS: Long = 16
-
 
 
 /**
@@ -818,7 +816,11 @@ class WatchCanvasRenderer(
     }
 
     canvas.withScale(timeTextScale, timeTextScale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      val offsetX = if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(34f, 0f) else 0f
+      val offsetX =
+        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
+          34f,
+          0f
+        ) else 0f
       canvas.withTranslation(offsetX, 0f) {
 
         val compBmp = Bitmap.createBitmap(
@@ -827,79 +829,81 @@ class WatchCanvasRenderer(
 
         val compCanvas = Canvas(compBmp)
 
-    if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-        drawText(
-          canvas,
-          bounds,
-          getHour(zonedDateTime).toString().padStart(2, '0'),
-          hourPaint,
-          1f,
-          timeOffsetX,
-          hourOffsetY,
-          timeTextSize,
-          HOURS_BITMAP_KEY
-        )
-
-        drawText(
-          canvas,
-          bounds,
-          zonedDateTime.minute.toString().padStart(2, '0'),
-          minutePaint,
-          1f,
-          timeOffsetX,
-          minuteOffsetY,
-          timeTextSize,
-          MINUTES_BITMAP_KEY
-        )
-
-        if (shouldDrawSeconds) {
+        if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
           drawText(
-            compCanvas,
+            canvas,
             bounds,
-            if (watchFaceData.detailedAmbient && drawProperties.timeScale == 0f) "M8" else zonedDateTime.second.toString()
-              .padStart(2, '0'),
-            secondPaint,
+            getHour(zonedDateTime).toString().padStart(2, '0'),
+            hourPaint,
             1f,
-            secondsOffsetX,
-            secondsOffsetY,
-            secondsTextSize,
-            SECONDS_BITMAP_KEY,
+            timeOffsetX,
+            hourOffsetY,
+            timeTextSize,
+            HOURS_BITMAP_KEY
           )
-        }
 
-        if (shouldDrawAmPm) {
           drawText(
-            compCanvas,
+            canvas,
             bounds,
-            getAmPm(zonedDateTime).uppercase(),
-            secondPaint,
+            zonedDateTime.minute.toString().padStart(2, '0'),
+            minutePaint,
             1f,
-            ampmOffsetX,
-            24f,
-            5f,
-            AMPM_BITMAP_KEY,
+            timeOffsetX,
+            minuteOffsetY,
+            timeTextSize,
+            MINUTES_BITMAP_KEY
           )
-        }
 
-        when (watchFaceData.secondsStyle.id) {
-          SecondsStyle.DASHES.id -> {
-            drawDashes(compCanvas, bounds, zonedDateTime)
+          if (shouldDrawSeconds) {
+            drawText(
+              compCanvas,
+              bounds,
+              if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString()
+                .padStart(2, '0'),
+              secondPaint,
+              1f,
+              secondsOffsetX,
+              secondsOffsetY,
+              secondsTextSize,
+              SECONDS_BITMAP_KEY,
+            )
           }
 
-          SecondsStyle.DOTS.id -> {
-            drawDots(compCanvas, bounds, zonedDateTime)
+          if (shouldDrawAmPm) {
+            drawText(
+              compCanvas,
+              bounds,
+              getAmPm(zonedDateTime).uppercase(),
+              secondPaint,
+              1f,
+              ampmOffsetX,
+              24f,
+              5f,
+              AMPM_BITMAP_KEY,
+            )
           }
-        }
+
+          when (watchFaceData.secondsStyle.id) {
+            SecondsStyle.DASHES.id -> {
+              drawDashes(compCanvas, bounds, zonedDateTime)
+            }
+
+            SecondsStyle.DOTS.id -> {
+              drawDots(compCanvas, bounds, zonedDateTime)
+            }
+          }
 
         }
 
         if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
           (watchFaceData.detailedAmbient || drawProperties.timeScale != 0f)
-          ) {
+        ) {
           drawComplications(compCanvas, zonedDateTime)
         }
 
-        val opacity = if (watchFaceData.detailedAmbient) interpolate(.5f, 1f) else interpolate(0f, 1f)
+        val scale = if (isAmbient) .75f else 1f
+//        val scale = interpolate(.75f, 1f) // TODO scaling opacity looks weird due to automatic brightness kicking in
+        val opacity = if (watchFaceData.detailedAmbient) scale else interpolate(0f, 1f)
 
         canvas.drawBitmap(
           compBmp,
