@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toRectF
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import androidx.wear.watchface.CanvasComplication
@@ -38,18 +39,18 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
       textPaint.color = tertiaryColor
     }
 
-  var opacity: Float = 1f
-    set(opacity) {
-      field = opacity
+//  var opacity: Float = 1f
+//    set(opacity) {
+//      field = opacity
+//
+//      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, 1f)
+//
+//      textPaint.color = color
+//    }
 
-      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, opacity)
+//  var offsetX: Float = 0f
 
-      textPaint.color = color
-    }
-
-  var offsetX: Float = 0f
-
-  var scale: Float = 0f
+//  var scale: Float = 0f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -79,21 +80,24 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
       else -> return
     }
 
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+//    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      renderDebug(canvas, bounds.toRectF())
+
       canvas.drawBitmap(
         bitmap,
-        bounds.left + offsetX,
+        bounds.left.toFloat(),
         bounds.top.toFloat(),
         Paint(),
+//        Paint().apply { alpha = (opacity * 255).toInt() },
       )
-    }
+//    }
   }
 
   private fun drawShortTextComplication(
     bounds: Rect,
     data: ShortTextComplicationData
   ): Bitmap {
-    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${opacity},${debug}"
+    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${debug}"
 
     val cached = bitmapCache.get(hash)
     if (cached != null) {
@@ -108,8 +112,6 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
     val rect = Rect(0, 0, bitmap.width, bitmap.height)
 
     renderShortTextComplication(bitmapCanvas, rect, data)
-
-    renderDebug(bitmapCanvas, rect)
 
     bitmapCache.set(hash, bitmap)
 
@@ -152,15 +154,15 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
     )
   }
 
-  private fun renderDebug(canvas: Canvas, bounds: Rect) {
+  private fun renderDebug(canvas: Canvas, bounds: RectF) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
-        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
+        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
         style = Paint.Style.STROKE
         strokeWidth = 2f
       })
       val p2 = Paint()
-      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
+      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
       p2.typeface = context.resources.getFont(R.font.m8stealth57)
       p2.textSize = 8f
       canvas.drawText(

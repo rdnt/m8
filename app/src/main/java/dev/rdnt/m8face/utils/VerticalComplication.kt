@@ -33,22 +33,22 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       prefixPaint.alpha = 100
     }
 
-  var opacity: Float = 1f
-    set(opacity) {
-      field = opacity
+//  var opacity: Float = 1f
+//    set(opacity) {
+//      field = opacity
+//
+//      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, 1f)
+//      textPaint.color = color
+//      titlePaint.color = color
+//
+//      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+////      imagePaint.alpha = (opacity * 255).toInt()
+//
+//      prefixPaint.color = color
+//      prefixPaint.alpha = 100
+//    }
 
-      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, opacity)
-      textPaint.color = color
-      titlePaint.color = color
-
-      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-      imagePaint.alpha = (opacity * 255).toInt()
-
-      prefixPaint.color = color
-      prefixPaint.alpha = 100
-    }
-
-  var scale: Float = 1f
+//  var scale: Float = 1f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -110,21 +110,24 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       else -> return
     }
 
-    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+//    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
+      renderDebug(canvas, bounds)
+
       canvas.drawBitmap(
         bitmap,
         bounds.left.toFloat(),
         bounds.top.toFloat(),
         Paint(),
+//        Paint().apply { alpha = (opacity * 255).toInt() },
       )
-    }
+//    }
   }
 
   private fun drawShortTextComplication(
     bounds: Rect,
     data: ShortTextComplicationData
   ): Bitmap {
-    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${opacity},${debug}"
+    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${debug}"
 
     val cached = bitmapCache.get(hash)
     if (cached != null) {
@@ -140,8 +143,6 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
 
     renderShortTextComplication(bitmapCanvas, rect, data)
 
-    renderDebug(bitmapCanvas, rect)
-
     bitmapCache.set(hash, bitmap)
 
     return bitmap
@@ -151,7 +152,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     bounds: Rect,
     data: MonochromaticImageComplicationData
   ): Bitmap {
-    val hash = "${bounds},${data.monochromaticImage.image.resId},${tertiaryColor},${opacity},${debug}"
+    val hash = "${bounds},${data.monochromaticImage.image.resId},${tertiaryColor},${debug}"
 
     val cached = bitmapCache.get(hash)
     if (cached != null) {
@@ -178,7 +179,7 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
     bounds: Rect,
     data: SmallImageComplicationData
   ): Bitmap {
-    val hash = "${bounds},${data.smallImage.image.resId},${tertiaryColor},${opacity},${debug}"
+    val hash = "${bounds},${data.smallImage.image.resId},${tertiaryColor},${debug}"
 
     val cached = bitmapCache.get(hash)
     if (cached != null) {
@@ -204,12 +205,12 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
   private fun renderDebug(canvas: Canvas, bounds: Rect) {
     if (debug) {
       canvas.drawRect(bounds, Paint().apply {
-        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
+        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
         style = Paint.Style.STROKE
         strokeWidth = 2f
       })
       val p2 = Paint()
-      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), opacity)
+      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
       p2.typeface = context.resources.getFont(R.font.m8stealth57)
       p2.textSize = 8f
       canvas.drawText(
