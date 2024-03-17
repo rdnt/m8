@@ -266,7 +266,7 @@ class WatchCanvasRenderer(
         drawProperties, DrawProperties.TIME_SCALE, 0f, 1.0f
       ).apply {
         duration = ambientTransitionMs
-        setAutoCancel(true)
+//        setAutoCancel(true)
         doOnStart {
           interactiveDrawModeUpdateDelayMillis = 16
         }
@@ -295,7 +295,7 @@ class WatchCanvasRenderer(
     play(
       ObjectAnimator.ofPropertyValuesHolder(drawProperties, propertyValuesHolder).apply {
         duration = ambientTransitionMs
-        setAutoCancel(true)
+//        setAutoCancel(true)
         doOnStart {
           interactiveDrawModeUpdateDelayMillis = 16 // TODO: consider 33 for better battery life
         }
@@ -321,8 +321,8 @@ class WatchCanvasRenderer(
         if (!watchState.isHeadless) {
           if (isAmbient) {
 
-            ambientExitAnimator.cancel()
             ambientEnterAnimator.cancel()
+            ambientExitAnimator.cancel()
 
             ambientEnterAnimator.setupStartValues()
             ambientEnterAnimator.start()
