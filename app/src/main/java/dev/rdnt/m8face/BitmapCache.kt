@@ -7,8 +7,18 @@ const val MINUTES_BITMAP_KEY = "minutes"
 const val SECONDS_BITMAP_KEY = "seconds"
 const val AMPM_BITMAP_KEY = "ampm"
 
+const val TIME_BITMAP_KEY = "time"
+const val AUX_BITMAP_KEY = "aux"
+
 class BitmapCache {
   private val entries: MutableMap<String, BitmapCacheEntry> = mutableMapOf()
+
+  override fun toString(): String {
+    //loop entries
+    var result = ""
+    entries.forEach { (k, v) -> result += "{$k: $v} " }
+    return "(entries= $result)"
+  }
 
   fun get(k: String, h: String): Bitmap? {
     return entries[k]?.get(h)
@@ -33,6 +43,10 @@ class BitmapCacheEntry {
   var loads: Int = 1
   private var hash: String = ""
   private var bitmap: Bitmap? = null
+
+  override fun toString(): String {
+    return "(renders=$renders, loads=$loads)"
+  }
 
   fun get(h: String): Bitmap? {
     loads++

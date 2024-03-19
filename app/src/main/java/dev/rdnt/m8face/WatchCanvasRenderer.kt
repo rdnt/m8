@@ -27,9 +27,11 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.FloatProperty
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
+import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.graphics.ColorUtils
@@ -64,6 +66,7 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.system.measureNanoTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -192,7 +195,17 @@ class WatchCanvasRenderer(
   private val secondPaint = Paint().apply {
     isAntiAlias = true // make sure text is not anti-aliased even with this on
     typeface = context.resources.getFont(R.font.m8stealth57)
-    textSize = 112f / 14f
+    color = watchFaceColors.tertiaryColor
+    textSize = when (watchFaceData.layoutStyle.id) {
+      LayoutStyle.SPORT.id -> 56f
+      else -> 48f
+    }
+  }
+
+  private val ampmPaint = Paint().apply {
+    isAntiAlias = true // make sure text is not anti-aliased even with this on
+    typeface = context.resources.getFont(R.font.m8stealth57)
+    textSize = 112f / 14f * 5f
     color = watchFaceColors.tertiaryColor
   }
 
@@ -248,7 +261,7 @@ class WatchCanvasRenderer(
 
   private var debug: Boolean = watchFaceData.debug
 
-  private val ambientTransitionMs = 1000L
+  private val ambientTransitionMs = 750L
   private var drawProperties = DrawProperties()
   private var isHeadless = false
   private var isAmbient = false
@@ -266,16 +279,31 @@ class WatchCanvasRenderer(
         drawProperties, DrawProperties.TIME_SCALE, 0f, 1.0f
       ).apply {
         duration = ambientTransitionMs
-//        setAutoCancel(true)
+        setAutoCancel(true)
         doOnStart {
-          interactiveDrawModeUpdateDelayMillis = 16
+          Log.d("@@@", "AMBIENT -> INTERACTIVE START")
+//          interactiveDrawModeUpdateDelayMillis = 16
+//          animating = true
+        }
+        doOnCancel {
+//          animationCanceled = true
         }
         doOnEnd {
-          interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
+          if (!animationCanceled) {
+            Log.d("@@@", "AMBIENT -> INTERACTIVE END")
+            interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
+            animating = false
+            animationCanceled = false
+          } else {
+            Log.d("@@@", "AMBIENT -> INTERACTIVE CANCEL")
+          }
         }
       },
     )
   }
+
+  private var animating: Boolean = false
+  private var animationCanceled: Boolean = false
 
   private val ambientEnterAnimator = AnimatorSet().apply {
     interpolator = AnimationUtils.loadInterpolator(
@@ -297,16 +325,30 @@ class WatchCanvasRenderer(
         duration = ambientTransitionMs
 //        setAutoCancel(true)
         doOnStart {
-          interactiveDrawModeUpdateDelayMillis = 16 // TODO: consider 33 for better battery life
+//          interactiveDrawModeUpdateDelayMillis = 16 // TODO: consider 33 for better battery life
+//          animating = true
+          Log.d("@@@", "INTERACTIVE -> AMBIENT START")
+        }
+        doOnCancel {
+//          animationCanceled = true
         }
         doOnEnd {
-          interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
+          if (!animationCanceled) {
+            interactiveDrawModeUpdateDelayMillis = 60000
+            animating = false
+            Log.d("@@@", "INTERACTIVE -> AMBIENT END")
+            animationCanceled = false
+          } else {
+            Log.d("@@@", "INTERACTIVE -> AMBIENT CANCEL")
+          }
         }
       },
     )
   }
 
   init {
+    preloadBitmaps()
+
     scope.launch {
       currentUserStyleRepository.userStyle.collect { userStyle ->
         updateWatchFaceData(userStyle)
@@ -319,18 +361,28 @@ class WatchCanvasRenderer(
         isAmbient = ambient!!
 
         if (!watchState.isHeadless) {
+          animating = true
           if (isAmbient) {
+            animationCanceled = true
 
             ambientEnterAnimator.cancel()
             ambientExitAnimator.cancel()
 
+            interactiveDrawModeUpdateDelayMillis = 16
+
+            animationCanceled = false
             ambientEnterAnimator.setupStartValues()
+//            drawProperties.timeScale = 0f
             ambientEnterAnimator.start()
           } else {
+            animationCanceled = true
 
             ambientExitAnimator.cancel()
             ambientEnterAnimator.cancel()
 
+            interactiveDrawModeUpdateDelayMillis = 16
+
+            animationCanceled = false
             ambientExitAnimator.setupStartValues()
             ambientExitAnimator.start()
           }
@@ -463,6 +515,12 @@ class WatchCanvasRenderer(
       ambientMinutePaint.color = watchFaceColors.secondaryColor
 
       secondPaint.color = watchFaceColors.tertiaryColor
+      secondPaint.textSize = when (watchFaceData.layoutStyle.id) {
+        LayoutStyle.SPORT.id -> 56f
+        else -> 48f
+      }
+
+      ampmPaint.color = watchFaceColors.tertiaryColor
 
       batteryPaint.color = watchFaceColors.tertiaryColor
       batteryIconPaint.color = watchFaceColors.tertiaryColor
@@ -543,6 +601,190 @@ class WatchCanvasRenderer(
           else -> {}
         }
       }
+
+      preloadBitmaps()
+    }
+  }
+
+  private fun preloadBitmaps() {
+    val canvas = Canvas()
+    preloadHourBitmaps(canvas)
+    preloadMinuteBitmaps(canvas)
+    preloadSecondBitmaps(canvas)
+    preloadAmPmBitmaps(canvas)
+  }
+
+  private fun preloadHourBitmaps(canvas: Canvas) {
+
+    val text14 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 144f
+    }
+
+    val paint = Paint(text14).apply {
+      color = watchFaceColors.primaryColor
+    }
+
+    for (i in 0..23) {
+      val text = i.toString().padStart(2, '0')
+
+      var textBounds = Rect()
+      paint.getTextBounds(text, 0, text.length, textBounds)
+      textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+      val bmp = Bitmap.createBitmap(
+        textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
+      )
+
+      canvas.setBitmap(bmp)
+
+      canvas.drawText(
+        text,
+        0f,
+        textBounds.height().toFloat(),
+        paint,
+      )
+
+      val cacheKey = "hour_$text"
+
+      bitmapCache.set(cacheKey, "", bmp)
+    }
+  }
+
+  private fun preloadMinuteBitmaps(canvas: Canvas) {
+    val text14 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 144f
+    }
+
+    val paint = Paint(text14).apply {
+      color = watchFaceColors.secondaryColor
+    }
+
+    for (i in 0..59) {
+      val text = i.toString().padStart(2, '0')
+
+      var textBounds = Rect()
+      paint.getTextBounds(text, 0, text.length, textBounds)
+      textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+      val bmp = Bitmap.createBitmap(
+        textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
+      )
+
+      canvas.setBitmap(bmp)
+
+      canvas.drawText(
+        text,
+        0f,
+        textBounds.height().toFloat(),
+        paint,
+      )
+
+      val cacheKey = "minute_$text"
+
+      bitmapCache.set(cacheKey, "", bmp)
+    }
+  }
+
+  private fun preloadSecondBitmaps(canvas: Canvas) {
+    val text14 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 56f
+    }
+
+    val paint = Paint(text14).apply {
+      color = watchFaceColors.tertiaryColor
+    }
+
+    for (i in 0..60) {
+      val text = if (i == 60) "M8" else i.toString().padStart(2, '0')
+
+      var textBounds = Rect()
+      paint.getTextBounds(text, 0, text.length, textBounds)
+      textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+      val bmp = Bitmap.createBitmap(
+        textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
+      )
+
+      canvas.setBitmap(bmp)
+
+      canvas.drawText(
+        text,
+        0f,
+        textBounds.height().toFloat(),
+        paint,
+      )
+
+      val cacheKey = "second_$text"
+
+      bitmapCache.set(cacheKey, "", bmp)
+    }
+  }
+
+  private fun preloadAmPmBitmaps(canvas: Canvas) {
+    val text14 = Paint(hourPaint).apply {
+      isAntiAlias = false
+      typeface = context.resources.getFont(R.font.m8stealth57)
+      textSize = 40f
+    }
+
+    val paint = Paint(text14).apply {
+      color = watchFaceColors.tertiaryColor
+    }
+
+
+    if (true) {
+      val text = "AM"
+
+      var textBounds = Rect()
+      paint.getTextBounds(text, 0, text.length, textBounds)
+      textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+      val bmp = Bitmap.createBitmap(
+        textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
+      )
+
+      canvas.setBitmap(bmp)
+
+      canvas.drawText(
+        text,
+        0f,
+        textBounds.height().toFloat(),
+        paint,
+      )
+
+      val cacheKey = "ampm_$text"
+
+      bitmapCache.set(cacheKey, "", bmp)
+    }
+    if (true) {
+      val text = "PM"
+
+      var textBounds = Rect()
+      paint.getTextBounds(text, 0, text.length, textBounds)
+      textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
+
+      val bmp = Bitmap.createBitmap(
+        textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
+      )
+
+      canvas.setBitmap(bmp)
+
+      canvas.drawText(
+        text,
+        0f,
+        textBounds.height().toFloat(),
+        paint,
+      )
+
+      val cacheKey = "ampm_$text"
+
+      bitmapCache.set(cacheKey, "", bmp)
     }
   }
 
@@ -780,9 +1022,11 @@ class WatchCanvasRenderer(
     get() = when (watchFaceData.layoutStyle.id) {
       LayoutStyle.SPORT.id -> {
         if (watchFaceData.detailedAmbient) {
-          95f
+//          95f
+          94f
         } else {
-          95f
+//          95f
+          94f
 //          interpolate(129f, 95f)
         }
       }
@@ -806,18 +1050,18 @@ class WatchCanvasRenderer(
 
   val ampmOffsetX: Float
     get() = if (watchFaceData.detailedAmbient) {
-      84f
+//      84f
+      83f
     } else {
-      84f
+//      84f
+      83f
 //      interpolate(84f+34f, 84f)
     }
 
   val secondsTextSize: Float
     get() = when (watchFaceData.layoutStyle.id) {
-      LayoutStyle.INFO1.id -> 6f
-      LayoutStyle.INFO3.id -> 6f
-      LayoutStyle.SPORT.id -> 7f
-      else -> 0f
+      LayoutStyle.SPORT.id -> 56f
+      else -> 48f
     }
 
 //  val secondsTextScale: Float
@@ -870,237 +1114,289 @@ class WatchCanvasRenderer(
     zonedDateTime: ZonedDateTime,
     sharedAssets: AnalogSharedAssets,
   ) {
-    frame++
+    val took = measureNanoTime {
+      frame++
 
-    canvas.drawColor(Color.parseColor("#ff000000"))
+      canvas.drawColor(Color.parseColor("#ff000000"))
 
-    if (debug) {
-      val p2 = Paint()
-      p2.color = Color.parseColor("#aaff1111")
-      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-      p2.textSize = 8f
+//      if (debug) {
+//        val p2 = Paint()
+//        p2.color = Color.parseColor("#aaff1111")
+//        p2.typeface = context.resources.getFont(R.font.m8stealth57)
+//        p2.textSize = 8f
+//
+//        val text = "f $frame s ${"%.2f".format(drawProperties.timeScale)}"
+//
+//        val textBounds = Rect()
+//        p2.getTextBounds(text, 0, text.length, textBounds)
+//
+//        canvas.drawText(
+//          text,
+//          192f - textBounds.width() / 2,
+//          192f + textBounds.height() / 2,
+//          p2,
+//        )
+//      }
 
-      val text = "f $frame s ${"%.2f".format(drawProperties.timeScale)}"
-
-      val textBounds = Rect()
-      p2.getTextBounds(text, 0, text.length, textBounds)
-
-      canvas.drawText(
-        text,
-        192f - textBounds.width() / 2,
-        192f + textBounds.height() / 2,
-        p2,
-      )
-    }
-
-    var offsetX =
-      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
-        35f/14f*18f,
-        0f
-      ) else 0f
+      var offsetX =
+        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
+          35f / 14f * 18f,
+          0f
+        ) else 0f
 //    val offsetX = 0f
 
-    val text14 = Paint(hourPaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57)
-      textSize = 144f
-    }
-
-    val text16 = Paint(hourPaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57thin)
-      textSize = 9f
-    }
-
-    val text18 = Paint(hourPaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57thick)
-      textSize = 9f
-    }
-
-    val hourText = when  {
-      (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
-        Paint(text16)
+      val text14 = Paint(hourPaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57)
+        textSize = 144f
       }
-      (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
-        Paint(text18)
+
+      val text16 = Paint(hourPaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57thin)
+        textSize = 9f
       }
-      else -> {
-        Paint(text14)
+
+      val text18 = Paint(hourPaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57thick)
+        textSize = 9f
       }
-    }
 
-    val minuteText14 = Paint(minutePaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57)
-      textSize = 144f
-    }
+      val hourText = when {
+        (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
+          Paint(text16)
+        }
 
-    val minuteText16 = Paint(minutePaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57thin)
-      textSize = 9f
-    }
+        (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
+          Paint(text18)
+        }
 
-    val minuteText18 = Paint(minutePaint).apply {
-      isAntiAlias = false
-      typeface = context.resources.getFont(R.font.m8stealth57thick)
-      textSize = 9f
-    }
-
-
-    val minuteText = when  {
-      (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
-        Paint(minuteText16)
+        else -> {
+          Paint(text14)
+        }
       }
-      (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
-        Paint(minuteText18)
-      }
-      else -> {
-        Paint(minuteText14)
-      }
-    }
 
-      canvas.withScale(timeTextScaleThick, timeTextScaleThick, bounds.exactCenterX(), bounds.exactCenterY()) {
+      val minuteText14 = Paint(minutePaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57)
+        textSize = 144f
+      }
+
+      val minuteText16 = Paint(minutePaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57thin)
+        textSize = 9f
+      }
+
+      val minuteText18 = Paint(minutePaint).apply {
+        isAntiAlias = false
+        typeface = context.resources.getFont(R.font.m8stealth57thick)
+        textSize = 9f
+      }
+
+
+      val minuteText = when {
+        (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
+          Paint(minuteText16)
+        }
+
+        (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
+          Paint(minuteText18)
+        }
+
+        else -> {
+          Paint(minuteText14)
+        }
+      }
+
+      canvas.withScale(
+        timeTextScaleThick,
+        timeTextScaleThick,
+        bounds.exactCenterX(),
+        bounds.exactCenterY()
+      ) {
 
         canvas.withTranslation(offsetX, 0f) {
-        if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-          drawText(
-            canvas,
-            bounds,
-            getHour(zonedDateTime).toString().padStart(2, '0'),
-            hourText,
-            1f,
-            timeOffsetXThick,
-            hourOffsetYThick,
-            1f,
-            HOURS_BITMAP_KEY
-          )
+          if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
 
-          drawText(
-            canvas,
-            bounds,
-            zonedDateTime.minute.toString().padStart(2, '0'),
-            minuteText,
-            1f,
-            timeOffsetXThick,
-            minuteOffsetYThick,
-            1f,
-            MINUTES_BITMAP_KEY
-          )
+            if (true) {
+              val hourText = getHour(zonedDateTime).toString().padStart(2, '0')
+              val cacheKey = "hour_$hourText"
+
+              val hourBmp = bitmapCache.get(cacheKey, "")!!
+
+              val hourOffsetX = timeOffsetXThick
+              val hourOffsetY = hourOffsetYThick
+
+              canvas.drawBitmap(
+                hourBmp,
+                192f - hourBmp.width / 2 + hourOffsetX,
+                192f - hourBmp.height / 2 + hourOffsetY,
+                Paint(),
+              )
+            }
+
+
+            if (true) {
+              val minuteText = zonedDateTime.minute.toString().padStart(2, '0')
+              val cacheKey = "minute_$minuteText"
+
+              val minuteBmp = bitmapCache.get(cacheKey, "")!!
+
+              val minuteOffsetX = timeOffsetXThick
+              val minuteOffsetY = minuteOffsetYThick
+
+              canvas.drawBitmap(
+                minuteBmp,
+                192f - minuteBmp.width / 2 + minuteOffsetX,
+                192f - minuteBmp.height / 2 + minuteOffsetY,
+                Paint(),
+              )
+            }
+
+//            renderTime(
+//              canvas,
+//              bounds,
+//              zonedDateTime,
+//              hourText,
+//              minuteText,
+//            )
+
+
+
+//            drawText(
+//              canvas,
+//              getHour(zonedDateTime).toString().padStart(2, '0'),
+//              hourText,
+//              timeOffsetXThick,
+//              hourOffsetYThick,
+//              HOURS_BITMAP_KEY
+//            )
+//
+//            drawText(
+//              canvas,
+//              zonedDateTime.minute.toString().padStart(2, '0'),
+//              minuteText,
+//              timeOffsetXThick,
+//              minuteOffsetYThick,
+//              MINUTES_BITMAP_KEY
+//            )
+          }
         }
       }
-    }
 
-    offsetX =
-      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
-        35f,
-        0f
-      ) else 0f
-
-
-
-    canvas.withScale(timeTextScale, timeTextScale, bounds.exactCenterX(), bounds.exactCenterY()) {
-      canvas.withTranslation(offsetX, 0f) {
-
-        val compBmp = Bitmap.createBitmap(
-          bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-        )
-
-        val compCanvas = Canvas(compBmp)
-
-        if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
-//          drawText(
-//            canvas,
-//            bounds,
-//            getHour(zonedDateTime).toString().padStart(2, '0'),
-//            hourPaint,
-//            1f,
-//            timeOffsetX,
-//            hourOffsetY,
-//            timeTextSize,
-//            HOURS_BITMAP_KEY
-//          )
+      offsetX =
+        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
+          35f,
+          0f
+        ) else 0f
 
 
 
-//          drawText(
-//            canvas,
-//            bounds,
-//            zonedDateTime.minute.toString().padStart(2, '0'),
-//            minutePaint,
-//            1f,
-//            timeOffsetX,
-//            minuteOffsetY,
-//            timeTextSize,
-//            MINUTES_BITMAP_KEY
-//          )
+      canvas.withScale(timeTextScale, timeTextScale, bounds.exactCenterX(), bounds.exactCenterY()) {
+        canvas.withTranslation(offsetX, 0f) {
 
-          if (shouldDrawSeconds) {
-            drawText(
-              compCanvas,
-              bounds,
-              if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString()
-                .padStart(2, '0'),
-              secondPaint,
-              1f,
-              secondsOffsetX,
-              secondsOffsetY,
-              secondsTextSize,
-              SECONDS_BITMAP_KEY,
-            )
-          }
+          val compBmp = Bitmap.createBitmap(
+            bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+          )
 
-          if (shouldDrawAmPm) {
-            drawText(
-              compCanvas,
-              bounds,
-              getAmPm(zonedDateTime).uppercase(),
-              secondPaint,
-              1f,
-              ampmOffsetX,
-              24f,
-              5f,
-              AMPM_BITMAP_KEY,
-            )
-          }
+          val compCanvas = Canvas(compBmp)
 
-          when (watchFaceData.secondsStyle.id) {
-            SecondsStyle.DASHES.id -> {
-              drawDashes(compCanvas, bounds, zonedDateTime)
+          if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
+            if (shouldDrawSeconds) {
+                val secondText = if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString().padStart(2, '0')
+                val cacheKey = "second_$secondText"
+
+                val secondBmp = bitmapCache.get(cacheKey, "")!!
+
+                compCanvas.drawBitmap(
+                  secondBmp,
+                  192f - secondBmp.width / 2 + secondsOffsetX,
+                  192f - secondBmp.height / 2 + secondsOffsetY,
+                  Paint(),
+                )
+
+
+
+
+//              drawText(
+//                compCanvas,
+//                bounds,
+//                if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString()
+//                  .padStart(2, '0'),
+//                secondPaint,
+//                secondsOffsetX,
+//                secondsOffsetY,
+//                SECONDS_BITMAP_KEY,
+//              )
             }
 
-            SecondsStyle.DOTS.id -> {
-              drawDots(compCanvas, bounds, zonedDateTime)
+            if (shouldDrawAmPm) {
+              val ampmText = getAmPm(zonedDateTime).uppercase()
+              val cacheKey = "ampm_$ampmText"
+
+              val ampmBmp = bitmapCache.get(cacheKey, "")!!
+
+              compCanvas.drawBitmap(
+                ampmBmp,
+                192f - ampmBmp.width / 2 + ampmOffsetX,
+                192f - ampmBmp.height / 2 + 24f,
+                Paint(),
+              )
+
+//              drawText(
+//                compCanvas,
+//                bounds,
+//                getAmPm(zonedDateTime).uppercase(),
+//                ampmPaint,
+//                ampmOffsetX,
+//                24f,
+//                AMPM_BITMAP_KEY,
+//              )
             }
+
+            when (watchFaceData.secondsStyle.id) {
+              SecondsStyle.DASHES.id -> {
+                drawDashes(compCanvas, bounds, zonedDateTime)
+              }
+
+              SecondsStyle.DOTS.id -> {
+                drawDots(compCanvas, bounds, zonedDateTime)
+              }
+            }
+
           }
 
-        }
+          if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
+            (watchFaceData.detailedAmbient || drawProperties.timeScale != 0f)
+          ) {
+            drawComplications(compCanvas, zonedDateTime)
+          }
 
-        if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
-          (watchFaceData.detailedAmbient || drawProperties.timeScale != 0f)
-        ) {
-          drawComplications(compCanvas, zonedDateTime)
-        }
-
-        val scale = if (isAmbient) .75f else 1f
+          val scale = if (isAmbient) .75f else 1f
 //        val scale = interpolate(.75f, 1f) // TODO scaling opacity looks weird due to automatic brightness kicking in
-        val opacity = if (watchFaceData.detailedAmbient) scale else interpolate(0f, 1f)
+          val opacity = if (watchFaceData.detailedAmbient) scale else interpolate(0f, 1f)
 
-        canvas.drawBitmap(
-          compBmp,
-          bounds.left.toFloat(),
-          bounds.top.toFloat(),
-          Paint().apply { alpha = (opacity * 255).toInt() },
-        )
+          canvas.drawBitmap(
+            compBmp,
+            bounds.left.toFloat(),
+            bounds.top.toFloat(),
+            Paint().apply { alpha = (opacity * 255).toInt() },
+          )
 
+        }
       }
+
     }
 
+    if (debug) {
+      Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, $bitmapCache")
+    }
   }
 
   override fun shouldAnimate(): Boolean {
-    return super.shouldAnimate() || ambientEnterAnimator.isRunning || ambientExitAnimator.isRunning
+    return super.shouldAnimate() || animating
   }
 
   // ----- All drawing functions -----
@@ -1152,91 +1448,185 @@ class WatchCanvasRenderer(
     }
   }
 
+  private fun renderTime(
+    canvas: Canvas,
+    bounds: Rect,
+    zonedDateTime: ZonedDateTime,
+    hourPaint: Paint,
+    minutePaint: Paint,
+  ) {
+    val hourText = getHour(zonedDateTime).toString().padStart(2, '0')
+    val hourHash = "$hourText,${hourPaint.textSize},${hourPaint.color},$debug"
+
+    val minuteText = zonedDateTime.minute.toString().padStart(2, '0')
+    val minuteHash = "$minuteText,${minutePaint.textSize},${minutePaint.color},$debug"
+
+//    val timeHash = "$hourHash,$minuteHash"
+//
+//    val cached = bitmapCache.get(TIME_BITMAP_KEY, timeHash)
+//    if (cached != null) {
+//      return cached
+//    }
+
+//    val timeBmp = Bitmap.createBitmap(
+//      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+//    )
+//
+//    val timeCanvas = Canvas(timeBmp)
+
+    drawText2(
+      canvas,
+      bounds,
+      hourText,
+      hourPaint,
+      timeOffsetXThick,
+      hourOffsetYThick,
+      hourHash,
+      HOURS_BITMAP_KEY
+    )
+
+
+    drawText2(
+      canvas,
+      bounds,
+      minuteText,
+      minutePaint,
+      timeOffsetXThick,
+      minuteOffsetYThick,
+      minuteHash,
+      MINUTES_BITMAP_KEY
+    )
+
+//    if (debug) {
+//      canvas.drawRect(bounds, Paint().apply {
+//        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
+//        style = Paint.Style.STROKE
+//        strokeWidth = 2f
+//      })
+//      val p2 = Paint()
+//      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
+//      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+//      p2.textSize = 8f
+//      canvas.drawText(
+//        "r ${bitmapCache.loads(TIME_BITMAP_KEY)}",
+//        3f,
+//        bounds.height().toFloat()/2 - 7f,
+//        p2,
+//      )
+//
+//      canvas.drawText(
+//        "w ${bitmapCache.renders(TIME_BITMAP_KEY)}",
+//        3f,
+//        bounds.height().toFloat()/2 + 8f,
+//        p2,
+//      )
+//    }
+
+//    bitmapCache.set(TIME_BITMAP_KEY, timeHash, timeBmp)
+
+//    return canvas
+  }
+
   private fun drawText(
     canvas: Canvas,
     bounds: Rect,
     text: String,
     paint: Paint,
-    opacity: Float,
     offsetX: Float,
     offsetY: Float,
-    textSize: Float,
     cacheKey: String,
   ) {
-    val bitmap = renderText(text, paint, textSize, paint.color, cacheKey)
+    val hash = "${text},${paint.textSize},${paint.color},${debug}"
+
+    val bitmap = renderText(canvas, bounds, text, paint, cacheKey, hash)
 
     canvas.drawBitmap(
       bitmap,
       192f - bitmap.width / 2 + offsetX,
       192f - bitmap.height / 2 + offsetY,
-      Paint().apply {
-        alpha = (opacity * 255).toInt()
-      },
+      Paint(),
+    )
+  }
+
+  private fun drawText2(
+    canvas: Canvas,
+    bounds: Rect,
+    text: String,
+    paint: Paint,
+    offsetX: Float,
+    offsetY: Float,
+    hash: String,
+    cacheKey: String,
+  ) {
+    val bitmap = renderText(canvas, bounds, text, paint, cacheKey, hash)
+
+    canvas.drawBitmap(
+      bitmap,
+      192f - bitmap.width / 2 + offsetX,
+      192f - bitmap.height / 2 + offsetY,
+      Paint(),
     )
   }
 
   private fun renderText(
+    canvas: Canvas,
+    bounds: Rect,
     text: String,
     paint: Paint,
-    textSize: Float,
-    color: Int,
+    cacheHash: String,
     cacheKey: String,
   ): Bitmap {
-    val hash = "${text},${textSize},${color},${debug}"
-
-//    val cached = bitmapCache.get(cacheKey, hash)
-//    if (cached != null) {
-//      return cached
+//    if (debug) {
+//      canvas.drawRect(bounds, Paint().apply {
+//        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
+//        style = Paint.Style.STROKE
+//        strokeWidth = 2f
+//      })
+//      val p2 = Paint()
+//      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
+//      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+//      p2.textSize = 8f
+//      canvas.drawText(
+//        "r ${bitmapCache.loads(cacheKey)}",
+//        3f,
+//        bounds.height().toFloat() - 12f,
+//        p2,
+//      )
+//
+//      canvas.drawText(
+//        "w ${bitmapCache.renders(cacheKey)}",
+//        3f,
+//        bounds.height().toFloat() - 3f,
+//        p2,
+//      )
 //    }
 
+    val cached = bitmapCache.get(cacheKey, cacheHash)
+    if (cached != null) {
+      return cached
+    }
+
     val p = Paint(paint)
-    p.textSize *= textSize
-    p.color = color
 
-    val textBounds = Rect()
+    var textBounds = Rect()
     p.getTextBounds(text, 0, text.length, textBounds)
-    val bounds = Rect(0, 0, textBounds.width(), textBounds.height())
+    textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
 
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    val bmp = Bitmap.createBitmap(
+      textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
     )
-    val canvas = Canvas(bitmap)
+    val bmpCanvas = Canvas(bmp)
 
-    canvas.drawText(
+    bmpCanvas.drawText(
       text,
       0f,
-      bounds.height().toFloat(),
+      textBounds.height().toFloat(),
       p,
     )
 
-    if (debug) {
-      canvas.drawRect(bounds, Paint().apply {
-        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-        style = Paint.Style.STROKE
-        strokeWidth = 2f
-      })
-      val p2 = Paint()
-      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-      p2.textSize = 8f
-      canvas.drawText(
-        "r ${bitmapCache.loads(cacheKey)}",
-        3f,
-        bounds.height().toFloat() - 12f,
-        p2,
-      )
+    bitmapCache.set(cacheKey, cacheHash, bmp)
 
-      canvas.drawText(
-        "w ${bitmapCache.renders(cacheKey)}",
-        3f,
-        bounds.height().toFloat() - 3f,
-        p2,
-      )
-    }
-
-    bitmapCache.set(cacheKey, hash, bitmap)
-
-    return bitmap
+    return bmp
   }
 
   private fun drawDashes(
