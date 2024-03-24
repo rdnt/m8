@@ -1081,10 +1081,18 @@ class WatchCanvasRenderer(
       }
 
       else -> {
-        if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) {
-          14f / 14f
-        } else {
-          interpolate(if (watchFaceData.ambientStyle == AmbientStyle.BIG_OUTLINE || watchFaceData.ambientStyle == AmbientStyle.BIG_BOLD_OUTLINE || watchFaceData.ambientStyle == AmbientStyle.BIG_FILLED) 18f / 14f else 16f / 14f, 14f / 14f)
+        when(watchFaceData.ambientStyle) {
+          AmbientStyle.BIG_OUTLINE, AmbientStyle.BIG_BOLD_OUTLINE, AmbientStyle.BIG_FILLED -> {
+//            interpolate(18f / 14f, 14f / 14f)
+            interpolate(16f / 14f, 14f / 14f)
+          }
+
+          AmbientStyle.DETAILED -> 14f / 14f
+
+          else -> {
+//            interpolate(16f / 14f, 14f / 14f)
+            interpolate(15f / 14f, 14f / 14f)
+          }
         }
       }
     }
