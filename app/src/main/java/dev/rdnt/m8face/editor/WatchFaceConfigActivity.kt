@@ -347,8 +347,6 @@ fun WatchfaceConfigApp(
           val secondsStyleIndex =
             secondsStyles.indexOfFirst { it.id == state.userStylesAndPreview.secondsStyleId }
           val militaryTimeEnabled = state.userStylesAndPreview.militaryTime
-          val bigAmbientEnabled = state.userStylesAndPreview.bigAmbient
-          val detailedAmbientEnabled = state.userStylesAndPreview.detailedAmbient
 //          val debugEnabled = state.userStylesAndPreview.debug
 
           Box(
@@ -369,8 +367,6 @@ fun WatchfaceConfigApp(
               ambientStyleIndex,
               secondsStyleIndex,
               militaryTimeEnabled,
-              bigAmbientEnabled,
-              detailedAmbientEnabled,
             )
           }
         }
@@ -404,12 +400,10 @@ fun ConfigScaffold(
   ambientStyleIndex: Int,
   secondsStyleIndex: Int,
   militaryTimeEnabled: Boolean,
-  bigAmbientEnabled: Boolean,
-  detailedAmbientEnabled: Boolean,
 ) {
   Log.d(
     "Editor",
-    "ConfigScaffold($layoutIndex, $colorIndex, $ambientStyleIndex, $militaryTimeEnabled, $bigAmbientEnabled)"
+    "ConfigScaffold($layoutIndex, $colorIndex, $ambientStyleIndex, $militaryTimeEnabled)"
   )
 
   val pagerState = rememberPagerState(
@@ -464,7 +458,7 @@ fun ConfigScaffold(
         2 -> SecondsStyleSelect(focusRequester2, stateHolder, secondsStyles, secondsStyleIndex)
         3 -> AmbientStyleSelect(focusRequester3, stateHolder, ambientStyles, ambientStyleIndex)
         4 -> ComplicationPicker(stateHolder, layoutIndex)
-        5 -> Options(stateHolder, militaryTimeEnabled, bigAmbientEnabled, detailedAmbientEnabled)
+        5 -> Options(stateHolder, militaryTimeEnabled)
       }
     }
 
@@ -475,66 +469,67 @@ fun ConfigScaffold(
         ambientStyles.indexOfFirst { it.id == (stateHolder.uiState.value as WatchFaceConfigStateHolder.EditWatchFaceUiState.Success).userStylesAndPreview.ambientStyleId }
 
 
-      if (current == 0) {
-        if (!militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_outline
-        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_outline_military
-        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_outline_big
-        } else if (militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_outline_military_big
-        }
-      } else if (current == 1) {
-        if (!militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_bold
-        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_bold_military
-        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_bold_big
-        } else if (militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_bold_military_big
-        }
-      } else if (current == 2) {
-        if (!militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_filled
-        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_filled_military
-        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_filled_big
-        } else if (militaryTimeEnabled && bigAmbientEnabled) {
-          id = R.drawable.preview_ambient_filled_military_big
-        }
-      }
-
-      Image(
-        painterResource(id = id),
-        contentDescription = "Preview",
-        colorFilter = ColorFilter.tint(
-          colorResource(id = colorStyles[colorIndex].primaryColorId),
-          BlendMode.Darken
-        ),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxSize()
-            .zIndex(1f)
-            .clip(TopHalfRectShape)
-            .scale(1f)
-      )
-      Image(
-        painterResource(id = id),
-        contentDescription = "Preview",
-        colorFilter = ColorFilter.tint(
-          colorResource(id = colorStyles[colorIndex].secondaryColorId),
-          BlendMode.Darken
-        ),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxSize()
-            .zIndex(1f)
-            .clip(BottomHalfRectShape)
-            .scale(1f)
-      )
+      // TODO: @rdnt fix
+      Preview(bitmap)
+//      if (current == 0) {
+//        if (!militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_outline
+//        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_outline_military
+//        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_outline_big
+//        } else if (militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_outline_military_big
+//        }
+//      } else if (current == 1) {
+//        if (!militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_bold
+//        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_bold_military
+//        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_bold_big
+//        } else if (militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_bold_military_big
+//        }
+//      } else if (current == 2) {
+//        if (!militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_filled
+//        } else if (militaryTimeEnabled && !bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_filled_military
+//        } else if (!militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_filled_big
+//        } else if (militaryTimeEnabled && bigAmbientEnabled) {
+//          id = R.drawable.preview_ambient_filled_military_big
+//        }
+//      }
+//      Image(
+//        painterResource(id = id),
+//        contentDescription = "Preview",
+//        colorFilter = ColorFilter.tint(
+//          colorResource(id = colorStyles[colorIndex].primaryColorId),
+//          BlendMode.Darken
+//        ),
+//        contentScale = ContentScale.Crop,
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .zIndex(1f)
+//            .clip(TopHalfRectShape)
+//            .scale(1f)
+//      )
+//      Image(
+//        painterResource(id = id),
+//        contentDescription = "Preview",
+//        colorFilter = ColorFilter.tint(
+//          colorResource(id = colorStyles[colorIndex].secondaryColorId),
+//          BlendMode.Darken
+//        ),
+//        contentScale = ContentScale.Crop,
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .zIndex(1f)
+//            .clip(BottomHalfRectShape)
+//            .scale(1f)
+//      )
     } else {
       Preview(bitmap)
     }
@@ -676,8 +671,6 @@ fun Overlay(
 fun Options(
   stateHolder: WatchFaceConfigStateHolder,
   militaryTime: Boolean,
-  bigAmbient: Boolean,
-  detailedAmbient: Boolean,
 ) {
   Box(
     Modifier
@@ -720,69 +713,6 @@ fun Options(
         },
       )
 
-      ToggleChip(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(12.dp, 0.dp)
-          .height((40.dp)),
-        checked = bigAmbient,
-        colors = ToggleChipDefaults.toggleChipColors(
-          checkedStartBackgroundColor = Transparent,
-          checkedEndBackgroundColor = Transparent,
-          uncheckedStartBackgroundColor = Transparent,
-          uncheckedEndBackgroundColor = Transparent,
-        ),
-        onCheckedChange = {
-          stateHolder.setBigAmbient(it)
-        },
-        toggleControl = {
-          Switch(
-            modifier = Modifier.padding(0.dp),
-            checked = bigAmbient,
-          )
-        },
-        label = {
-          Text(
-            text = "Big Ambient",
-            fontSize = 12.sp,
-            fontWeight = Medium,
-            fontFamily = Default,
-            color = White
-          )
-        },
-      )
-
-      ToggleChip(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(12.dp, 0.dp)
-          .height((40.dp)),
-        checked = detailedAmbient,
-        colors = ToggleChipDefaults.toggleChipColors(
-          checkedStartBackgroundColor = Transparent,
-          checkedEndBackgroundColor = Transparent,
-          uncheckedStartBackgroundColor = Transparent,
-          uncheckedEndBackgroundColor = Transparent,
-        ),
-        onCheckedChange = {
-          stateHolder.setDetailedAmbient(it)
-        },
-        toggleControl = {
-          Switch(
-            modifier = Modifier.padding(0.dp),
-            checked = detailedAmbient,
-          )
-        },
-        label = {
-          Text(
-            text = "Detailed Ambient",
-            fontSize = 12.sp,
-            fontWeight = Medium,
-            fontFamily = Default,
-            color = White
-          )
-        },
-      )
     }
   }
 }

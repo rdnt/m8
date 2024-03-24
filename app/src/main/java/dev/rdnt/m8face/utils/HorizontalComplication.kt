@@ -9,7 +9,10 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
@@ -26,6 +29,7 @@ import dev.rdnt.m8face.BitmapCacheEntry
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
+import kotlin.math.max
 
 class HorizontalComplication(private val context: Context) : CanvasComplication {
   private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
@@ -100,37 +104,38 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
   ) {
     if (bounds.isEmpty) return
 
-    val bitmap: Bitmap
-
-    when (data.type) {
+    val bitmap = when (data.type) {
       ComplicationType.SHORT_TEXT -> {
-        bitmap = drawShortTextComplication(bounds, data as ShortTextComplicationData)
+        drawShortTextComplication(bounds, data as ShortTextComplicationData)
+      }
+
+      ComplicationType.NO_DATA -> {
+        val placeholder = (data as NoDataComplicationData).placeholder
+        if (placeholder != null && placeholder.type == ComplicationType.SHORT_TEXT) {
+          drawShortTextComplication(bounds, placeholder as ShortTextComplicationData)
+        } else {
+          return
+        }
       }
 
       else -> return
     }
 
-//    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-      renderDebug(canvas, bounds.toRectF())
+    renderDebug(canvas, bounds.toRectF())
 
-      canvas.drawBitmap(
-        bitmap,
-        bounds.left.toFloat(),
-        bounds.top.toFloat(),
-        Paint(),
-//        Paint().apply { alpha = (opacity * 255).toInt() },
-      )
-//    }
+    canvas.drawBitmap(
+      bitmap,
+      bounds.left.toFloat(),
+      bounds.top.toFloat(),
+      Paint(),
+    )
   }
-
 
   private fun drawShortTextComplication(
     bounds: Rect,
     data: ShortTextComplicationData
   ): Bitmap {
-    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${debug}"
-
-    val cached = bitmapCache.get(hash)
+    val cached = bitmapCache.get("")
     if (cached != null) {
       return cached
     }
@@ -144,7 +149,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
 
     renderShortTextComplication(bitmapCanvas, rect, data)
 
-    bitmapCache.set(hash, bitmap)
+    bitmapCache.set("", bitmap)
 
     return bitmap
   }
@@ -177,78 +182,30 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     val now = Instant.now()
 
     var text = data.text.getTextAt(context.resources, now).toString().uppercase()
-    if (text == "--") {
-      return
+
+    val title = data.title?.getTextAt(context.resources, now)?.toString()?.uppercase()
+    if (title != null) {
+      text = "$text $title"
     }
 
-    val isBattery =
-      data.dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
-
-    val threeDigit = isBattery
-
-    var title: String? = null
     var icon: Bitmap? = null
     var iconBounds = Rect()
+    if (title == null) {
+      val bmpSize = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.55f).toInt()
 
-    if (isBattery) {
-      val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
-      icon = drawable.toBitmap(
-        (32f / 186f * canvas.width).toInt(),
-        (32f / 186f * canvas.width).toInt()
-      )
-      iconBounds =
-        Rect(0, 0, (32f / 186f * canvas.width).toInt(), (32f / 186f * canvas.width).toInt())
-    } else if (data.monochromaticImage != null) {
-      val drawable = data.monochromaticImage!!.image.loadDrawable(context)
-      if (drawable != null) {
-        val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.55f).toInt()
-
-        icon = drawable.toBitmap(size, size)
-        iconBounds = Rect(0, 0, size, size)
-      }
-    }
-
-    var prefixLen = 0
-
-    if (threeDigit) {
-      prefixLen = 3 - text.length
-      text = text.padStart(3, ' ')
-    }
-
-    if (data.title != null && !data.title!!.isPlaceholder()) {
-      title = data.title!!.getTextAt(context.resources, now).toString().uppercase()
+      icon = data.monochromaticImage?.image?.loadDrawable(context)?.toBitmap(bmpSize, bmpSize)
+      iconBounds = Rect(0, 0, bmpSize, bmpSize)
     }
 
     textPaint.textSize = 24F / 186f * canvas.width
 
     val textBounds = Rect()
-
-    if (threeDigit) {
-      textPaint.getTextBounds("000", 0, 3, textBounds)
-    } else {
-      textPaint.getTextBounds(text, 0, text.length, textBounds)
-    }
-
-    val titleBounds = Rect()
-
-    if (title != null) {
-      titlePaint.textSize = textPaint.textSize
-      titlePaint.getTextBounds(title, 0, title.length, titleBounds)
-    }
+    textPaint.getTextBounds(text, 0, text.length, textBounds)
 
     var iconOffsetX = 0f
-    var titleOffsetX = 0f
     var textOffsetX = 0f
 
-    if (title != null) {
-      val width = titleBounds.width() + textBounds.width()
-
-      titleOffsetX = (width - titleBounds.width()).toFloat() / 2f
-      textOffsetX = (width - textBounds.width()).toFloat() / 2f
-
-      titleOffsetX += 6f / 186f * canvas.width
-      textOffsetX += 6f / 186f * canvas.width
-    } else if (icon != null) {
+    if (icon != null) {
       val width = iconBounds.width() + textBounds.width()
 
       iconOffsetX = (width - iconBounds.width()).toFloat() / 2f
@@ -256,20 +213,9 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
 
       iconOffsetX += 9f / 186f * canvas.width
       textOffsetX += 9f / 186f * canvas.width
-
-      if (isBattery) {
-        iconOffsetX = iconOffsetX.toInt().toFloat()
-      }
     }
 
-    if (title != null) {
-      canvas.drawText(
-        title,
-        bounds.exactCenterX() - titleBounds.width() / 2 - titleOffsetX,
-        bounds.exactCenterY() + titleBounds.height() / 2,
-        titlePaint
-      )
-    } else if (icon != null) {
+    if (title == null && icon != null) {
       val dstRect = RectF(
         bounds.exactCenterX() - iconBounds.width() / 2f - iconOffsetX,
         bounds.exactCenterY() - iconBounds.height() / 2f,
@@ -280,23 +226,10 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     }
 
-
-    if (prefixLen > 0) {
-      val prefix = "".padStart(prefixLen, '0')
-      prefixPaint.textSize = textPaint.textSize
-
-      canvas.drawText(
-        prefix,
-        bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
-        bounds.exactCenterY() + textBounds.height() / 2,
-        prefixPaint
-      )
-    }
-
     canvas.drawText(
       text,
       bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
-      bounds.exactCenterY() + textBounds.height() / 2,
+      bounds.exactCenterY() + textPaint.fontSpacing / 2,
       textPaint
     )
   }
@@ -320,6 +253,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     loadDrawablesAsynchronous: Boolean
   ) {
     data = complicationData
+    bitmapCache.set("", null)
   }
 }
 

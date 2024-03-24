@@ -122,14 +122,6 @@ class WatchFaceConfigStateHolder(
           militaryTimeKey = setting as UserStyleSetting.BooleanUserStyleSetting
         }
 
-        BIG_AMBIENT_SETTING -> {
-          bigAmbientKey = setting as UserStyleSetting.BooleanUserStyleSetting
-        }
-
-        DETAILED_AMBIENT_SETTING -> {
-          detailedAmbientKey = setting as UserStyleSetting.BooleanUserStyleSetting
-        }
-
         DEBUG_SETTING -> {
           debugKey = setting as UserStyleSetting.BooleanUserStyleSetting
         }
@@ -175,12 +167,6 @@ class WatchFaceConfigStateHolder(
     val militaryTime =
       userStyle[militaryTimeKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
-    val bigAmbient =
-      userStyle[bigAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
-
-    val detailedAmbient =
-      userStyle[detailedAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
-
     val debug =
       userStyle[debugKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
@@ -190,8 +176,6 @@ class WatchFaceConfigStateHolder(
       ambientStyleId = ambientStyle.id.toString(),
       secondsStyleId = secondsStyle.id.toString(),
       militaryTime = militaryTime.value,
-      bigAmbient = bigAmbient.value,
-      detailedAmbient = detailedAmbient.value,
       debug = debug.value,
       previewImage = bitmap,
     )
@@ -363,34 +347,6 @@ class WatchFaceConfigStateHolder(
     )
   }
 
-  fun setBigAmbient(enabled: Boolean) {
-    setUserStyleOption(
-      bigAmbientKey,
-      UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
-    )
-
-    if (enabled) {
-      setUserStyleOption(
-        detailedAmbientKey,
-        UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(false)
-      )
-    }
-  }
-
-  fun setDetailedAmbient(enabled: Boolean) {
-    setUserStyleOption(
-      detailedAmbientKey,
-      UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
-    )
-
-    if (enabled) {
-      setUserStyleOption(
-        bigAmbientKey,
-        UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(false)
-      )
-    }
-  }
-
   fun setDebug(enabled: Boolean) {
     setUserStyleOption(
       debugKey,
@@ -429,8 +385,6 @@ class WatchFaceConfigStateHolder(
     val ambientStyleId: String,
     val secondsStyleId: String,
     val militaryTime: Boolean,
-    val bigAmbient: Boolean,
-    val detailedAmbient: Boolean,
     val debug: Boolean,
     val previewImage: Bitmap,
   )

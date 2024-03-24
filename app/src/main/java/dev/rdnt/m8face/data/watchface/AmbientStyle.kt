@@ -34,9 +34,21 @@ enum class AmbientStyle(
 //    iconResourceId = R.drawable.outline_style_icon,
     iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   ),
+  BIG_OUTLINE(
+    id = "big_outline",
+    nameResourceId = R.string.big_outline_ambient_style_name, // TODO
+//    iconResourceId = R.drawable.outline_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
+  ),
   BOLD_OUTLINE(
     id = "bold_outline",
     nameResourceId = R.string.bold_outline_ambient_style_name,
+//    iconResourceId = R.drawable.bold_outline_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
+  ),
+  BIG_BOLD_OUTLINE(
+    id = "big_bold_outline",
+    nameResourceId = R.string.big_bold_outline_ambient_style_name, // TODO
 //    iconResourceId = R.drawable.bold_outline_style_icon,
     iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   ),
@@ -45,14 +57,23 @@ enum class AmbientStyle(
     nameResourceId = R.string.filled_ambient_style_name,
 //    iconResourceId = R.drawable.filled_style_icon,
     iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
+  ),
+  DETAILED(
+    id = "detailed",
+    nameResourceId = R.string.detailed_ambient_style_name, // TODO
+//    iconResourceId = R.drawable.filled_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   );
 
   companion object {
     fun getAmbientStyleConfig(id: String): AmbientStyle {
       return when (id) {
         OUTLINE.id -> OUTLINE
+        BIG_OUTLINE.id -> BIG_OUTLINE
         BOLD_OUTLINE.id -> BOLD_OUTLINE
+        BIG_BOLD_OUTLINE.id -> BIG_BOLD_OUTLINE
         FILLED.id -> FILLED
+        DETAILED.id -> DETAILED
         else -> OUTLINE
       }
     }

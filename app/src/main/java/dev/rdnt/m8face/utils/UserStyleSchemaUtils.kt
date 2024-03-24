@@ -43,8 +43,6 @@ const val COLOR_STYLE_SETTING = "color_style_setting"
 const val AMBIENT_STYLE_SETTING = "ambient_style_setting"
 const val SECONDS_STYLE_SETTING = "seconds_style_setting"
 const val MILITARY_TIME_SETTING = "military_time_setting"
-const val BIG_AMBIENT_SETTING = "big_ambient_setting"
-const val DETAILED_AMBIENT_SETTING = "detailed_ambient_setting"
 const val DEBUG_SETTING = "debug_setting"
 
 /*
@@ -55,31 +53,39 @@ const val DEBUG_SETTING = "debug_setting"
 fun createUserStyleSchema(context: Context): UserStyleSchema {
   // 1. Allows user to change the color styles of the watch face (if any are available).
 
+  // TODO: @rdnt fix icons, fix name resource IDs and screen reader name resource IDs
+
   val info1 = ComplicationSlotsOption(
     id = UserStyleSetting.Option.Id(LayoutStyle.INFO1.id),
     resources = context.resources,
     displayNameResourceId = R.string.info1_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         TOP_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         BOTTOM_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -88,31 +94,38 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     id = UserStyleSetting.Option.Id(LayoutStyle.INFO2.id),
     resources = context.resources,
     displayNameResourceId = R.string.info2_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         RIGHT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         TOP_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         BOTTOM_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -121,31 +134,38 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     id = UserStyleSetting.Option.Id(LayoutStyle.INFO3.id),
     resources = context.resources,
     displayNameResourceId = R.string.info3_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         TOP_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         BOTTOM_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -154,39 +174,48 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     id = UserStyleSetting.Option.Id(LayoutStyle.INFO4.id),
     resources = context.resources,
     displayNameResourceId = R.string.info4_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
         enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         TOP_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         BOTTOM_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_TOP_LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_TOP_RIGHT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         COMPLICATIONS_BOTTOM_RIGHT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -195,7 +224,8 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     id = UserStyleSetting.Option.Id(LayoutStyle.SPORT.id),
     resources = context.resources,
     displayNameResourceId = R.string.sport_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
@@ -206,6 +236,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           HOUR_SPORT_COMPLICATION_RIGHT_BOUND,
           HOUR_SPORT_COMPLICATION_BOTTOM_BOUND,
         )),
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
@@ -216,18 +247,22 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           MINUTE_SPORT_COMPLICATION_RIGHT_BOUND,
           MINUTE_SPORT_COMPLICATION_BOTTOM_BOUND,
         )),
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         TOP_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         BOTTOM_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         RIGHT_TEXT_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -236,7 +271,8 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     id = UserStyleSetting.Option.Id(LayoutStyle.FOCUS.id),
     resources = context.resources,
     displayNameResourceId = R.string.focus_layout_style_name,
-    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon), // TODO @rdnt fix icon
+    icon = Icon.createWithResource(context, R.drawable.aqua_style_icon),
+//    screenReaderNameResourceId = R.string.sport_layout_style_name,
     complicationSlotOverlays = listOf(
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         HOUR_COMPLICATION_ID,
@@ -247,6 +283,7 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           HOUR_FOCUS_COMPLICATION_RIGHT_BOUND,
           HOUR_FOCUS_COMPLICATION_BOTTOM_BOUND,
         )),
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         MINUTE_COMPLICATION_ID,
@@ -257,14 +294,17 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
           MINUTE_FOCUS_COMPLICATION_RIGHT_BOUND,
           MINUTE_FOCUS_COMPLICATION_BOTTOM_BOUND,
         )),
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         FOCUS_LEFT_ICON_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
       ComplicationSlotsUserStyleSetting.ComplicationSlotOverlay(
         FOCUS_RIGHT_ICON_COMPLICATION_ID,
-        enabled = true
+        enabled = true,
+//        nameResourceId = R.string.minute_complication_name,
       ),
     )
   )
@@ -335,26 +375,6 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
     DateFormat.is24HourFormat(context), // default
   )
 
-  val bigAmbientSetting = UserStyleSetting.BooleanUserStyleSetting(
-    UserStyleSetting.Id(BIG_AMBIENT_SETTING),
-    context.resources,
-    R.string.big_ambient_setting,
-    R.string.big_ambient_setting_description,
-    null,
-    listOf(WatchFaceLayer.BASE),
-    false,
-  )
-
-  val detailedAmbientSetting = UserStyleSetting.BooleanUserStyleSetting(
-    UserStyleSetting.Id(DETAILED_AMBIENT_SETTING),
-    context.resources,
-    R.string.detailed_ambient_setting,
-    R.string.detailed_ambient_setting_description,
-    null,
-    listOf(WatchFaceLayer.BASE),
-    false,
-  )
-
   val debugSetting = UserStyleSetting.BooleanUserStyleSetting(
     UserStyleSetting.Id(DEBUG_SETTING),
     context.resources,
@@ -373,8 +393,6 @@ fun createUserStyleSchema(context: Context): UserStyleSchema {
       ambientStyleSetting,
       secondsStyleSetting,
       militaryTimeSetting,
-      bigAmbientSetting,
-      detailedAmbientSetting,
       debugSetting,
     )
   )

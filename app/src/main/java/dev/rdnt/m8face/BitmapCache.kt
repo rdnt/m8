@@ -1,14 +1,15 @@
 package dev.rdnt.m8face
 
 import android.graphics.Bitmap
+import android.util.Log
 
-const val HOURS_BITMAP_KEY = "hours"
-const val MINUTES_BITMAP_KEY = "minutes"
-const val SECONDS_BITMAP_KEY = "seconds"
-const val AMPM_BITMAP_KEY = "ampm"
-
-const val TIME_BITMAP_KEY = "time"
-const val AUX_BITMAP_KEY = "aux"
+//const val HOURS_BITMAP_KEY = "hours"
+//const val MINUTES_BITMAP_KEY = "minutes"
+//const val SECONDS_BITMAP_KEY = "seconds"
+//const val AMPM_BITMAP_KEY = "ampm"
+//
+//const val TIME_BITMAP_KEY = "time"
+//const val AUX_BITMAP_KEY = "aux"
 
 class BitmapCache {
   private val entries: MutableMap<String, BitmapCacheEntry> = mutableMapOf()
