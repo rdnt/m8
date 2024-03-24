@@ -139,7 +139,7 @@ class WatchFaceConfigStateHolder(
 
     Log.d(TAG, "createWatchFacePreview()")
 
-    val instant = LocalDateTime.parse("2020-10-10T22:09:36")
+    val instant = LocalDateTime.parse("2020-10-10T21:30:36")
       .atZone(ZoneId.of("UTC"))
       .toInstant()
 

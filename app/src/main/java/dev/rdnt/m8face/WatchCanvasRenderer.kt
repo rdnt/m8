@@ -1332,7 +1332,7 @@ class WatchCanvasRenderer(
         bounds.exactCenterY()
       ) {
 
-        canvas.withTranslation(timeOffsetX, 0f) {
+        canvas.withTranslation(timeOffsetX * renderScale, 0f) {
           if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
 
             val opacity = interpolate(0.75f, 1f)
