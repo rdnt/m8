@@ -16,7 +16,7 @@
 <resources>
   <string name="app_name" translatable="false">M8</string>
 
-  <string name="analog_watch_face_name" translatable="false">M8</string>
+  <string name="watch_face_name" translatable="false">M8</string>
 
   <!-- Name of watchface style category for selecting the color theme [CHAR LIMIT=20] -->
   <string name="layout_style_setting">Layout Style</string>
