@@ -99,10 +99,11 @@ class HorizontalTextComplication(private val context: Context) : CanvasComplicat
   ): Bitmap {
     val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${debug}"
 
-    val cached = bitmapCache.get(hash)
-    if (cached != null) {
-      return cached
-    }
+    // TODO: fix as done in HorizontalComplication
+//    val cached = bitmapCache.get(hash)
+//    if (cached != null) {
+//      return cached
+//    }
 
     val bitmap = Bitmap.createBitmap(
       bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888

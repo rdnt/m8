@@ -1074,6 +1074,7 @@ class WatchCanvasRenderer(
         when(watchFaceData.ambientStyle) {
           AmbientStyle.BIG_OUTLINE, AmbientStyle.BIG_BOLD_OUTLINE, AmbientStyle.BIG_FILLED -> {
             interpolate(18f / 16f, 16f / 16f)
+//            interpolate(17f / 16f, 16f / 16f)
           }
 
           else -> 16f / 16f
@@ -1083,15 +1084,15 @@ class WatchCanvasRenderer(
       else -> {
         when(watchFaceData.ambientStyle) {
           AmbientStyle.BIG_OUTLINE, AmbientStyle.BIG_BOLD_OUTLINE, AmbientStyle.BIG_FILLED -> {
-//            interpolate(18f / 14f, 14f / 14f)
-            interpolate(16f / 14f, 14f / 14f)
+            interpolate(18f / 14f, 14f / 14f)
+//            interpolate(16f / 14f, 14f / 14f)
           }
 
           AmbientStyle.DETAILED -> 14f / 14f
 
           else -> {
-//            interpolate(16f / 14f, 14f / 14f)
-            interpolate(15f / 14f, 14f / 14f)
+            interpolate(16f / 14f, 14f / 14f)
+//            interpolate(15f / 14f, 14f / 14f)
           }
         }
       }
@@ -1516,7 +1517,7 @@ class WatchCanvasRenderer(
 //            drawComplications(compCanvas, zonedDateTime)
 //          }
           if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
-            (watchFaceData.ambientStyle == AmbientStyle.DETAILED || drawProperties.timeScale != 0f || true) // TODO @rdnt remove true
+            (watchFaceData.ambientStyle == AmbientStyle.DETAILED || drawProperties.timeScale != 0f)
           ) {
             drawComplications(compCanvas, zonedDateTime)
           }
@@ -1526,7 +1527,7 @@ class WatchCanvasRenderer(
 //          val opacity = if (watchFaceData.detailedAmbient) scale else interpolate(0f, 1f)
 //          val opacity = if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) scale else interpolate(0f, 1f)
 
-          val opacity = if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) interpolate(0.75f, 1f) else interpolate(0.25f, 1f) // TODO @rdnt: use 0f to 1f
+          val opacity = if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) interpolate(0.75f, 1f) else interpolate(0f, 1f)
 
 
 
