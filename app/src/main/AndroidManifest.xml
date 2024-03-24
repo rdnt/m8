@@ -71,7 +71,7 @@
       android:name=".editor.WatchFaceConfigActivity"
       android:exported="true"
       android:label="@string/title_activity_watch_face_config"
-      android:taskAffinity="dev.rdnt.m8face.editor.WatchFaceConfigActivity">
+      android:taskAffinity="dev.rdnt.m8face">
 
       <intent-filter>
         <action android:name="androidx.wear.watchface.editor.action.WATCH_FACE_EDITOR" />
