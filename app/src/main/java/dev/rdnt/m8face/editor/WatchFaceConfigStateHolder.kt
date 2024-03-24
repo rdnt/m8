@@ -139,7 +139,9 @@ class WatchFaceConfigStateHolder(
 
     Log.d(TAG, "createWatchFacePreview()")
 
-    val instant = LocalDateTime.parse("2020-10-10T21:30:36")
+    // actual watch uses this date and not 09:30:36. changed to 22 instead of 10
+    // for military time to be visible
+    val instant = LocalDateTime.parse("2020-10-10T22:09:36")
       .atZone(ZoneId.of("UTC"))
       .toInstant()
 

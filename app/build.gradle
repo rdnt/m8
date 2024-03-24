@@ -27,7 +27,7 @@ android {
     applicationId "dev.rdnt.m8face"
     minSdk 28
     targetSdk 33
-    versionCode 56
+    versionCode 57
     versionName '3.0.0'
   }
 
