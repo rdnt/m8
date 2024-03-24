@@ -1,4 +1,7 @@
-Last updated: 2023-11-25
+Last updated: 2024-03-25
+
+- v3.0.0-alpha
+  - Dynamic layouts
 
 - v2.12.1
   - Remove heartrate complication prefix style
