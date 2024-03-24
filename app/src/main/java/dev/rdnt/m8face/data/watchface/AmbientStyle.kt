@@ -58,6 +58,12 @@ enum class AmbientStyle(
 //    iconResourceId = R.drawable.filled_style_icon,
     iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
   ),
+  BIG_FILLED(
+    id = "big_filled",
+    nameResourceId = R.string.big_filled_ambient_style_name,
+//    iconResourceId = R.drawable.filled_style_icon,
+    iconResourceId = R.drawable.mauve_style_icon, // TODO @rdnt fix icon
+  ),
   DETAILED(
     id = "detailed",
     nameResourceId = R.string.detailed_ambient_style_name, // TODO
@@ -73,6 +79,7 @@ enum class AmbientStyle(
         BOLD_OUTLINE.id -> BOLD_OUTLINE
         BIG_BOLD_OUTLINE.id -> BIG_BOLD_OUTLINE
         FILLED.id -> FILLED
+        BIG_FILLED.id -> BIG_FILLED
         DETAILED.id -> DETAILED
         else -> OUTLINE
       }

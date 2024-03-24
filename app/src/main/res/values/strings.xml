@@ -77,11 +77,12 @@
   <string name="snow_style_name">Snow</string>
   <string name="onyx_style_name">Onyx</string>
 
-  <string name="outline_ambient_style_name">Outline</string>
-  <string name="big_outline_ambient_style_name">Big Outline</string>
-  <string name="bold_outline_ambient_style_name">Bold</string>
-  <string name="big_bold_outline_ambient_style_name">Big Bold</string>
-  <string name="filled_ambient_style_name">Filled</string>
+  <string name="outline_ambient_style_name">Outline I</string>
+  <string name="big_outline_ambient_style_name">Outline II</string>
+  <string name="bold_outline_ambient_style_name">Bold I</string>
+  <string name="big_bold_outline_ambient_style_name">Bold II</string>
+  <string name="filled_ambient_style_name">Filled I</string>
+  <string name="big_filled_ambient_style_name">Filled II</string>
   <string name="detailed_ambient_style_name">Detailed</string>
 
   <string name="none_seconds_style_name">None</string>
