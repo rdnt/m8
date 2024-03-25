@@ -347,7 +347,6 @@ fun WatchfaceConfigApp(
           val secondsStyleIndex =
             secondsStyles.indexOfFirst { it.id == state.userStylesAndPreview.secondsStyleId }
           val militaryTimeEnabled = state.userStylesAndPreview.militaryTime
-//          val debugEnabled = state.userStylesAndPreview.debug
 
           Box(
               Modifier

@@ -31,14 +31,14 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import kotlin.math.max
 
+private const val debug = false
+
 class HorizontalComplication(private val context: Context) : CanvasComplication {
   private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
 
   init {
     Log.d("HorizontalComplication", "Constructor ran")
   }
-
-  var debug: Boolean = false;
 
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {

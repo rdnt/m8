@@ -26,6 +26,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.util.FloatProperty
 import android.util.Log
+import android.util.LruCache
 import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
@@ -48,7 +49,6 @@ import dev.rdnt.m8face.data.watchface.WatchFaceColorPalette.Companion.convertToW
 import dev.rdnt.m8face.data.watchface.WatchFaceData
 import dev.rdnt.m8face.utils.AMBIENT_STYLE_SETTING
 import dev.rdnt.m8face.utils.COLOR_STYLE_SETTING
-import dev.rdnt.m8face.utils.DEBUG_SETTING
 import dev.rdnt.m8face.utils.HorizontalComplication
 import dev.rdnt.m8face.utils.HorizontalTextComplication
 import dev.rdnt.m8face.utils.LAYOUT_STYLE_SETTING
@@ -67,11 +67,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-
-// Default for how long each frame is displayed at expected frame rate.
-private const val DEFAULT_INTERACTIVE_DRAW_MODE_UPDATE_DELAY_MILLIS: Long = 16
-
-
+private const val debug = false
 
 /**
  * Renders watch face via data in Room database. Also, updates watch face state based on setting
@@ -90,7 +86,7 @@ class WatchCanvasRenderer(
   currentUserStyleRepository,
   watchState,
   canvasType,
-  DEFAULT_INTERACTIVE_DRAW_MODE_UPDATE_DELAY_MILLIS,
+  60000,
   clearWithBackgroundTintBeforeRenderingHighlightLayer = false
 ) {
   class AnalogSharedAssets : SharedAssets {
@@ -115,7 +111,6 @@ class WatchCanvasRenderer(
     secondsStyle = SecondsStyle.NONE,
     militaryTime = true,
     layoutStyle = LayoutStyle.INFO1,
-    debug = false,
   )
 
   // Converts resource ids into Colors and ComplicationDrawable.
@@ -258,13 +253,9 @@ class WatchCanvasRenderer(
 
   private var is24Format: Boolean = watchFaceData.militaryTime
 
-  private var debug: Boolean = watchFaceData.debug
-
   private var drawProperties = DrawProperties() // timeScale = 0f
   private var isHeadless = false
   private var isAmbient = false
-
-  private var bitmapCache: BitmapCache = BitmapCache()
 
   private var interactiveFrameDelay: Long = 16
 
@@ -456,6 +447,9 @@ class WatchCanvasRenderer(
     }
   }
 
+  private lateinit var memoryCache: LruCache<String, Bitmap>
+  var memInit = false
+
   override suspend fun createSharedAssets(): AnalogSharedAssets {
     return AnalogSharedAssets()
   }
@@ -529,14 +523,6 @@ class WatchCanvasRenderer(
 
           newWatchFaceData = newWatchFaceData.copy(
             militaryTime = booleanValue.value,
-          )
-        }
-
-        DEBUG_SETTING -> {
-          val booleanValue = options.value as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
-
-          newWatchFaceData = newWatchFaceData.copy(
-            debug = booleanValue.value,
           )
         }
       }
@@ -640,8 +626,6 @@ class WatchCanvasRenderer(
       }
 
       is24Format = watchFaceData.militaryTime
-//      debug = watchFaceData.debug
-      debug = false
 
       interactiveFrameDelay = when (watchFaceData.secondsStyle.id) {
         SecondsStyle.NONE.id -> if (shouldDrawSeconds) 1000 else 60000
@@ -846,7 +830,7 @@ class WatchCanvasRenderer(
 
       val cacheKey = "hour_normal_$hour"
 
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -859,7 +843,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "hour_outline_$hour"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -872,7 +856,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "hour_big_outline_$hour"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -885,7 +869,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "hour_bold_outline_$hour"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -898,7 +882,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "hour_big_bold_outline_$hour"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -912,7 +896,7 @@ class WatchCanvasRenderer(
 
       val cacheKey = "minute_normal_$minute"
 
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -925,7 +909,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "minute_outline_$minute"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -938,7 +922,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "minute_big_outline_$minute"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -951,7 +935,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "minute_bold_outline_$minute"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -964,7 +948,7 @@ class WatchCanvasRenderer(
       })
 
       val cacheKey = "minute_big_bold_outline_$minute"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -976,7 +960,7 @@ class WatchCanvasRenderer(
         textSize *= scale
       })
       val cacheKey = "second_normal_$second"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -986,7 +970,7 @@ class WatchCanvasRenderer(
         textSize *= scale
       })
       val cacheKey = "ampm_$text"
-      bitmapCache.set(cacheKey, "", bmp)
+      memoryCache.put(cacheKey, bmp)
     }
   }
 
@@ -1203,7 +1187,16 @@ class WatchCanvasRenderer(
 
     canvas.drawColor(Color.parseColor("#ff000000"))
 
-    if (!this::state.isInitialized) {
+    if (!memInit) {
+      // Use 1/8th of the available memory for this memory cache.
+      val maxItems = 1000
+
+      memoryCache = LruCache<String, Bitmap>(maxItems)
+
+      memInit = true
+    }
+
+    if (!this::state.isInitialized || !this::memoryCache.isInitialized) {
       // placeholder
       return
     }
@@ -1356,7 +1349,7 @@ class WatchCanvasRenderer(
 
               val cacheKey = "hour_${textStyle}_$hourText"
 
-              val hourBmp = bitmapCache.get(cacheKey, "")!!
+              val hourBmp = memoryCache.get(cacheKey)
 
               val hourOffsetX = 0f
               val hourOffsetY = hourOffsetY * renderScale
@@ -1374,7 +1367,7 @@ class WatchCanvasRenderer(
               val minuteText = zonedDateTime.minute.toString().padStart(2, '0')
               val cacheKey = "minute_${textStyle}_$minuteText"
 
-              val minuteBmp = bitmapCache.get(cacheKey, "")!!
+              val minuteBmp = memoryCache.get(cacheKey)
 
               val minuteOffsetX = 0f
               val minuteOffsetY = minuteOffsetY * renderScale
@@ -1445,7 +1438,7 @@ class WatchCanvasRenderer(
                 val secondText = if (false && isAmbient) "M8" else zonedDateTime.second.toString().padStart(2, '0')
                 val cacheKey = "second_normal_$secondText"
 
-                val secondBmp = bitmapCache.get(cacheKey, "")!!
+                val secondBmp = memoryCache.get(cacheKey)
 
                 val offsetX = secondsOffsetX * renderScale
                 val offsetY = secondsOffsetY * renderScale
@@ -1476,7 +1469,7 @@ class WatchCanvasRenderer(
               val ampmText = getAmPm(zonedDateTime).uppercase()
               val cacheKey = "ampm_$ampmText"
 
-              val ampmBmp = bitmapCache.get(cacheKey, "")!!
+              val ampmBmp = memoryCache.get(cacheKey)
 
               val offsetX = 83f * renderScale
               val offsetY = 24f * renderScale
@@ -1544,11 +1537,12 @@ class WatchCanvasRenderer(
     }
 
     if (debug) {
-      Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, $bitmapCache")
+      Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, cache ${memoryCache.size()} / ${memoryCache.maxSize()}")
     }
 
-    if (!(ambientExitAnimator.isRunning || ambientEnterAnimator.isRunning)) {
+    if (!(ambientExitAnimator.isRunning || ambientEnterAnimator.isRunning) && animating) {
       animating = false
+      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
     }
 
 //    if (ambientExitAnimator.isRunning) {
@@ -1593,7 +1587,7 @@ class WatchCanvasRenderer(
   }
 
   override fun shouldAnimate(): Boolean {
-    return super.shouldAnimate() || ambientEnterAnimator.isRunning || animating
+    return super.shouldAnimate() || animating
   }
 
   // ----- All drawing functions -----
@@ -1620,21 +1614,21 @@ class WatchCanvasRenderer(
           is VerticalComplication -> {
 //            (complication.renderer as VerticalComplication).opacity = opacity
 //            (complication.renderer as VerticalComplication).scale = scale
-            (complication.renderer as VerticalComplication).debug = debug
+//            (complication.renderer as VerticalComplication).debug = debug
           }
 
           is HorizontalComplication -> {
 //            (complication.renderer as HorizontalComplication).opacity = opacity
 //            (complication.renderer as HorizontalComplication).offsetX = offsetX
 //            (complication.renderer as HorizontalComplication).scale = scale
-            (complication.renderer as HorizontalComplication).debug = debug
+//            (complication.renderer as HorizontalComplication).debug = debug
           }
 
           is HorizontalTextComplication -> {
 //            (complication.renderer as HorizontalTextComplication).opacity = opacity
 //            (complication.renderer as HorizontalTextComplication).offsetX = offsetX
 //            (complication.renderer as HorizontalTextComplication).scale = scale
-            (complication.renderer as HorizontalTextComplication).debug = debug
+//            (complication.renderer as HorizontalTextComplication).debug = debug
           }
 
           else -> {}
@@ -1643,189 +1637,6 @@ class WatchCanvasRenderer(
         complication.render(canvas, zonedDateTime, renderParameters)
       }
     }
-  }
-
-  private fun renderTime(
-    canvas: Canvas,
-    bounds: Rect,
-    zonedDateTime: ZonedDateTime,
-    hourPaint: Paint,
-    minutePaint: Paint,
-  ) {
-    val hourText = getHour(zonedDateTime).toString().padStart(2, '0')
-    val hourHash = "$hourText,${hourPaint.textSize},${hourPaint.color},$debug"
-
-    val minuteText = zonedDateTime.minute.toString().padStart(2, '0')
-    val minuteHash = "$minuteText,${minutePaint.textSize},${minutePaint.color},$debug"
-
-//    val timeHash = "$hourHash,$minuteHash"
-//
-//    val cached = bitmapCache.get(TIME_BITMAP_KEY, timeHash)
-//    if (cached != null) {
-//      return cached
-//    }
-
-//    val timeBmp = Bitmap.createBitmap(
-//      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-//    )
-//
-//    val timeCanvas = Canvas(timeBmp)
-
-    drawText2(
-      canvas,
-      bounds,
-      hourText,
-      hourPaint,
-      0f,
-      hourOffsetY,
-      hourHash,
-      "",
-//      HOURS_BITMAP_KEY
-    )
-
-
-    drawText2(
-      canvas,
-      bounds,
-      minuteText,
-      minutePaint,
-      0f,
-      minuteOffsetY,
-      minuteHash,
-      "",
-//      MINUTES_BITMAP_KEY
-    )
-
-//    if (debug) {
-//      canvas.drawRect(bounds, Paint().apply {
-//        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-//        style = Paint.Style.STROKE
-//        strokeWidth = 2f
-//      })
-//      val p2 = Paint()
-//      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-//      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-//      p2.textSize = 8f
-//      canvas.drawText(
-//        "r ${bitmapCache.loads(TIME_BITMAP_KEY)}",
-//        3f,
-//        bounds.height().toFloat()/2 - 7f,
-//        p2,
-//      )
-//
-//      canvas.drawText(
-//        "w ${bitmapCache.renders(TIME_BITMAP_KEY)}",
-//        3f,
-//        bounds.height().toFloat()/2 + 8f,
-//        p2,
-//      )
-//    }
-
-//    bitmapCache.set(TIME_BITMAP_KEY, timeHash, timeBmp)
-
-//    return canvas
-  }
-
-  private fun drawText(
-    canvas: Canvas,
-    bounds: Rect,
-    text: String,
-    paint: Paint,
-    offsetX: Float,
-    offsetY: Float,
-    cacheKey: String,
-  ) {
-    val hash = "${text},${paint.textSize},${paint.color},${debug}"
-
-    val bitmap = renderText(canvas, bounds, text, paint, cacheKey, hash)
-
-    canvas.drawBitmap(
-      bitmap,
-      192f - bitmap.width / 2 + offsetX,
-      192f - bitmap.height / 2 + offsetY,
-      Paint(),
-    )
-  }
-
-  private fun drawText2(
-    canvas: Canvas,
-    bounds: Rect,
-    text: String,
-    paint: Paint,
-    offsetX: Float,
-    offsetY: Float,
-    hash: String,
-    cacheKey: String,
-  ) {
-    val bitmap = renderText(canvas, bounds, text, paint, cacheKey, hash)
-
-    canvas.drawBitmap(
-      bitmap,
-      192f - bitmap.width / 2 + offsetX,
-      192f - bitmap.height / 2 + offsetY,
-      Paint(),
-    )
-  }
-
-  private fun renderText(
-    canvas: Canvas,
-    bounds: Rect,
-    text: String,
-    paint: Paint,
-    cacheHash: String,
-    cacheKey: String,
-  ): Bitmap {
-//    if (debug) {
-//      canvas.drawRect(bounds, Paint().apply {
-//        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-//        style = Paint.Style.STROKE
-//        strokeWidth = 2f
-//      })
-//      val p2 = Paint()
-//      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aaf2e900"), 1f)
-//      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-//      p2.textSize = 8f
-//      canvas.drawText(
-//        "r ${bitmapCache.loads(cacheKey)}",
-//        3f,
-//        bounds.height().toFloat() - 12f,
-//        p2,
-//      )
-//
-//      canvas.drawText(
-//        "w ${bitmapCache.renders(cacheKey)}",
-//        3f,
-//        bounds.height().toFloat() - 3f,
-//        p2,
-//      )
-//    }
-
-    val cached = bitmapCache.get(cacheKey, cacheHash)
-    if (cached != null) {
-      return cached
-    }
-
-    val p = Paint(paint)
-
-    var textBounds = Rect()
-    p.getTextBounds(text, 0, text.length, textBounds)
-    textBounds = Rect(0, 0, textBounds.width(), textBounds.height())
-
-    val bmp = Bitmap.createBitmap(
-      textBounds.width(), textBounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val bmpCanvas = Canvas(bmp)
-
-    bmpCanvas.drawText(
-      text,
-      0f,
-      textBounds.height().toFloat(),
-      p,
-    )
-
-    bitmapCache.set(cacheKey, cacheHash, bmp)
-
-    return bmp
   }
 
   private fun drawDashes(

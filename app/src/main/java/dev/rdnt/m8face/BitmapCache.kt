@@ -11,7 +11,7 @@ import android.util.Log
 //const val TIME_BITMAP_KEY = "time"
 //const val AUX_BITMAP_KEY = "aux"
 
-class BitmapCache {
+class BitmapCacheOld {
   private val entries: MutableMap<String, BitmapCacheEntry> = mutableMapOf()
 
   override fun toString(): String {

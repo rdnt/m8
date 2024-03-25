@@ -65,9 +65,6 @@ class WatchFaceConfigStateHolder(
   private lateinit var ambientStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var secondsStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var militaryTimeKey: UserStyleSetting.BooleanUserStyleSetting
-  private lateinit var bigAmbientKey: UserStyleSetting.BooleanUserStyleSetting
-  private lateinit var detailedAmbientKey: UserStyleSetting.BooleanUserStyleSetting
-  private lateinit var debugKey: UserStyleSetting.BooleanUserStyleSetting
 
   val uiState: StateFlow<EditWatchFaceUiState> =
     flow<EditWatchFaceUiState> {
@@ -121,10 +118,6 @@ class WatchFaceConfigStateHolder(
         MILITARY_TIME_SETTING -> {
           militaryTimeKey = setting as UserStyleSetting.BooleanUserStyleSetting
         }
-
-        DEBUG_SETTING -> {
-          debugKey = setting as UserStyleSetting.BooleanUserStyleSetting
-        }
       }
     }
   }
@@ -169,16 +162,12 @@ class WatchFaceConfigStateHolder(
     val militaryTime =
       userStyle[militaryTimeKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
-    val debug =
-      userStyle[debugKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
-
     return UserStylesAndPreview(
       layoutStyleId = layoutStyle.id.toString(),
       colorStyleId = colorStyle.id.toString(),
       ambientStyleId = ambientStyle.id.toString(),
       secondsStyleId = secondsStyle.id.toString(),
       militaryTime = militaryTime.value,
-      debug = debug.value,
       previewImage = bitmap,
     )
   }
@@ -349,13 +338,6 @@ class WatchFaceConfigStateHolder(
     )
   }
 
-  fun setDebug(enabled: Boolean) {
-    setUserStyleOption(
-      debugKey,
-      UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
-    )
-  }
-
   // Saves User Style Option change back to the back to the EditorSession.
   // Note: The UI widgets in the Activity that can trigger this method (through the 'set' methods)
   // will only be enabled after the EditorSession has been initialized.
@@ -387,7 +369,6 @@ class WatchFaceConfigStateHolder(
     val ambientStyleId: String,
     val secondsStyleId: String,
     val militaryTime: Boolean,
-    val debug: Boolean,
     val previewImage: Bitmap,
   )
 

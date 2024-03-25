@@ -24,5 +24,4 @@ data class WatchFaceData(
   val ambientStyle: AmbientStyle = AmbientStyle.OUTLINE,
   val secondsStyle: SecondsStyle = SecondsStyle.NONE,
   val militaryTime: Boolean = true,
-  val debug: Boolean = false,
 )

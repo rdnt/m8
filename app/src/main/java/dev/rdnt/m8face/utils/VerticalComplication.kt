@@ -12,16 +12,15 @@ import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
 import androidx.wear.watchface.complications.data.*
-import dev.rdnt.m8face.BitmapCache
 import dev.rdnt.m8face.BitmapCacheEntry
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
 
+private const val debug = false
+
 class VerticalComplication(private val context: Context) : CanvasComplication {
   private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
-
-  var debug: Boolean = false;
 
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {

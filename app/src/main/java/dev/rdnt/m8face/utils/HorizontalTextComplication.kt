@@ -28,10 +28,10 @@ import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
 
+private const val debug = false
+
 class HorizontalTextComplication(private val context: Context) : CanvasComplication {
   private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
-
-  var debug: Boolean = false;
 
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {
