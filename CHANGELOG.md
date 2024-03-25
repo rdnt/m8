@@ -1,5 +1,8 @@
 Last updated: 2024-03-25
 
+- v3.0.1-alpha
+  - Use LruCache instead of BitmapCache
+
 - v3.0.0-alpha
   - Dynamic layouts
 
