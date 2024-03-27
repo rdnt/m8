@@ -19,6 +19,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -31,8 +32,11 @@ import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
 import androidx.compose.runtime.saveable.autoSaver
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.set
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
@@ -1263,15 +1267,14 @@ class WatchCanvasRenderer(
     zonedDateTime: ZonedDateTime,
     sharedAssets: AnalogSharedAssets,
   ) {
-    // all calculations are done with 384x384 resolution in mind
-    val renderScale = min(bounds.width(), bounds.height()).toFloat() / 384.0f
-
     canvas.drawColor(Color.parseColor("#ff000000"))
 
     if (!this::state.isInitialized) {
-      // placeholder
       return
     }
+
+    // all calculations are done with 384x384 resolution in mind
+    val renderScale = min(bounds.width(), bounds.height()).toFloat() / 384.0f
 
     if (!bitmapsInitialized || bitmapsScale != renderScale) {
       preloadBitmaps(bounds, renderScale)
