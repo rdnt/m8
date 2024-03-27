@@ -42,4 +42,4 @@ implementing fixes.
 
 ## Changelogs
 Changelogs for each and every release can be found
-[here](https://github.com/rdnt/m8/blob/main/CHANGELOG.md).
+[here](https://github.com/rdnt/m8/blob/main/CHANGELOG.md). Alpha releases usually only appear on open pull requests, are available for testing on the [Open Testing track](https://play.google.com/apps/testing/dev.rdnt.m8face), and are retracted from the PR's changelog before merging.
