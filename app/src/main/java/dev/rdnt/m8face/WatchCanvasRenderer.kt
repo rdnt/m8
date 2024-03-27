@@ -30,6 +30,7 @@ import android.util.LruCache
 import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
+import androidx.compose.runtime.saveable.autoSaver
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.set
@@ -271,7 +272,7 @@ class WatchCanvasRenderer(
 //  private var enteringAmbientFrame = 0
 //  private var enteringInteractiveFrame = 0
 
-  private val ambientExitAnimator =
+  private val ambientExitAnimatorOld =
     AnimatorSet().apply {
       play(
         ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 1.0f).apply {
@@ -286,7 +287,8 @@ class WatchCanvasRenderer(
     }
 
   // Animation played when entering ambient mode.
-  private val ambientEnterAnimator =
+
+  private val ambientEnterAnimatorOld =
     AnimatorSet().apply {
 //        interpolator = AnimationUtils.loadInterpolator(
 //          context,
@@ -302,19 +304,61 @@ class WatchCanvasRenderer(
 //        DrawProperties.TIME_SCALE, *keyframes, Keyframe.ofFloat(1f, 0f)
 //      )
 
-      playSequentially(
-        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, drawProperties.timeScale).apply {
-          setAutoCancel(true)
-        },
-        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 0.0f).apply {
+      play(
+//        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, drawProperties.timeScale).apply {
+//
+//          duration = ambientTransitionMs/4
+//        },
+        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 1f).apply {
           interpolator = AnimationUtils.loadInterpolator(
             context,
             android.R.interpolator.accelerate_decelerate
           )
-          setAutoCancel(true)
+//          setAutoCancel(true)
+//          duration = ambientTransitionMs
         },
       )
     }
+
+  private val ambientAnimator =
+//    AnimatorSet().apply {
+//        interpolator = AnimationUtils.loadInterpolator(
+//          context,
+//          android.R.interpolator.decelerate_cubic
+//        )
+
+//      val keyframes = arrayOf(
+//        Keyframe.ofFloat(0f, 1f),
+//        Keyframe.ofFloat(1f, 0f),
+//      )
+//
+//      val propertyValuesHolder = PropertyValuesHolder.ofKeyframe(
+//        DrawProperties.TIME_SCALE, *keyframes, Keyframe.ofFloat(1f, 0f)
+//      )
+
+//      play(
+//        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, drawProperties.timeScale).apply {
+//          setAutoCancel(true)
+//        },
+        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 1f).apply {
+          interpolator = AnimationUtils.loadInterpolator(
+            context,
+            android.R.interpolator.accelerate_decelerate
+          )
+          duration = ambientTransitionMs
+          setAutoCancel(true)
+        }
+//      )
+//    }
+
+//  val animator = ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 1.0f).apply {
+//    interpolator = AnimationUtils.loadInterpolator(
+//      context,
+//      android.R.interpolator.accelerate_decelerate
+//    )
+//    setAutoCancel(true)
+//  }
+
 
 //  override fun onRenderParametersChanged(renderParameters: RenderParameters) {
 //    super.onRenderParametersChanged(renderParameters)
@@ -323,9 +367,9 @@ class WatchCanvasRenderer(
 //  }
 
 //  private var animating = false
-  private var animatingEnter = false
-  private var animatingExit = false
-  private var animationDone = false
+  private var animatingEnterOld = false
+  private var animatingExitOld = false
+  private var animating = false
 
   private lateinit var state: UserStyle
 
@@ -363,11 +407,6 @@ class WatchCanvasRenderer(
 
 
 //            Log.d("@@@", "cancel before enter")
-            ambientEnterAnimator.removeAllListeners()
-            ambientExitAnimator.removeAllListeners()
-//
-            ambientEnterAnimator.cancel()
-            ambientExitAnimator.cancel()
 //
 //            interactiveDrawModeUpdateDelayMillis = 16
 
@@ -398,33 +437,42 @@ class WatchCanvasRenderer(
 
 //            Log.d("@@@", ambientTransitionMs.toString())
 
-            animatingEnter = true
-            animationDone = false
+            ambientAnimator.cancel()
+            animating = true
+            ambientAnimator.setFloatValues(0f)
+            ambientAnimator.duration = ((drawProperties.timeScale) * (ambientTransitionMs*2).toFloat()).toLong()
+            ambientAnimator.start()
 
 //            ambientEnterAnimator.doOnEnd {
 //              animatingEnter = false
 //            }
 
-            ambientEnterAnimator.setupStartValues()
+//            ambientAnimator.setupStartValues()
 //            ambientEnterAnimator.duration = (drawProperties.timeScale * ambientTransitionMs.toFloat()).toLong()
-            ambientEnterAnimator.childAnimations[0].duration = (drawProperties.timeScale * (ambientTransitionMs/2).toFloat()).toLong()
-            ambientEnterAnimator.childAnimations[1].duration = (drawProperties.timeScale * (ambientTransitionMs/2*3).toFloat()).toLong()
+//            ambientAnimator.childAnimations[0].duration = (drawProperties.timeScale * (ambientTransitionMs/2).toFloat()).toLong()
+//            ambientAnimator.childAnimations[1].duration = (drawProperties.timeScale * (ambientTransitionMs/2*3).toFloat()).toLong()
 //            interactiveDrawModeUpdateDelayMillis = 16
-            ambientEnterAnimator.start()
+
+//            ambientAnimator.setDuration(ambientTransitionMs*2)
+//            ambientAnimator.start()
+
           } else {
             interactiveDrawModeUpdateDelayMillis = 16
 //            Log.d("@@@", "ambient off")
 //            interactiveDrawModeUpdateDelayMillis = 16
 //            Log.d("@@@", "cancel before exit")
 
-            ambientEnterAnimator.removeAllListeners()
-            ambientExitAnimator.removeAllListeners()
-//
-            ambientEnterAnimator.cancel()
-            ambientExitAnimator.cancel()
+//            ambientEnterAnimator.removeAllListeners()
+//            ambientExitAnimator.removeAllListeners()
+////
+//            ambientEnterAnimator.cancel()
+//            ambientExitAnimator.cancel()
 
-            animatingExit = true
-            animationDone = false
+            ambientAnimator.cancel()
+            animating = true
+            ambientAnimator.setFloatValues(1f)
+            ambientAnimator.duration = ((1f-drawProperties.timeScale) * (ambientTransitionMs).toFloat()).toLong()
+            ambientAnimator.start()
 
 //            ambientExitAnimator.doOnEnd {
 //              animatingExit = false
@@ -458,12 +506,14 @@ class WatchCanvasRenderer(
 //            }
 
 //            Log.d("@@@", "starting from ${(1f-drawProperties.timeScale) * AMBIENT_TRANSITION_MS.toFloat()} / $AMBIENT_TRANSITION_MS")
-            ambientExitAnimator.setupStartValues()
+//            ambientAnimator.setupStartValues()
 //            ambientExitAnimator.currentPlayTime = ((1f-drawProperties.timeScale) * AMBIENT_TRANSITION_MS.toFloat()).toLong()
 
-            ambientExitAnimator.duration = ((1f-drawProperties.timeScale) * ambientTransitionMs.toFloat()).toLong()
+//            ambientAnimator.duration = ((drawProperties.timeScale) * ambientTransitionMs.toFloat()).toLong()
+//            ambientAnimator.childAnimations[1].duration = ((1f-drawProperties.timeScale) * ambientTransitionMs.toFloat()).toLong()
 //            interactiveDrawModeUpdateDelayMillis = 16
-            ambientExitAnimator.start()
+//            ambientAnimator.setDuration(ambientTransitionMs)
+//            ambientAnimator.start()
           }
         } else {
           drawProperties.timeScale = 1f
@@ -1390,17 +1440,9 @@ class WatchCanvasRenderer(
       Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, cache ${memoryCache.size()} / ${memoryCache.maxSize()}")
     }
 
-    if (animatingEnter && !ambientEnterAnimator.isRunning) {
-      animatingEnter = false
-    }
-
-    if (animatingExit && !ambientExitAnimator.isRunning) {
-      animatingExit = false
-    }
-
-    if ((!animatingEnter && !animatingExit) && !animationDone) {
+    if (animating && !ambientAnimator.isRunning) {
+      animating = false
       interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
-      animationDone = true
     }
 
 //    Log.d("@@@", "Render time diff ${last.until(Instant.now(), ChronoUnit.MICROS)/1000.0f}ms")
@@ -1409,7 +1451,7 @@ class WatchCanvasRenderer(
   }
 
   override fun shouldAnimate(): Boolean {
-    return super.shouldAnimate() || animatingEnter || animatingExit
+    return super.shouldAnimate() || animating
   }
 
   // ----- All drawing functions -----
