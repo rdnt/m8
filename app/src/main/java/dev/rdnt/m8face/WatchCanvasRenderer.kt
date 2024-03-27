@@ -30,7 +30,9 @@ import android.util.LruCache
 import android.view.SurfaceHolder
 import android.view.animation.AnimationUtils
 import androidx.annotation.Keep
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.set
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
@@ -56,7 +58,9 @@ import dev.rdnt.m8face.utils.MILITARY_TIME_SETTING
 import dev.rdnt.m8face.utils.SECONDS_STYLE_SETTING
 import dev.rdnt.m8face.utils.VerticalComplication
 import java.time.Duration
+import java.time.Instant
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -68,6 +72,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 private const val debug = false
+private const val debugTiming = false
 
 /**
  * Renders watch face via data in Room database. Also, updates watch face state based on setting
@@ -268,14 +273,13 @@ class WatchCanvasRenderer(
 
   private val ambientExitAnimator =
     AnimatorSet().apply {
-      interpolator =
-        AnimationUtils.loadInterpolator(
-          context,
-          android.R.interpolator.linear_out_slow_in
-        )
       play(
         ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 1.0f).apply {
-          duration = ambientTransitionMs
+          interpolator =
+            AnimationUtils.loadInterpolator(
+              context,
+              android.R.interpolator.accelerate_decelerate
+            )
           setAutoCancel(true)
         },
       )
@@ -284,10 +288,10 @@ class WatchCanvasRenderer(
   // Animation played when entering ambient mode.
   private val ambientEnterAnimator =
     AnimatorSet().apply {
-        interpolator = AnimationUtils.loadInterpolator(
-          context,
-          android.R.interpolator.fast_out_linear_in
-        )
+//        interpolator = AnimationUtils.loadInterpolator(
+//          context,
+//          android.R.interpolator.decelerate_cubic
+//        )
 
 //      val keyframes = arrayOf(
 //        Keyframe.ofFloat(0f, 1f),
@@ -298,13 +302,15 @@ class WatchCanvasRenderer(
 //        DrawProperties.TIME_SCALE, *keyframes, Keyframe.ofFloat(1f, 0f)
 //      )
 
-      play(
-//        ObjectAnimator.ofPropertyValuesHolder(drawProperties, propertyValuesHolder).apply {
-//          duration = AMBIENT_TRANSITION_MS
-//          setAutoCancel(false)
-//        },
+      playSequentially(
+        ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, drawProperties.timeScale).apply {
+          setAutoCancel(true)
+        },
         ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 0.0f).apply {
-          duration = ambientTransitionMs
+          interpolator = AnimationUtils.loadInterpolator(
+            context,
+            android.R.interpolator.accelerate_decelerate
+          )
           setAutoCancel(true)
         },
       )
@@ -316,7 +322,10 @@ class WatchCanvasRenderer(
 //    preloadBitmaps()
 //  }
 
-  private var animating = false
+//  private var animating = false
+  private var animatingEnter = false
+  private var animatingExit = false
+  private var animationDone = false
 
   private lateinit var state: UserStyle
 
@@ -344,21 +353,21 @@ class WatchCanvasRenderer(
         isAmbient = ambient!!
 
         if (!watchState.isHeadless) {
-          animating = true
-          interactiveDrawModeUpdateDelayMillis = 16
+//          animating = true
 
           if (isAmbient) {
 //            Log.d("@@@", "ambient on")
 //            drawProperties.timeScale = 0f
 //            ambientEnterAnimator.setupStartValues()
+            interactiveDrawModeUpdateDelayMillis = 33
 
 
 //            Log.d("@@@", "cancel before enter")
-//            ambientEnterAnimator.removeAllListeners()
-//            ambientExitAnimator.removeAllListeners()
+            ambientEnterAnimator.removeAllListeners()
+            ambientExitAnimator.removeAllListeners()
 //
-//            ambientEnterAnimator.cancel()
-//            ambientExitAnimator.cancel()
+            ambientEnterAnimator.cancel()
+            ambientExitAnimator.cancel()
 //
 //            interactiveDrawModeUpdateDelayMillis = 16
 
@@ -376,7 +385,7 @@ class WatchCanvasRenderer(
 ////                interactiveDrawModeUpdateDelayMillis = 16
 //              }
 //            }
-            ambientExitAnimator.cancel()
+//            ambientExitAnimator.cancel()
 
 //            enteringInteractive = false
 //            enteringAmbient = true
@@ -389,21 +398,37 @@ class WatchCanvasRenderer(
 
 //            Log.d("@@@", ambientTransitionMs.toString())
 
-            ambientEnterAnimator.setupStartValues()
-            ambientEnterAnimator.duration = (drawProperties.timeScale * ambientTransitionMs.toFloat()).toLong()
+            animatingEnter = true
+            animationDone = false
 
+//            ambientEnterAnimator.doOnEnd {
+//              animatingEnter = false
+//            }
+
+            ambientEnterAnimator.setupStartValues()
+//            ambientEnterAnimator.duration = (drawProperties.timeScale * ambientTransitionMs.toFloat()).toLong()
+            ambientEnterAnimator.childAnimations[0].duration = (drawProperties.timeScale * (ambientTransitionMs/2).toFloat()).toLong()
+            ambientEnterAnimator.childAnimations[1].duration = (drawProperties.timeScale * (ambientTransitionMs/2*3).toFloat()).toLong()
 //            interactiveDrawModeUpdateDelayMillis = 16
             ambientEnterAnimator.start()
           } else {
+            interactiveDrawModeUpdateDelayMillis = 16
 //            Log.d("@@@", "ambient off")
 //            interactiveDrawModeUpdateDelayMillis = 16
 //            Log.d("@@@", "cancel before exit")
 
-//            ambientEnterAnimator.removeAllListeners()
-//            ambientExitAnimator.removeAllListeners()
+            ambientEnterAnimator.removeAllListeners()
+            ambientExitAnimator.removeAllListeners()
 //
-//            ambientEnterAnimator.cancel()
-//            ambientExitAnimator.cancel()
+            ambientEnterAnimator.cancel()
+            ambientExitAnimator.cancel()
+
+            animatingExit = true
+            animationDone = false
+
+//            ambientExitAnimator.doOnEnd {
+//              animatingExit = false
+//            }
 //
 //            interactiveDrawModeUpdateDelayMillis = 16
 //            animating = true
@@ -420,7 +445,7 @@ class WatchCanvasRenderer(
 //              }
 //            }
 
-            ambientEnterAnimator.cancel()
+//            ambientEnterAnimator.cancel()
 
 //            enteringInteractive = true
 //            enteringAmbient = false
@@ -447,8 +472,7 @@ class WatchCanvasRenderer(
     }
   }
 
-  private lateinit var memoryCache: LruCache<String, Bitmap>
-  var memInit = false
+  private val memoryCache: LruCache<String, Bitmap> = LruCache<String, Bitmap>(484)
 
   override suspend fun createSharedAssets(): AnalogSharedAssets {
     return AnalogSharedAssets()
@@ -658,9 +682,14 @@ class WatchCanvasRenderer(
     }
   }
 
-  private fun preloadBitmaps(scale: Float) {
+  private fun preloadBitmaps(bounds: Rect, scale: Float) {
     Log.d("WatchCanvasRenderer", "preloadBitmaps($scale)")
     bitmapsScale = scale
+
+    val compBmp = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    memoryCache.put("comp", compBmp)
 
     val canvas = Canvas()
     preloadHourBitmaps(canvas, scale)
@@ -817,7 +846,7 @@ class WatchCanvasRenderer(
 
     tmpCanvas.setBitmap(null)
 
-    return bmp
+    return bmp//.asShared()
   }
 
   private fun preloadHourBitmaps(canvas: Canvas, scale: Float) {
@@ -1176,6 +1205,8 @@ class WatchCanvasRenderer(
 
   private var frame: Int = 0
 
+  private var last: Instant = Instant.now()
+
   override fun render(
     canvas: Canvas,
     bounds: Rect,
@@ -1187,22 +1218,13 @@ class WatchCanvasRenderer(
 
     canvas.drawColor(Color.parseColor("#ff000000"))
 
-    if (!memInit) {
-      // Use 1/8th of the available memory for this memory cache.
-      val maxItems = 1000
-
-      memoryCache = LruCache<String, Bitmap>(maxItems)
-
-      memInit = true
-    }
-
-    if (!this::state.isInitialized || !this::memoryCache.isInitialized) {
+    if (!this::state.isInitialized) {
       // placeholder
       return
     }
 
     if (!bitmapsInitialized || bitmapsScale != renderScale) {
-      preloadBitmaps(renderScale)
+      preloadBitmaps(bounds, renderScale)
       bitmapsInitialized = true
     }
 
@@ -1228,97 +1250,7 @@ class WatchCanvasRenderer(
         )
       }
 
-      var offsetXOld =
-//        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
-//          35f / 14f * 18f,
-//          0f
-//        ) else if (watchFaceData.detailedAmbient) {
-//          0f
-//        } else {
-//          0f
-//
-//        }
-//        if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) {
-//          0f
-//        }
-      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && watchFaceData.ambientStyle != AmbientStyle.DETAILED) interpolate(
-        35f / 14f * 18f,
-        0f
-      ) else if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) {
-        0f
-      } else {
-        0f
-
-      }
-//    val offsetX = 0f
-
-      val text14 = Paint(hourPaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57)
-        textSize = 144f
-      }
-
-      val text16 = Paint(hourPaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57thin)
-        textSize = 9f
-      }
-
-      val text18 = Paint(hourPaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57thick)
-        textSize = 9f
-      }
-
-      val hourText = when {
-        (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
-          Paint(text16)
-        }
-
-        (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
-          Paint(text18)
-        }
-
-        else -> {
-          Paint(text14)
-        }
-      }
-
-      val minuteText14 = Paint(minutePaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57)
-        textSize = 144f
-      }
-
-      val minuteText16 = Paint(minutePaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57thin)
-        textSize = 9f
-      }
-
-      val minuteText18 = Paint(minutePaint).apply {
-        isAntiAlias = false
-        typeface = context.resources.getFont(R.font.m8stealth57thick)
-        textSize = 9f
-      }
-
-
-      val minuteText = when {
-        (watchFaceData.ambientStyle.id == AmbientStyle.OUTLINE.id && drawProperties.timeScale == 0f) -> {
-          Paint(minuteText16)
-        }
-
-        (watchFaceData.ambientStyle.id == AmbientStyle.BOLD_OUTLINE.id && drawProperties.timeScale == 0f) -> {
-          Paint(minuteText18)
-        }
-
-        else -> {
-          Paint(minuteText14)
-        }
-      }
-
       canvas.withScale(
-//        1f, 1f,
         timeScale,
         timeScale,
         bounds.exactCenterX(),
@@ -1338,12 +1270,6 @@ class WatchCanvasRenderer(
               else -> "normal"
             }
 
-//            val size = if (watchFaceData.bigAmbient && textStyle != "normal") "_big" else ""
-//            val size = if (
-//                         (drawProperties.timeScale == 0f) && (drawProperties.timeScale != 0f) &&
-//              (watchFaceData.ambientStyle.id == AmbientStyle.BIG_OUTLINE.id || watchFaceData.ambientStyle.id == AmbientStyle.BIG_BOLD_OUTLINE.id))
-//              "_big" else ""
-
             if (true) {
               val hourText = getHour(zonedDateTime).toString().padStart(2, '0')
 
@@ -1362,7 +1288,6 @@ class WatchCanvasRenderer(
               )
             }
 
-
             if (true) {
               val minuteText = zonedDateTime.minute.toString().padStart(2, '0')
               val cacheKey = "minute_${textStyle}_$minuteText"
@@ -1379,62 +1304,21 @@ class WatchCanvasRenderer(
                 Paint().apply { alpha = (opacity * 255).toInt() },
               )
             }
-
-//            renderTime(
-//              canvas,
-//              bounds,
-//              zonedDateTime,
-//              hourText,
-//              minuteText,
-//            )
-
-
-
-//            drawText(
-//              canvas,
-//              getHour(zonedDateTime).toString().padStart(2, '0'),
-//              hourText,
-//              timeOffsetXThick,
-//              hourOffsetYThick,
-//              HOURS_BITMAP_KEY
-//            )
-//
-//            drawText(
-//              canvas,
-//              zonedDateTime.minute.toString().padStart(2, '0'),
-//              minuteText,
-//              timeOffsetXThick,
-//              minuteOffsetYThick,
-//              MINUTES_BITMAP_KEY
-//            )
           }
         }
       }
 
-//      val offsetX =
-////        if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(
-////          35f,
-////          0f
-////        ) else 0f
-//      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && watchFaceData.ambientStyle != AmbientStyle.DETAILED) interpolate(
-//        35f,
-//        0f
-//      ) else 0f
-
-
-
       canvas.withScale(complicationsScale, complicationsScale, bounds.exactCenterX(), bounds.exactCenterY()) {
         canvas.withTranslation(complicationsOffsetX, 0f) {
 
-          val compBmp = Bitmap.createBitmap(
-            bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-          )
+          val compBmp = memoryCache.get("comp")
 
-          val compCanvas = Canvas(compBmp)
+          val compCanvas = Canvas()
+          compBmp.eraseColor(Color.TRANSPARENT)
+          compCanvas.setBitmap(compBmp)
 
           if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.BASE)) {
             if (shouldDrawSeconds) {
-//              val secondText = if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString().padStart(2, '0')
                 val secondText = if (false && isAmbient) "M8" else zonedDateTime.second.toString().padStart(2, '0')
                 val cacheKey = "second_normal_$secondText"
 
@@ -1450,19 +1334,6 @@ class WatchCanvasRenderer(
                   Paint(),
                 )
 
-
-
-
-//              drawText(
-//                compCanvas,
-//                bounds,
-//                if (watchFaceData.detailedAmbient && isAmbient) "M8" else zonedDateTime.second.toString()
-//                  .padStart(2, '0'),
-//                secondPaint,
-//                secondsOffsetX,
-//                secondsOffsetY,
-//                SECONDS_BITMAP_KEY,
-//              )
             }
 
             if (shouldDrawAmPm) {
@@ -1481,15 +1352,6 @@ class WatchCanvasRenderer(
                 Paint(),
               )
 
-//              drawText(
-//                compCanvas,
-//                bounds,
-//                getAmPm(zonedDateTime).uppercase(),
-//                ampmPaint,
-//                ampmOffsetX,
-//                24f,
-//                AMPM_BITMAP_KEY,
-//              )
             }
 
             when (watchFaceData.secondsStyle.id) {
@@ -1504,25 +1366,13 @@ class WatchCanvasRenderer(
 
           }
 
-//          if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
-//            (watchFaceData.detailedAmbient || drawProperties.timeScale != 0f)
-//          ) {
-//            drawComplications(compCanvas, zonedDateTime)
-//          }
           if (renderParameters.watchFaceLayers.contains(WatchFaceLayer.COMPLICATIONS) &&
             (watchFaceData.ambientStyle == AmbientStyle.DETAILED || drawProperties.timeScale != 0f)
           ) {
             drawComplications(compCanvas, zonedDateTime)
           }
 
-//          val scale = if (isAmbient) .75f else 1f
-//        val scale = interpolate(.75f, 1f) // TODO scaling opacity looks weird due to automatic brightness kicking in
-//          val opacity = if (watchFaceData.detailedAmbient) scale else interpolate(0f, 1f)
-//          val opacity = if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) scale else interpolate(0f, 1f)
-
           val opacity = if (watchFaceData.ambientStyle == AmbientStyle.DETAILED) interpolate(0.75f, 1f) else interpolate(0f, 1f)
-
-
 
           canvas.drawBitmap(
             compBmp,
@@ -1536,104 +1386,36 @@ class WatchCanvasRenderer(
 
     }
 
-    if (debug) {
+    if (debugTiming) {
       Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, cache ${memoryCache.size()} / ${memoryCache.maxSize()}")
     }
 
-    if (!(ambientExitAnimator.isRunning || ambientEnterAnimator.isRunning) && animating) {
-      animating = false
-      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
+    if (animatingEnter && !ambientEnterAnimator.isRunning) {
+      animatingEnter = false
     }
 
-//    if (ambientExitAnimator.isRunning) {
-//      if (!enteringInteractive) {
-//        enteringInteractive = true
-//      }
-//    } else if (enteringInteractive) {
-//      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
-//      enteringInteractive = false
-//    }
-//
-//
-//    if (ambientEnterAnimator.isRunning) {
-//      if (!enteringAmbient) {
-//        enteringAmbient = true
-//      }
-//    } else if (enteringAmbient) {
-////      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
-//      enteringAmbient = false
-//    }
+    if (animatingExit && !ambientExitAnimator.isRunning) {
+      animatingExit = false
+    }
 
-//    if (ambientEnterAnimator.isRunning || ambientExitAnimator.isRunning) {
-////      if (!animating) {
-////        animating = true
-////        interactiveDrawModeUpdateDelayMillis = 16
-////      }
-////      interactiveDrawModeUpdateDelayMillis = 16
-////      Log.d("@@@", "set to fast 16")
-//    } else {
-//      if (enteringInteractive) {
-//        interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
-//        enteringInteractive = false
-//      }
-//
-//      if (enteringAmbient) {
-//        interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
-//        enteringAmbient = false
-//      }
-////      Log.d("@@@", "set to int ${interactiveFrameDelay}")
-//    }
+    if ((!animatingEnter && !animatingExit) && !animationDone) {
+      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
+      animationDone = true
+    }
+
+//    Log.d("@@@", "Render time diff ${last.until(Instant.now(), ChronoUnit.MICROS)/1000.0f}ms")
+    last = Instant.now()
 
   }
 
   override fun shouldAnimate(): Boolean {
-    return super.shouldAnimate() || animating
+    return super.shouldAnimate() || animatingEnter || animatingExit
   }
 
   // ----- All drawing functions -----
   private fun drawComplications(canvas: Canvas, zonedDateTime: ZonedDateTime) {
-//    var opacity =
-//      if (watchFaceData.detailedAmbient) .75f + this.easeInOutCirc(drawProperties.timeScale) / 4 else this.easeInOutCirc(
-//        drawProperties.timeScale
-//      )
-//    opacity = 1f
-
-//    val offsetX =
-//      if (watchFaceData.layoutStyle.id == LayoutStyle.SPORT.id && !watchFaceData.detailedAmbient) interpolate(34f, 0f) else 0f
-//    val offsetX = 0f
-
-//    val maxScale = if (watchFaceData.bigAmbient) 18f / 14f else 16f / 14f
-//    var scale = if (watchFaceData.detailedAmbient) 1f else interpolate(maxScale, 1f)
-//    if (watchFaceData.layoutStyle.id == LayoutStyle.FOCUS.id) {
-//      scale = 1f
-//    }
-
     for ((_, complication) in complicationSlotsManager.complicationSlots) {
       if (complication.enabled) {
-        when (complication.renderer) {
-          is VerticalComplication -> {
-//            (complication.renderer as VerticalComplication).opacity = opacity
-//            (complication.renderer as VerticalComplication).scale = scale
-//            (complication.renderer as VerticalComplication).debug = debug
-          }
-
-          is HorizontalComplication -> {
-//            (complication.renderer as HorizontalComplication).opacity = opacity
-//            (complication.renderer as HorizontalComplication).offsetX = offsetX
-//            (complication.renderer as HorizontalComplication).scale = scale
-//            (complication.renderer as HorizontalComplication).debug = debug
-          }
-
-          is HorizontalTextComplication -> {
-//            (complication.renderer as HorizontalTextComplication).opacity = opacity
-//            (complication.renderer as HorizontalTextComplication).offsetX = offsetX
-//            (complication.renderer as HorizontalTextComplication).scale = scale
-//            (complication.renderer as HorizontalTextComplication).debug = debug
-          }
-
-          else -> {}
-        }
-
         complication.render(canvas, zonedDateTime, renderParameters)
       }
     }

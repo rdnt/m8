@@ -12,6 +12,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
+import android.util.LruCache
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -25,7 +26,6 @@ import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.NoDataComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
-import dev.rdnt.m8face.BitmapCacheEntry
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -34,7 +34,7 @@ import kotlin.math.max
 private const val debug = false
 
 class HorizontalComplication(private val context: Context) : CanvasComplication {
-  private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
+  private val memoryCache = LruCache<String, Bitmap>(1)
 
   init {
     Log.d("HorizontalComplication", "Constructor ran")
@@ -135,7 +135,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     bounds: Rect,
     data: ShortTextComplicationData
   ): Bitmap {
-    val cached = bitmapCache.get("")
+    val cached = memoryCache.get("")
     if (cached != null) {
       return cached
     }
@@ -149,7 +149,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
 
     renderShortTextComplication(bitmapCanvas, rect, data)
 
-    bitmapCache.set("", bitmap)
+    memoryCache.put("", bitmap)
 
     return bitmap
   }
@@ -165,12 +165,12 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
       p2.typeface = context.resources.getFont(R.font.m8stealth57)
       p2.textSize = 8f
-      canvas.drawText(
-        "r ${bitmapCache.loads} w ${bitmapCache.renders}",
-        bounds.left + 3f,
-        bounds.bottom - 3f,
-        p2,
-      )
+//      canvas.drawText(
+//        "r ${bitmapCache.loads} w ${bitmapCache.renders}",
+//        bounds.left + 3f,
+//        bounds.bottom - 3f,
+//        p2,
+//      )
     }
   }
 
@@ -253,7 +253,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     loadDrawablesAsynchronous: Boolean
   ) {
     data = complicationData
-    bitmapCache.set("", null)
+    memoryCache.remove("")
   }
 }
 
