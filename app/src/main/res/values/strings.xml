@@ -14,16 +14,18 @@
      limitations under the License.
 -->
 <resources>
-  <string name="app_name" translatable="false">m8face</string>
+  <string name="app_name" translatable="false">M8</string>
 
-  <string name="analog_watch_face_name" translatable="false">m8face</string>
+  <string name="watch_face_name" translatable="false">M8</string>
 
   <!-- Name of watchface style category for selecting the color theme [CHAR LIMIT=20] -->
+  <string name="layout_style_setting">Layout Style</string>
   <string name="color_style_setting">Color</string>
   <string name="ambient_style_setting">Ambient Style</string>
   <string name="seconds_style_setting">Seconds Indicator</string>
 
   <!-- Subtitle for the menu option to select the watch face color theme -->
+  <string name="layout_style_setting_description">Layout Style</string>
   <string name="color_style_setting_description">Color scheme</string>
   <string name="ambient_style_setting_description">Ambient mode style</string>
   <string name="seconds_style_setting_description">Seconds indicator style</string>
@@ -75,19 +77,40 @@
   <string name="snow_style_name">Snow</string>
   <string name="onyx_style_name">Onyx</string>
 
-  <string name="outline_ambient_style_name">Outline</string>
-  <string name="bold_outline_ambient_style_name">Bold</string>
-  <string name="filled_ambient_style_name">Filled</string>
+  <string name="outline_ambient_style_name">Outline I</string>
+  <string name="big_outline_ambient_style_name">Outline II</string>
+  <string name="bold_outline_ambient_style_name">Bold I</string>
+  <string name="big_bold_outline_ambient_style_name">Bold II</string>
+  <string name="filled_ambient_style_name">Filled I</string>
+  <string name="big_filled_ambient_style_name">Filled II</string>
+  <string name="detailed_ambient_style_name">Detailed</string>
 
   <string name="none_seconds_style_name">None</string>
   <string name="dashes_seconds_style_name">Dashes</string>
   <string name="dots_seconds_style_name">Dots</string>
 
 
+  <string name="hour_complication_name">Hours</string>
+  <string name="minute_complication_name">Minutes</string>
+
   <string name="left_complication_name">Left</string>
   <string name="right_complication_name">Right</string>
+
   <string name="top_complication_name">Top</string>
   <string name="bottom_complication_name">Bottom</string>
+
+  <string name="top_left_complication_name">Top Left</string>
+  <string name="bottom_left_complication_name">Bottom Left</string>
+  <string name="top_right_complication_name">Top Right</string>
+  <string name="bottom_right_complication_name">Bottom Right</string>
+
+
+  <string name="info1_layout_style_name">Info I</string>
+  <string name="info2_layout_style_name">Info II</string>
+  <string name="info3_layout_style_name">Info III</string>
+  <string name="info4_layout_style_name">Info IV</string>
+  <string name="focus_layout_style_name">Focus</string>
+  <string name="sport_layout_style_name">Sport</string>
 
 
   <!--    <string name="light_coral_style_name">Light Coral</string>-->
@@ -126,12 +149,16 @@
   <string name="watchface_pips_setting">Hour Pips</string>
   <string name="military_time_setting">Military Time</string>
   <string name="big_ambient_setting">Big Ambient</string>
+  <string name="detailed_ambient_setting">Detailed Ambient</string>
+  <string name="debug_setting">Debug</string>
 
   <!-- Subtitle for the menu option to configure if we should draw pips to mark each hour
    on the watch face -->
   <string name="watchface_pips_setting_description">Whether to draw or not</string>
   <string name="military_time_setting_description">Whether to use military instead of standard time</string>
   <string name="big_ambient_setting_description">Use big time on ambient mode</string>
+  <string name="detailed_ambient_setting_description">Show complications on ambient mode</string>
+  <string name="debug_setting_description">&gt;.&gt;</string>
 
   <!-- A menu option to select a widget that lets us configure the length of the watch hands
   [CHAR LIMIT=20] -->

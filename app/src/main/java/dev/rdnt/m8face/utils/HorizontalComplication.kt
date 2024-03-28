@@ -1,21 +1,45 @@
 package dev.rdnt.m8face.utils
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
+import android.util.LruCache
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.withRotation
+import androidx.core.graphics.toRectF
+import androidx.core.graphics.withScale
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
-import androidx.wear.watchface.complications.data.*
+import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.NoDataComplicationData
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
+import kotlin.math.max
+
+private const val debug = false
 
 class HorizontalComplication(private val context: Context) : CanvasComplication {
+  private val memoryCache = LruCache<String, Bitmap>(1)
+
+  init {
+    Log.d("HorizontalComplication", "Constructor ran")
+  }
+
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {
       field = tertiaryColor
@@ -26,20 +50,24 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       prefixPaint.alpha = 100
     }
 
-  var opacity: Float = 1f
-    set(opacity) {
-      field = opacity
+//  var opacity: Float = 1f
+//    set(opacity) {
+//      field = opacity
+//
+//      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, 1f)
+//
+//      textPaint.color = color
+//      titlePaint.color = color
+//
+//      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+//
+//      prefixPaint.color = color
+//      prefixPaint.alpha = 100
+//    }
 
-      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, opacity)
+//  var offsetX: Float = 0f
 
-      textPaint.color = color
-      titlePaint.color = color
-
-      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-
-      prefixPaint.color = color
-      prefixPaint.alpha = 100
-    }
+//  var scale: Float = 1f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -76,116 +104,118 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
   ) {
     if (bounds.isEmpty) return
 
-    when (data.type) {
+    val bitmap = when (data.type) {
       ComplicationType.SHORT_TEXT -> {
-        renderShortTextComplication(canvas, bounds, data as ShortTextComplicationData)
+        drawShortTextComplication(bounds, data as ShortTextComplicationData)
+      }
+
+      ComplicationType.NO_DATA -> {
+        val placeholder = (data as NoDataComplicationData).placeholder
+        if (placeholder != null && placeholder.type == ComplicationType.SHORT_TEXT) {
+          drawShortTextComplication(bounds, placeholder as ShortTextComplicationData)
+        } else {
+          return
+        }
       }
 
       else -> return
+    }
+
+    renderDebug(canvas, bounds.toRectF())
+
+    canvas.drawBitmap(
+      bitmap,
+      bounds.left.toFloat(),
+      bounds.top.toFloat(),
+      Paint(),
+    )
+  }
+
+  private fun drawShortTextComplication(
+    bounds: Rect,
+    data: ShortTextComplicationData
+  ): Bitmap {
+    val cached = memoryCache.get("")
+    if (cached != null) {
+      return cached
+    }
+
+    val bitmap = Bitmap.createBitmap(
+      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    )
+    val bitmapCanvas = Canvas(bitmap)
+
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    renderShortTextComplication(bitmapCanvas, rect, data)
+
+    memoryCache.put("", bitmap)
+
+    return bitmap
+  }
+
+  private fun renderDebug(canvas: Canvas, bounds: RectF) {
+    if (debug) {
+      canvas.drawRect(bounds, Paint().apply {
+        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
+        style = Paint.Style.STROKE
+        strokeWidth = 2f
+      })
+      val p2 = Paint()
+      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
+      p2.typeface = context.resources.getFont(R.font.m8stealth57)
+      p2.textSize = 8f
+//      canvas.drawText(
+//        "r ${bitmapCache.loads} w ${bitmapCache.renders}",
+//        bounds.left + 3f,
+//        bounds.bottom - 3f,
+//        p2,
+//      )
     }
   }
 
   private fun renderShortTextComplication(
     canvas: Canvas,
     bounds: Rect,
-    data: ShortTextComplicationData,
+    data: ShortTextComplicationData
   ) {
     val now = Instant.now()
 
     var text = data.text.getTextAt(context.resources, now).toString().uppercase()
-    if (text == "--") {
-      return
+
+    val title = data.title?.getTextAt(context.resources, now)?.toString()?.uppercase()
+    if (title != null) {
+      text = "$text $title"
     }
 
-    val isBattery =
-      data.dataSource?.className == "com.google.android.clockwork.sysui.experiences.complications.providers.BatteryProviderService"
-
-    val threeDigit = isBattery
-
-    var title: String? = null
     var icon: Bitmap? = null
     var iconBounds = Rect()
+    if (title == null) {
+      val bmpSize = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.55f).toInt()
 
-    if (isBattery) {
-      val drawable = ContextCompat.getDrawable(context, R.drawable.battery_icon_32)!!
-      icon = drawable.toBitmap(
-        (32f / 48f * bounds.height()).toInt(),
-        (32f / 48f * bounds.height()).toInt()
-      )
-      iconBounds =
-        Rect(0, 0, (32f / 48f * bounds.height()).toInt(), (32f / 48f * bounds.height()).toInt())
-    } else if (data.monochromaticImage != null) {
-      val drawable = data.monochromaticImage!!.image.loadDrawable(context)
-      if (drawable != null) {
-        val size = (bounds.width().coerceAtMost(bounds.height()).toFloat() * 0.55f).toInt()
-
-        icon = drawable.toBitmap(size, size)
-        iconBounds = Rect(0, 0, size, size)
-      }
+      icon = data.monochromaticImage?.image?.loadDrawable(context)?.toBitmap(bmpSize, bmpSize)
+      iconBounds = Rect(0, 0, bmpSize, bmpSize)
     }
 
-    var prefixLen = 0
-
-    if (threeDigit) {
-      prefixLen = 3 - text.length
-      text = text.padStart(3, ' ')
-    }
-
-    if (data.title != null && !data.title!!.isPlaceholder()) {
-      title = data.title!!.getTextAt(context.resources, now).toString().uppercase()
-    }
-
-    textPaint.textSize = 24F / 48f * bounds.height()
+    textPaint.textSize = 24F / 186f * canvas.width
 
     val textBounds = Rect()
-
-    if (threeDigit) {
-      textPaint.getTextBounds("000", 0, 3, textBounds)
-    } else {
-      textPaint.getTextBounds(text, 0, text.length, textBounds)
-    }
-
-    val titleBounds = Rect()
-
-    if (title != null) {
-      titlePaint.textSize = textPaint.textSize
-      titlePaint.getTextBounds(title, 0, title.length, titleBounds)
-    }
+    textPaint.getTextBounds(text, 0, text.length, textBounds)
 
     var iconOffsetX = 0f
-    var titleOffsetX = 0f
     var textOffsetX = 0f
 
-    if (title != null) {
-      val width = titleBounds.width() + textBounds.width()
-
-      titleOffsetX = (width - titleBounds.width()).toFloat() / 2f
-      textOffsetX = (width - textBounds.width()).toFloat() / 2f
-
-      titleOffsetX += 6f / 156f * bounds.width()
-      textOffsetX += 6f / 156f * bounds.width()
-    } else if (icon != null) {
+    if (icon != null) {
       val width = iconBounds.width() + textBounds.width()
 
       iconOffsetX = (width - iconBounds.width()).toFloat() / 2f
       textOffsetX = (width - textBounds.width()).toFloat() / 2f
 
-      iconOffsetX += 9f / 156f * bounds.width()
-      textOffsetX += 9f / 156f * bounds.width()
-
-      if (isBattery) {
-        iconOffsetX = iconOffsetX.toInt().toFloat()
-      }
+      iconOffsetX += 9f / 186f * canvas.width
+      textOffsetX += 9f / 186f * canvas.width
     }
 
-    if (title != null) {
-      canvas.drawText(
-        title,
-        bounds.exactCenterX() - titleBounds.width() / 2 - titleOffsetX,
-        bounds.exactCenterY() + titleBounds.height() / 2,
-        titlePaint
-      )
-    } else if (icon != null) {
+    if (title == null && icon != null) {
       val dstRect = RectF(
         bounds.exactCenterX() - iconBounds.width() / 2f - iconOffsetX,
         bounds.exactCenterY() - iconBounds.height() / 2f,
@@ -196,22 +226,10 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       canvas.drawBitmap(icon, iconBounds, dstRect, iconPaint)
     }
 
-    if (prefixLen > 0) {
-      val prefix = "".padStart(prefixLen, '0')
-      prefixPaint.textSize = textPaint.textSize
-
-      canvas.drawText(
-        prefix,
-        bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
-        bounds.exactCenterY() + textBounds.height() / 2,
-        prefixPaint
-      )
-    }
-
     canvas.drawText(
       text,
       bounds.exactCenterX() - textBounds.width() / 2 + textOffsetX,
-      bounds.exactCenterY() + textBounds.height() / 2,
+      bounds.exactCenterY() + textPaint.fontSpacing / 2,
       textPaint
     )
   }
@@ -235,6 +253,7 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     loadDrawablesAsynchronous: Boolean
   ) {
     data = complicationData
+    memoryCache.remove("")
   }
 }
 

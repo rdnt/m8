@@ -33,4 +33,4 @@ dependencyResolutionManagement {
 }
 
 include ":app"
-rootProject.name = "m8face"
+rootProject.name = "m8"
