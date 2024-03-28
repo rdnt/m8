@@ -1006,12 +1006,17 @@ class WatchCanvasRenderer(
     }
 
   val timeTextStyle: String
-    get() = when (watchFaceData.ambientStyle.id) {
-      AmbientStyle.OUTLINE.id -> "outline"
-      AmbientStyle.BIG_OUTLINE.id -> "big_outline"
-      AmbientStyle.BOLD_OUTLINE.id -> "bold_outline"
-      AmbientStyle.BIG_BOLD_OUTLINE.id -> "big_bold_outline"
-      else -> "normal"
+    get() = when(isAmbient) {
+      true -> {
+        when (watchFaceData.ambientStyle.id) {
+          AmbientStyle.OUTLINE.id -> "outline"
+          AmbientStyle.BIG_OUTLINE.id -> "big_outline"
+          AmbientStyle.BOLD_OUTLINE.id -> "bold_outline"
+          AmbientStyle.BIG_BOLD_OUTLINE.id -> "big_bold_outline"
+          else -> "normal"
+        }
+      }
+      false -> "normal"
     }
 
   val timeOffsetX: Float
