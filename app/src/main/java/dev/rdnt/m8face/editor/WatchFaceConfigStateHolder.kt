@@ -60,11 +60,11 @@ class WatchFaceConfigStateHolder(
   private lateinit var editorSession: EditorSession
 
   // Keys from Watch Face Data Structure
+  private lateinit var layoutStyleKey: UserStyleSetting.ComplicationSlotsUserStyleSetting
   private lateinit var colorStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var ambientStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var secondsStyleKey: UserStyleSetting.ListUserStyleSetting
   private lateinit var militaryTimeKey: UserStyleSetting.BooleanUserStyleSetting
-  private lateinit var bigAmbientKey: UserStyleSetting.BooleanUserStyleSetting
 
   val uiState: StateFlow<EditWatchFaceUiState> =
     flow<EditWatchFaceUiState> {
@@ -99,6 +99,10 @@ class WatchFaceConfigStateHolder(
     // Loops through user styles and retrieves user editable styles.
     for (setting in userStyleSchema.userStyleSettings) {
       when (setting.id.toString()) {
+        LAYOUT_STYLE_SETTING -> {
+          layoutStyleKey = setting as UserStyleSetting.ComplicationSlotsUserStyleSetting
+        }
+
         COLOR_STYLE_SETTING -> {
           colorStyleKey = setting as UserStyleSetting.ListUserStyleSetting
         }
@@ -114,10 +118,6 @@ class WatchFaceConfigStateHolder(
         MILITARY_TIME_SETTING -> {
           militaryTimeKey = setting as UserStyleSetting.BooleanUserStyleSetting
         }
-
-        BIG_AMBIENT_SETTING -> {
-          bigAmbientKey = setting as UserStyleSetting.BooleanUserStyleSetting
-        }
       }
     }
   }
@@ -132,6 +132,8 @@ class WatchFaceConfigStateHolder(
 
     Log.d(TAG, "createWatchFacePreview()")
 
+    // actual watch uses this date and not 09:30:36. changed to 22 instead of 10
+    // for military time to be visible
     val instant = LocalDateTime.parse("2020-10-10T22:09:36")
       .atZone(ZoneId.of("UTC"))
       .toInstant()
@@ -145,6 +147,9 @@ class WatchFaceConfigStateHolder(
       complicationsPreviewData
     )
 
+    val layoutStyle =
+      userStyle[layoutStyleKey] as UserStyleSetting.ComplicationSlotsUserStyleSetting.ComplicationSlotsOption
+
     val colorStyle =
       userStyle[colorStyleKey] as UserStyleSetting.ListUserStyleSetting.ListOption
 
@@ -157,26 +162,23 @@ class WatchFaceConfigStateHolder(
     val militaryTime =
       userStyle[militaryTimeKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
 
-    val bigAmbient =
-      userStyle[bigAmbientKey] as UserStyleSetting.BooleanUserStyleSetting.BooleanOption
-
     return UserStylesAndPreview(
+      layoutStyleId = layoutStyle.id.toString(),
       colorStyleId = colorStyle.id.toString(),
       ambientStyleId = ambientStyle.id.toString(),
       secondsStyleId = secondsStyle.id.toString(),
       militaryTime = militaryTime.value,
-      bigAmbient = bigAmbient.value,
       previewImage = bitmap,
     )
   }
 
-  fun setComplication(complicationLocation: Int) {
+  fun setComplication(complicationId: Int) {
     if (launchInProgress) {
       return
     }
     launchInProgress = true
 
-    val complicationSlotId = when (complicationLocation) {
+    val complicationSlotId = when (complicationId) {
       LEFT_COMPLICATION_ID -> {
         LEFT_COMPLICATION_ID
       }
@@ -193,6 +195,42 @@ class WatchFaceConfigStateHolder(
         BOTTOM_COMPLICATION_ID
       }
 
+      COMPLICATIONS_TOP_LEFT_COMPLICATION_ID -> {
+        COMPLICATIONS_TOP_LEFT_COMPLICATION_ID
+      }
+
+      COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID -> {
+        COMPLICATIONS_BOTTOM_LEFT_COMPLICATION_ID
+      }
+
+      COMPLICATIONS_TOP_RIGHT_COMPLICATION_ID -> {
+        COMPLICATIONS_TOP_RIGHT_COMPLICATION_ID
+      }
+
+      COMPLICATIONS_BOTTOM_RIGHT_COMPLICATION_ID -> {
+        COMPLICATIONS_BOTTOM_RIGHT_COMPLICATION_ID
+      }
+
+      FOCUS_LEFT_ICON_COMPLICATION_ID -> {
+        FOCUS_LEFT_ICON_COMPLICATION_ID
+      }
+
+      FOCUS_RIGHT_ICON_COMPLICATION_ID -> {
+        FOCUS_RIGHT_ICON_COMPLICATION_ID
+      }
+
+      RIGHT_TEXT_COMPLICATION_ID -> {
+        RIGHT_TEXT_COMPLICATION_ID
+      }
+
+      HOUR_COMPLICATION_ID -> {
+        HOUR_COMPLICATION_ID
+      }
+
+      MINUTE_COMPLICATION_ID -> {
+        MINUTE_COMPLICATION_ID
+      }
+
       else -> {
         launchInProgress = false
         return
@@ -206,6 +244,28 @@ class WatchFaceConfigStateHolder(
         launchInProgress = false
       }
     )
+  }
+
+  fun setLayoutStyle(layoutStyleId: String) {
+    val userStyleSettingList = editorSession.userStyleSchema.userStyleSettings
+    // TODO @rdnt editorSession.userStyleSchema.rootUserStyleSettings
+
+    // Loops over all UserStyleSettings (basically the keys in the map) to find the setting for
+    // the color style (which contains all the possible options for that style setting).
+    for (userStyleSetting in userStyleSettingList) {
+      if (userStyleSetting.id == UserStyleSetting.Id(LAYOUT_STYLE_SETTING)) {
+        val layoutUserStyleSetting =
+          userStyleSetting as UserStyleSetting.ComplicationSlotsUserStyleSetting
+
+        // Loops over the UserStyleSetting.Option colors (all possible values for the key)
+        // to find the matching option, and if it exists, sets it as the color style.
+        for (layoutOptions in layoutUserStyleSetting.options) {
+          if (layoutOptions.id.toString() == layoutStyleId) {
+            setUserStyleOption(layoutStyleKey, layoutOptions)
+          }
+        }
+      }
+    }
   }
 
   fun setColorStyle(colorStyleId: String) {
@@ -278,13 +338,6 @@ class WatchFaceConfigStateHolder(
     )
   }
 
-  fun setBigAmbient(enabled: Boolean) {
-    setUserStyleOption(
-      bigAmbientKey,
-      UserStyleSetting.BooleanUserStyleSetting.BooleanOption.from(enabled)
-    )
-  }
-
   // Saves User Style Option change back to the back to the EditorSession.
   // Note: The UI widgets in the Activity that can trigger this method (through the 'set' methods)
   // will only be enabled after the EditorSession has been initialized.
@@ -311,12 +364,12 @@ class WatchFaceConfigStateHolder(
   }
 
   data class UserStylesAndPreview(
+    val layoutStyleId: String,
     val colorStyleId: String,
     val ambientStyleId: String,
     val secondsStyleId: String,
     val militaryTime: Boolean,
-    val bigAmbient: Boolean,
-    val previewImage: Bitmap
+    val previewImage: Bitmap,
   )
 
   companion object {

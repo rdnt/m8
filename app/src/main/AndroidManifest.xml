@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright 2020 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,69 +14,71 @@
   limitations under the License.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+  xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature android:name="android.hardware.type.watch" />
+  <uses-feature android:name="android.hardware.type.watch" />
 
-    <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
-    <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA_PRIVILEGED" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+  <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
+  <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA_PRIVILEGED" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission
+    android:name="com.google.android.gms.permission.AD_ID"
+    tools:node="remove" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="false"
-        >
+  <application
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:supportsRtl="false">
 
-        <meta-data
-            android:name="com.google.android.wearable.standalone"
-            android:value="true" />
+    <meta-data
+      android:name="com.google.android.wearable.standalone"
+      android:value="true" />
 
-        <service
-            android:name=".WatchFaceService"
-            android:directBootAware="true"
-            android:exported="true"
-            android:label="@string/analog_watch_face_name"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
-            </intent-filter>
+    <service
+      android:name=".WatchFaceService"
+      android:directBootAware="true"
+      android:exported="true"
+      android:label="@string/watch_face_name"
+      android:permission="android.permission.BIND_WALLPAPER">
+      <intent-filter>
+        <action android:name="android.service.wallpaper.WallpaperService" />
+        <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
+      </intent-filter>
 
-            <meta-data
-                android:name="com.google.android.wearable.watchface.preview"
-                android:resource="@drawable/watch_preview" />
-            <meta-data
-                android:name="com.google.android.wearable.watchface.preview_circular"
-                android:resource="@drawable/watch_preview" />
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/watch_face" />
+      <meta-data
+        android:name="com.google.android.wearable.watchface.preview"
+        android:resource="@drawable/watch_preview" />
+      <meta-data
+        android:name="com.google.android.wearable.watchface.preview_circular"
+        android:resource="@drawable/watch_preview" />
+      <meta-data
+        android:name="android.service.wallpaper"
+        android:resource="@xml/watch_face" />
 
-            <meta-data
-                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
-                android:value="androidx.wear.watchface.editor.action.WATCH_FACE_EDITOR" />
+      <meta-data
+        android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+        android:value="androidx.wear.watchface.editor.action.WATCH_FACE_EDITOR" />
 
-            <meta-data
-                android:name="com.google.android.wearable.watchface.companionBuiltinConfigurationEnabled"
-                android:value="true" />
-        </service>
+      <meta-data
+        android:name="com.google.android.wearable.watchface.companionBuiltinConfigurationEnabled"
+        android:value="true" />
+    </service>
 
-        <activity
-            android:name=".editor.WatchFaceConfigActivity"
-            android:exported="true"
-            android:label="@string/title_activity_watch_face_config">
+    <activity
+      android:name=".editor.WatchFaceConfigActivity"
+      android:exported="true"
+      android:label="@string/title_activity_watch_face_config"
+      android:taskAffinity="dev.rdnt.m8face">
 
-            <intent-filter>
-                <action android:name="androidx.wear.watchface.editor.action.WATCH_FACE_EDITOR" />
+      <intent-filter>
+        <action android:name="androidx.wear.watchface.editor.action.WATCH_FACE_EDITOR" />
 
-                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-    </application>
+        <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
+  </application>
 </manifest>

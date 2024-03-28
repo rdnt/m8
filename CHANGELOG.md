@@ -1,4 +1,13 @@
-Last updated: 2023-11-25
+Last updated: 2024-03-25
+
+- v3.0.2-alpha
+  - Use single animator to help avoid data races/bugs
+
+- v3.0.1-alpha
+  - Use LruCache instead of BitmapCache
+
+- v3.0.0-alpha
+  - Dynamic layouts
 
 - v2.12.1
   - Remove heartrate complication prefix style
