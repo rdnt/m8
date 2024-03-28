@@ -2,25 +2,18 @@ package dev.rdnt.m8face.utils
 
 import android.content.Context
 import android.graphics.*
-import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.toRect
-import androidx.core.graphics.withScale
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
 import androidx.wear.watchface.complications.data.*
-import dev.rdnt.m8face.BitmapCacheEntry
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
 
-private const val debug = false
-
 class VerticalComplication(private val context: Context) : CanvasComplication {
-  private val bitmapCache: BitmapCacheEntry = BitmapCacheEntry()
+  private val renderer = ComplicationRenderer()
 
   var tertiaryColor: Int = Color.parseColor("#8888bb")
     set(tertiaryColor) {
@@ -30,24 +23,8 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
       iconPaint.colorFilter = PorterDuffColorFilter(tertiaryColor, PorterDuff.Mode.SRC_IN)
       prefixPaint.color = tertiaryColor
       prefixPaint.alpha = 100
+      renderer.reset()
     }
-
-//  var opacity: Float = 1f
-//    set(opacity) {
-//      field = opacity
-//
-//      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, 1f)
-//      textPaint.color = color
-//      titlePaint.color = color
-//
-//      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-////      imagePaint.alpha = (opacity * 255).toInt()
-//
-//      prefixPaint.color = color
-//      prefixPaint.alpha = 100
-//    }
-
-//  var scale: Float = 1f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -88,144 +65,35 @@ class VerticalComplication(private val context: Context) : CanvasComplication {
   ) {
     if (bounds.isEmpty) return
 
-    val bitmap: Bitmap
+    val data = if (data.type == ComplicationType.NO_DATA) {
+      val placeholder = (data as NoDataComplicationData).placeholder
+      placeholder ?: data
+    } else {
+      data
+    }
 
-    when (data.type) {
+    val bitmap = when (data.type) {
       ComplicationType.SHORT_TEXT -> {
-        bitmap = drawShortTextComplication(bounds, data as ShortTextComplicationData)
+        renderer.render<ShortTextComplicationData>(bounds, data, ::renderShortTextComplication)
       }
 
       ComplicationType.MONOCHROMATIC_IMAGE -> {
-        bitmap = drawMonochromaticImageComplication(
-          bounds,
-          data as MonochromaticImageComplicationData
-        )
+        renderer.render<MonochromaticImageComplicationData>(bounds, data, ::renderMonochromaticImageComplication)
       }
 
       ComplicationType.SMALL_IMAGE -> {
-        bitmap = drawSmallImageComplication(bounds, data as SmallImageComplicationData)
+        renderer.render<SmallImageComplicationData>(bounds, data, ::renderSmallImageComplication)
       }
 
       else -> return
     }
 
-//    canvas.withScale(scale, scale, canvas.width/2f, canvas.height/2f) {
-      renderDebug(canvas, bounds)
-
-      canvas.drawBitmap(
-        bitmap,
-        bounds.left.toFloat(),
-        bounds.top.toFloat(),
-        Paint(),
-//        Paint().apply { alpha = (opacity * 255).toInt() },
-      )
-//    }
-  }
-
-  private fun drawShortTextComplication(
-    bounds: Rect,
-    data: ShortTextComplicationData
-  ): Bitmap {
-    val hash = "${bounds},${data.text},${data.title},${data.monochromaticImage?.image?.resId},${tertiaryColor},${debug}"
-
-    // TODO: fix as done in HorizontalComplication
-//    val cached = bitmapCache.get(hash)
-//    if (cached != null) {
-//      return cached
-//    }
-
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+    canvas.drawBitmap(
+      bitmap,
+      bounds.left.toFloat(),
+      bounds.top.toFloat(),
+      Paint(),
     )
-    val bitmapCanvas = Canvas(bitmap)
-
-    val rect = Rect(0, 0, bitmap.width, bitmap.height)
-
-    renderShortTextComplication(bitmapCanvas, rect, data)
-
-    bitmapCache.set(hash, bitmap)
-
-    return bitmap
-  }
-
-  private fun drawMonochromaticImageComplication(
-    bounds: Rect,
-    data: MonochromaticImageComplicationData
-  ): Bitmap {
-    val hash = "${bounds},${data.monochromaticImage.image.resId},${tertiaryColor},${debug}"
-
-    val cached = bitmapCache.get(hash)
-    if (cached != null) {
-      return cached
-    }
-
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(bitmap)
-
-    val rect = Rect(0, 0, bitmap.width, bitmap.height)
-
-    renderMonochromaticImageComplication(bitmapCanvas, rect, data)
-
-    renderDebug(bitmapCanvas, rect)
-
-    bitmapCache.set(hash, bitmap)
-
-    return bitmap
-  }
-
-  private fun drawSmallImageComplication(
-    bounds: Rect,
-    data: SmallImageComplicationData
-  ): Bitmap {
-    val hash = "${bounds},${data.smallImage.image.resId},${tertiaryColor},${debug}"
-
-    val cached = bitmapCache.get(hash)
-    if (cached != null) {
-      return cached
-    }
-
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(bitmap)
-
-    val rect = Rect(0, 0, bitmap.width, bitmap.height)
-
-    renderSmallImageComplication(bitmapCanvas, rect, data)
-
-    renderDebug(bitmapCanvas, rect)
-
-    bitmapCache.set(hash, bitmap)
-
-    return bitmap
-  }
-
-  private fun renderDebug(canvas: Canvas, bounds: Rect) {
-    if (debug) {
-      canvas.drawRect(bounds, Paint().apply {
-        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
-        style = Paint.Style.STROKE
-        strokeWidth = 2f
-      })
-      val p2 = Paint()
-      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
-      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-      p2.textSize = 8f
-      canvas.drawText(
-        "r ${bitmapCache.loads}",
-        bounds.left + 3f,
-        bounds.bottom - 12f,
-        p2,
-      )
-      canvas.drawText(
-        "w ${bitmapCache.renders}",
-        bounds.left + 3f,
-        bounds.bottom - 3f,
-        p2,
-      )
-    }
   }
 
   private fun renderShortTextComplication(

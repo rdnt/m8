@@ -9,16 +9,8 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.Log
-import android.util.LruCache
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.toRectF
-import androidx.core.graphics.withScale
 import androidx.wear.watchface.CanvasComplication
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.RenderParameters
@@ -29,12 +21,9 @@ import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import dev.rdnt.m8face.R
 import java.time.Instant
 import java.time.ZonedDateTime
-import kotlin.math.max
-
-private const val debug = false
 
 class HorizontalComplication(private val context: Context) : CanvasComplication {
-  private val memoryCache = LruCache<String, Bitmap>(1)
+  private val renderer = ComplicationRenderer()
 
   init {
     Log.d("HorizontalComplication", "Constructor ran")
@@ -48,26 +37,8 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
       iconPaint.colorFilter = PorterDuffColorFilter(tertiaryColor, PorterDuff.Mode.SRC_IN)
       prefixPaint.color = tertiaryColor
       prefixPaint.alpha = 100
+      renderer.reset()
     }
-
-//  var opacity: Float = 1f
-//    set(opacity) {
-//      field = opacity
-//
-//      val color = ColorUtils.blendARGB(Color.TRANSPARENT, tertiaryColor, 1f)
-//
-//      textPaint.color = color
-//      titlePaint.color = color
-//
-//      iconPaint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-//
-//      prefixPaint.color = color
-//      prefixPaint.alpha = 100
-//    }
-
-//  var offsetX: Float = 0f
-
-//  var scale: Float = 1f
 
   private val textPaint = Paint().apply {
     isAntiAlias = true
@@ -104,24 +75,20 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
   ) {
     if (bounds.isEmpty) return
 
+    val data = if (data.type == ComplicationType.NO_DATA) {
+      val placeholder = (data as NoDataComplicationData).placeholder
+      placeholder ?: data
+    } else {
+      data
+    }
+
     val bitmap = when (data.type) {
       ComplicationType.SHORT_TEXT -> {
-        drawShortTextComplication(bounds, data as ShortTextComplicationData)
-      }
-
-      ComplicationType.NO_DATA -> {
-        val placeholder = (data as NoDataComplicationData).placeholder
-        if (placeholder != null && placeholder.type == ComplicationType.SHORT_TEXT) {
-          drawShortTextComplication(bounds, placeholder as ShortTextComplicationData)
-        } else {
-          return
-        }
+        renderer.render<ShortTextComplicationData>(bounds, data, ::renderShortTextComplication)
       }
 
       else -> return
     }
-
-    renderDebug(canvas, bounds.toRectF())
 
     canvas.drawBitmap(
       bitmap,
@@ -131,54 +98,13 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     )
   }
 
-  private fun drawShortTextComplication(
-    bounds: Rect,
-    data: ShortTextComplicationData
-  ): Bitmap {
-    val cached = memoryCache.get("")
-    if (cached != null) {
-      return cached
-    }
-
-    val bitmap = Bitmap.createBitmap(
-      bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
-    )
-    val bitmapCanvas = Canvas(bitmap)
-
-    val rect = Rect(0, 0, bitmap.width, bitmap.height)
-
-    renderShortTextComplication(bitmapCanvas, rect, data)
-
-    memoryCache.put("", bitmap)
-
-    return bitmap
-  }
-
-  private fun renderDebug(canvas: Canvas, bounds: RectF) {
-    if (debug) {
-      canvas.drawRect(bounds, Paint().apply {
-        this.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
-        style = Paint.Style.STROKE
-        strokeWidth = 2f
-      })
-      val p2 = Paint()
-      p2.color = ColorUtils.blendARGB(Color.TRANSPARENT, Color.parseColor("#aa02d7f2"), 1f)
-      p2.typeface = context.resources.getFont(R.font.m8stealth57)
-      p2.textSize = 8f
-//      canvas.drawText(
-//        "r ${bitmapCache.loads} w ${bitmapCache.renders}",
-//        bounds.left + 3f,
-//        bounds.bottom - 3f,
-//        p2,
-//      )
-    }
-  }
-
   private fun renderShortTextComplication(
     canvas: Canvas,
     bounds: Rect,
-    data: ShortTextComplicationData
+    complData: ComplicationData
   ) {
+    val data = complData as ShortTextComplicationData
+
     val now = Instant.now()
 
     var text = data.text.getTextAt(context.resources, now).toString().uppercase()
@@ -253,7 +179,6 @@ class HorizontalComplication(private val context: Context) : CanvasComplication 
     loadDrawablesAsynchronous: Boolean
   ) {
     data = complicationData
-    memoryCache.remove("")
   }
 }
 

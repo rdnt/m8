@@ -16,13 +16,20 @@
 package dev.rdnt.m8face.utils
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
+import android.util.Log
+import android.util.LruCache
 import androidx.wear.watchface.CanvasComplicationFactory
 import androidx.wear.watchface.ComplicationSlot
 import androidx.wear.watchface.ComplicationSlotsManager
 import androidx.wear.watchface.complications.ComplicationSlotBounds
 import androidx.wear.watchface.complications.DefaultComplicationDataSourcePolicy
 import androidx.wear.watchface.complications.SystemDataSources
+import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.style.CurrentUserStyleRepository
 import dev.rdnt.m8face.R
@@ -819,4 +826,50 @@ fun createComplicationSlotManager(
       textComplication,
     ), currentUserStyleRepository
   )
+}
+
+class ComplicationRenderer {
+  val bmpCache = LruCache<String, Bitmap>(1)
+  val complCache = LruCache<String, Bitmap>(1)
+
+  fun reset() {
+    complCache.evictAll()
+  }
+
+  inline fun <reified T : ComplicationData> render(
+    bounds: Rect,
+    data: ComplicationData,
+    renderer: (canvas: Canvas, bounds: Rect, data: T) -> Unit
+  ): Bitmap {
+    val cacheKey = "${bounds.hashCode()},${data.hashCode()}"
+
+    val cached = complCache.get(cacheKey)
+    if (cached != null) {
+      return cached
+    }
+
+    val bmpKey = "${bounds.hashCode()}"
+
+    var bitmap = bmpCache.get(bmpKey)
+    if (bitmap != null) {
+      bitmap.eraseColor(Color.TRANSPARENT)
+    } else {
+      bitmap = Bitmap.createBitmap(
+        bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888
+      )
+      bmpCache.put(bmpKey, bitmap)
+    }
+
+    val bitmapCanvas = Canvas(bitmap)
+    val rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+    (data as? T)?.let {
+      renderer(bitmapCanvas, rect, it)
+    }
+
+    complCache.put(cacheKey, bitmap)
+
+    return bitmap
+  }
+
 }

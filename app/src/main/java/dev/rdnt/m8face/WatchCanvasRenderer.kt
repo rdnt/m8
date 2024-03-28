@@ -268,8 +268,6 @@ class WatchCanvasRenderer(
   private var isHeadless = false
   private var isAmbient = false
 
-  private var interactiveFrameDelay: Long = 16
-
   private val ambientAnimator =
     ObjectAnimator.ofFloat(drawProperties, DrawProperties.TIME_SCALE, 0f, 1f).apply {
       interpolator = AnimationUtils.loadInterpolator(
@@ -307,6 +305,7 @@ class WatchCanvasRenderer(
             ambientAnimator.removeAllListeners()
             ambientAnimator.cancel()
             drawProperties.timeScale = 0f
+            interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
           } else {
             interactiveDrawModeUpdateDelayMillis = 16
 
@@ -320,6 +319,14 @@ class WatchCanvasRenderer(
         }
       }
     }
+  }
+
+  private val interactiveFrameDelay: Long
+  get() = when (watchFaceData.secondsStyle.id) {
+    SecondsStyle.NONE.id -> if (shouldDrawSeconds) 1000 else 60000
+    SecondsStyle.DASHES.id -> 16
+    SecondsStyle.DOTS.id -> 16
+    else -> 1000
   }
 
   private val memoryCache: LruCache<String, Bitmap> = LruCache<String, Bitmap>(485)
@@ -490,13 +497,9 @@ class WatchCanvasRenderer(
 
       is24Format = watchFaceData.militaryTime
 
-      interactiveFrameDelay = when (watchFaceData.secondsStyle.id) {
-        SecondsStyle.NONE.id -> if (shouldDrawSeconds) 1000 else 60000
-        SecondsStyle.DASHES.id -> 16
-        SecondsStyle.DOTS.id -> 16
-        else -> 1000
+      if (!ambientAnimator.isRunning) {
+        interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
       }
-      interactiveDrawModeUpdateDelayMillis = interactiveFrameDelay
 
       // TODO: update colors for all elements here
 
@@ -690,7 +693,7 @@ class WatchCanvasRenderer(
 
     tmpCanvas.setBitmap(null)
 
-    return bmp//.asShared()
+    return bmp.asShared()
   }
 
   private fun preloadHourBitmaps(canvas: Canvas, scale: Float) {
@@ -1211,7 +1214,7 @@ class WatchCanvasRenderer(
     }
 
     if (debugTiming) {
-      Log.d("WatchCanvasRenderer", "render took ${took.toFloat() / 1000000.0}ms, cache ${memoryCache.size()} / ${memoryCache.maxSize()}")
+      Log.d("WatchCanvasRenderer.timing", "${took.toFloat() / 1000000.0}ms")
     }
   }
 
